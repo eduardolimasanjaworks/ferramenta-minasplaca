@@ -1,0 +1,168 @@
+{
+  "resumo": {
+    "ok": 9,
+    "total": 9
+  },
+  "resultados": [
+    {
+      "nome": "Localização — vazio + cidade válida",
+      "ok": true,
+      "turnos": [
+        {
+          "passo": 1,
+          "user": "pode falar",
+          "resposta": "Show de bola, parceiro! Então, você está disponível (vazio) ou já está carregado?",
+          "ferramentas": [],
+          "ok": true,
+          "problemas": []
+        },
+        {
+          "passo": 2,
+          "user": "to vazio",
+          "resposta": "Perfeito! Como você está vazio, já está disponível para carregar, Pra gente conseguir uma carga bem pertinho, preciso que me envie sua 'Localização Atual' aqui no whatsapp, Faz assim ó:, 1️⃣ Toque no clipe 📎, 2️⃣ Selecione Localização, 3️⃣ Escolha 'Localização atual', Se não conseguir, pode escrever o nome da cidade e estado mesmo!",
+          "ferramentas": [],
+          "ok": true,
+          "problemas": []
+        },
+        {
+          "passo": 3,
+          "user": "Campinas SP",
+          "resposta": "Show de bola, parceiro! Dados atualizados aqui, Boa viagem e vai com Deus!",
+          "ferramentas": [
+            "registrar_disponibilidade"
+          ],
+          "ok": true,
+          "problemas": []
+        }
+      ]
+    },
+    {
+      "nome": "Localização — referência vaga",
+      "ok": true,
+      "turnos": [
+        {
+          "passo": 1,
+          "user": "to perto do posto na rodovia",
+          "resposta": "Desculpe, o sistema não reconhece esse ponto de referência, Preciso que escreva o nome da CIDADE e ESTADO onde você está (ou mande a localização pelo clipe)",
+          "ferramentas": [],
+          "ok": true,
+          "problemas": []
+        }
+      ]
+    },
+    {
+      "nome": "Disponibilidade via menu",
+      "ok": true,
+      "turnos": [
+        {
+          "passo": 1,
+          "user": "disponibilidade",
+          "resposta": "Show de bola, parceiro! Então, você está disponível (vazio) ou já está carregado?",
+          "ferramentas": [],
+          "ok": true,
+          "problemas": []
+        }
+      ]
+    },
+    {
+      "nome": "Cadastro — inicia coleta CNH",
+      "ok": true,
+      "turnos": [
+        {
+          "passo": 1,
+          "user": "quero me cadastrar",
+          "resposta": "Que ótimo que tem interesse! Para começar, manda a foto da sua CNH por favor",
+          "ferramentas": [],
+          "ok": true,
+          "problemas": []
+        }
+      ]
+    },
+    {
+      "nome": "Cadastro — rejeita texto no lugar de foto",
+      "ok": true,
+      "turnos": [
+        {
+          "passo": 1,
+          "user": "minha cnh é 12345678901",
+          "resposta": "Desculpe, não ficou claro, Por favor, envie a foto da sua CNH para darmos andamento no cadastro",
+          "ferramentas": [],
+          "ok": true,
+          "problemas": []
+        }
+      ]
+    },
+    {
+      "nome": "Cadastro — recebe imagem CNH",
+      "ok": true,
+      "turnos": [
+        {
+          "passo": 1,
+          "user": "[motorista enviou imagem CNH]",
+          "resposta": "Recebi seu arquivo com sucesso, Obrigado! , Agora preciso da foto do CRLV do cavalo",
+          "ferramentas": [
+            "grava_ocr"
+          ],
+          "ok": true,
+          "problemas": []
+        }
+      ]
+    },
+    {
+      "nome": "Negociação — aceite direto",
+      "ok": true,
+      "turnos": [
+        {
+          "passo": 1,
+          "user": "fechou pode mandar",
+          "resposta": "Show de bola, já anotei, a equipe te chama, boa viagem!",
+          "ferramentas": [
+            "resposta_oferta_carga"
+          ],
+          "ok": true,
+          "problemas": []
+        }
+      ]
+    },
+    {
+      "nome": "Negociação — contraproposta e fechamento",
+      "ok": true,
+      "turnos": [
+        {
+          "passo": 1,
+          "user": "só faço por 5000",
+          "resposta": "O valor máximo que podemos oferecer é R$ 4.500,00, Você aceita nesse valor?",
+          "ferramentas": [],
+          "ok": true,
+          "problemas": []
+        },
+        {
+          "passo": 2,
+          "user": "e se for 4350?",
+          "resposta": "Podemos fechar por R$ 4.350,00, Vou registrar esse valor, Obrigado!",
+          "ferramentas": [
+            "resposta_oferta_carga"
+          ],
+          "ok": true,
+          "problemas": []
+        }
+      ]
+    },
+    {
+      "nome": "Negociação — recusa",
+      "ok": true,
+      "turnos": [
+        {
+          "passo": 1,
+          "user": "não rola essa não",
+          "resposta": "Combinado, fica para a próxima, boa viagem,",
+          "ferramentas": [
+            "resposta_oferta_carga"
+          ],
+          "ok": true,
+          "problemas": []
+        }
+      ]
+    }
+  ]
+}

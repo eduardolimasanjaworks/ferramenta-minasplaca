@@ -1,0 +1,4988 @@
+[
+  {
+    "texto": "Ok",
+    "intencao": "encerramento",
+    "encerramento": true,
+    "ocorrencias": 1130
+  },
+  {
+    "texto": "Bom dia",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 805
+  },
+  {
+    "texto": "Boa tarde",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 416
+  },
+  {
+    "texto": "👍",
+    "intencao": "encerramento",
+    "encerramento": true,
+    "ocorrencias": 328
+  },
+  {
+    "texto": "blz",
+    "intencao": "encerramento",
+    "encerramento": true,
+    "ocorrencias": 280
+  },
+  {
+    "texto": "Obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 263
+  },
+  {
+    "texto": "Boa noite",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 201
+  },
+  {
+    "texto": "Sim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 179
+  },
+  {
+    "texto": "Oi",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 99
+  },
+  {
+    "texto": "opa",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 99
+  },
+  {
+    "texto": "🤝",
+    "intencao": "encerramento",
+    "encerramento": true,
+    "ocorrencias": 98
+  },
+  {
+    "texto": "ok obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 92
+  },
+  {
+    "texto": "?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 83
+  },
+  {
+    "texto": "Esta mensagem foi excluída",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 82
+  },
+  {
+    "texto": "👍🏻",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 78
+  },
+  {
+    "texto": "🙏",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 74
+  },
+  {
+    "texto": "Beleza",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 50
+  },
+  {
+    "texto": "Tudo bem",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 49
+  },
+  {
+    "texto": "Certo",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 45
+  },
+  {
+    "texto": "Obg",
+    "intencao": "encerramento",
+    "encerramento": true,
+    "ocorrencias": 43
+  },
+  {
+    "texto": "Tá bem",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 40
+  },
+  {
+    "texto": "Bom dia Lucas",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 33
+  },
+  {
+    "texto": "Show",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 32
+  },
+  {
+    "texto": "Tudo bem?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 32
+  },
+  {
+    "texto": "Não",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 31
+  },
+  {
+    "texto": "isso",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 30
+  },
+  {
+    "texto": "Opa bom dia",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 30
+  },
+  {
+    "texto": "positivo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 28
+  },
+  {
+    "texto": "tudo certo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 28
+  },
+  {
+    "texto": "Nada",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 27
+  },
+  {
+    "texto": "Tranquilo",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 26
+  },
+  {
+    "texto": "Muito obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 26
+  },
+  {
+    "texto": "Valeu",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 26
+  },
+  {
+    "texto": "Tá bom",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 26
+  },
+  {
+    "texto": "🙏🏼",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 24
+  },
+  {
+    "texto": "Adriano",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 23
+  },
+  {
+    "texto": "Vazio",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 23
+  },
+  {
+    "texto": "Bom dia!",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 22
+  },
+  {
+    "texto": "entendi",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 21
+  },
+  {
+    "texto": "Bom dia Adriano",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 21
+  },
+  {
+    "texto": "Bora",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 20
+  },
+  {
+    "texto": "Tudo bem ?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 20
+  },
+  {
+    "texto": "👍🙏",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 20
+  },
+  {
+    "texto": "Ta bom",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 19
+  },
+  {
+    "texto": "Ta",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 19
+  },
+  {
+    "texto": "Opa boa tarde",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 18
+  },
+  {
+    "texto": "marcado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 17
+  },
+  {
+    "texto": "Combinado",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 17
+  },
+  {
+    "texto": "Blz obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 17
+  },
+  {
+    "texto": "???",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 17
+  },
+  {
+    "texto": "Boa tarde Lucas",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 17
+  },
+  {
+    "texto": "_<Image Message>_",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 17
+  },
+  {
+    "texto": "👍🏽",
+    "intencao": "encerramento",
+    "encerramento": true,
+    "ocorrencias": 16
+  },
+  {
+    "texto": "👍👍",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 16
+  },
+  {
+    "texto": "teste",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 16
+  },
+  {
+    "texto": "🙏🏻",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 15
+  },
+  {
+    "texto": "🔒 Content unavailable (protected message or not yet synced to this device).",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 15
+  },
+  {
+    "texto": "Obrigada",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 15
+  },
+  {
+    "texto": "👍🏼",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 15
+  },
+  {
+    "texto": "❤️",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 15
+  },
+  {
+    "texto": "Alguma novidade",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 15
+  },
+  {
+    "texto": "??",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 14
+  },
+  {
+    "texto": "Por favor",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 14
+  },
+  {
+    "texto": "Oi bom dia",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 14
+  },
+  {
+    "texto": "Blz então",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 14
+  },
+  {
+    "texto": "Pode sim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 14
+  },
+  {
+    "texto": "Tá ok",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 14
+  },
+  {
+    "texto": "Blza",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 14
+  },
+  {
+    "texto": "Fico no aguardo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 13
+  },
+  {
+    "texto": "Pode ser",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 13
+  },
+  {
+    "texto": "oi boa tarde",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 12
+  },
+  {
+    "texto": "Ta ok",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 12
+  },
+  {
+    "texto": "🆗",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 12
+  },
+  {
+    "texto": "Ola",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 12
+  },
+  {
+    "texto": "0k",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 11
+  },
+  {
+    "texto": "👍🤝",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 11
+  },
+  {
+    "texto": "carregado",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 11
+  },
+  {
+    "texto": "Tá certo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 11
+  },
+  {
+    "texto": "Nao",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 11
+  },
+  {
+    "texto": "A blz",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 11
+  },
+  {
+    "texto": "🙏🙏🙏",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 10
+  },
+  {
+    "texto": "Bom diaa",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 10
+  },
+  {
+    "texto": "Sibeli",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 9
+  },
+  {
+    "texto": "No aguardo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 9
+  },
+  {
+    "texto": "Carreta",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 9
+  },
+  {
+    "texto": "Qual valor",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 9
+  },
+  {
+    "texto": "Boa tarde!",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 9
+  },
+  {
+    "texto": "Oii",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 9
+  },
+  {
+    "texto": "Tudo na paz",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 9
+  },
+  {
+    "texto": "Bom dia tudo bem",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 9
+  },
+  {
+    "texto": "Tarde",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 9
+  },
+  {
+    "texto": "🙏👍",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 9
+  },
+  {
+    "texto": "Deu certo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "ainda não",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "Carregamento concluído",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "Marquei",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "Valeu obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "😢",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "Pix",
+    "intencao": "pagamento",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "Vou sim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "TD bem?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "Fala comigo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "Bom dia meu amigo",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "Top",
+    "intencao": "encerramento",
+    "encerramento": true,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "Kkkk",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "Boa tarde Adriano",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "Fala com migo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "Sim sim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "☝🏼",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "Show de bola",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 8
+  },
+  {
+    "texto": "Com certeza",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 7
+  },
+  {
+    "texto": "boa noite sibeli",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 7
+  },
+  {
+    "texto": "Ata",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 7
+  },
+  {
+    "texto": "Ta blz",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 7
+  },
+  {
+    "texto": "Vou ver aqui",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 7
+  },
+  {
+    "texto": "Isso mesmo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 7
+  },
+  {
+    "texto": "Lucas",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 7
+  },
+  {
+    "texto": "👍🏻👍🏻",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 7
+  },
+  {
+    "texto": "🙏👍🏻🙏",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 7
+  },
+  {
+    "texto": "🤝🏻",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 7
+  },
+  {
+    "texto": "Brigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 7
+  },
+  {
+    "texto": "Muito obrigada",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 7
+  },
+  {
+    "texto": "Ai",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 7
+  },
+  {
+    "texto": "Já",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Pois é",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "🙏🏻🙏🏻",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Boa noite Adriano",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Ok Obrigado 🙏",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Obrigado meu amigo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "🤝🤝",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Pode",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Estou no aguardo",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "😂",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Sibeli Rosa:",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Olá",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Claro",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Tou aqui",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Feito",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Bom.dia",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "boa",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Valor",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Vixe",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Bom dia blz",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "😉",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Descarga finalizada",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "👍🏿",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Bom diaaa",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Cavalo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "🙌🏼",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Ta certo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Bom dia !",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 6
+  },
+  {
+    "texto": "Cabo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Teresina",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Claudinei Córdova",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Oiii",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Combinado 🤝",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Pode deixar",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "👆🏼",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Chegada no cliente",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Alguma novidade?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Por nada",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Tá bem obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Tambom 🤗",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "😮",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Bom dia ok",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "????",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Abraço",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Bom   diaaaa",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "👍🏻🤝",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Rj",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Vou verificar",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Bom dia dr",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Showw",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Pode marcar",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Verdade",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Carregamento finalizado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Bom dia, tudo bem?",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "🙏👍🏻",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "🤝😊",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Boa tarde tudo bem",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Ls",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Bom dia doutor!",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Obgd",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 5
+  },
+  {
+    "texto": "Oi Adriano",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Já marquei",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "oi sibeli",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Bradesco",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "ainda",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Tô carregado",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "De nada",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Blz joia",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "👍🏼🤝",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Obrigado Sibeli",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Vamos carregar",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Qual o valor",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Kkkkk",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Arroz",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Tudo tranquilo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Nada ainda",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Tá",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "😁",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Esse mesmo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "PIS",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Ok?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Aguardando Descarga",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "TD bem",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Aguardo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Vai dar certo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Opa boa noite",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "**Sibeli Rosa**:",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Estou a caminho",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Blz então obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Bom dia.",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "🙏👍🏻🙏👍🏻🙏",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Estou vazio aqui",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "￼",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Merece",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Bom dia Lucas!",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Alguma novidade em cabo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Fala ai",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Sibele",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Descarga finalizada ok",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Jacareí",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Estou vazio",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Obrigado!",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Agradeço",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Ah blz",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Na ball",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Aviso sim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Bom dia Lucas, tudo certo?",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "👍 OK obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "👍🏾🙏🏾🚚 obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Extrema X Lages",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Posso carregar a parte de Anápolis para extrema",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Bom dia!\nEstou disponível em Recife, tenho interesse de carregar para o Belém.",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "CV: DBC2B07 \nCR: BAW2F29 \nDouglas Gonçalves da Cunha",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Boa noite tudo bem",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 4
+  },
+  {
+    "texto": "Bom dia sibeli",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "tem programação em cabo?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "manda email",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "MTB 5771",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Pedro Luiz \nMTB 5771",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Cabo x Teresina",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Cnpj",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Oi boa noite",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "25",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Tô aqui",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "tem não",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Igualmente",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Vou tentar",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Tenho sim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Cavalo JZE0C76\nCarreta CLK1G10\nMot valter de Oliveira",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Então",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Descarga finalizada na AmBev Maranhão",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Ok 👍",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Ok blz",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Boa noite \nCheguei",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "4 eixo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Tudo certo ?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Fala Lucas blz",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Tá blz",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Ok muito obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Tudo certo?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Já mando",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Ok, obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Estou resolvendo",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Posi",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Consigo sim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Já sim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Tá na mão",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Estou no cabo vazio",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Se tiver Estância alagoinhas Camaçari",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Estância",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Estou aqui",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Nada ainda?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Ta bem",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Ok tranquilo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Tranquilo então",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "MHN8H32 cavalo carreta Bua2j56 Motorista Jesiel santos de Morais",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Boa tarde vazio",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Assim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Não obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Ja marquei",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Carrega quando?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Pode ser?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Que pena",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Perai",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Blz fico no aguardo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Blz muito obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Vê aí",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "10",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Opa boa",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Estou na Bahia",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Fechou",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Tá pagando quanto",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Carrega quando",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Obrigado pela atenção",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Dailza ferreira coelho",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Qualquer novidade estou por aqui",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Tenho interesse",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Ok obrigado pela atenção",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "🙌🙌🙌🙌",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Sibele boa tarde",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "🙋🏼‍♂️",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Dados da conta: \n\nBanco: 748 - Banco Cooperativo Sicredi S.A. - Bansicredi\n\nAgência: 0109\n\nConta: 22233-9\n\nRazão Social: BRUNO HOLZSCHUH SOUZA\n\nCNPJ: 48.035.035/0001-92",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Não consigo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Bom dia mestre",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "🙏🙏👍🏻",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Boa tarde que Deus te abençoe sempre segue NF para emissão de cte LKR6B60 e JXA7460 jailson dias",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Não consegui marcar",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Não tem grade",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Pra onde ?",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Recife x Teresina",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Qual o valor?",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Vou",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Perfeito",
+    "intencao": "encerramento",
+    "encerramento": true,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Ok boa noite",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "td certo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Estou vazio aq na Ball Recife",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Tá bem então",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Fala Lucas",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Aguardando",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Obrigado boa noite",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Bom dia vazio",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Manda o email",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "cavalo iLT5C96 carreta GVK 24 17",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "☝🏽",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Vamos",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Chegada na AmBev Teresina",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Lages",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "4 eixos",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Tá marcado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Obrigado pelo retorno",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "TMJ",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Ótimo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Tudo Ok.",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Deus abençoe",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Bom dia jovem",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Tá bom obg",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Ah sim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Posso marcar",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Vai sim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Qual valor?",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Eu que agradeço",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Eita",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Eu vou",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Dia",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "A sim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Boa tarde vcs tem carga saindo de jacarei ou caçapava",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Tendi",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Ok\nObrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": ".",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Ja mando",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "No cabo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Frutal X Lages",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Emerson",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Bom  diaaa",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Bom dia,",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "numero do PIX: (11)94110-1964",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "👍🏻🙏",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Qual valor ?",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Segue CRLV CARRETA EOF 5C21",
+    "intencao": "cadastro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Como assim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "👍🏼👍🏼",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Boa tarde !",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Bom dia !!",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "🤝🏼",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 3
+  },
+  {
+    "texto": "Tem alguma viagem",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Só",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "9.500",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Infelizmente não",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Veja aí",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "--\r\n\r\nAdriano - GMX / CargoX",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Sem problema",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "ainda aguardando pra descarregar",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Recife",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "bom dia estou em Recife tem alguma coisa para gente",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "😍",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Meu Pix é meu número do telefone 79996339259 aglailson santos oliveira Itaú",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Esses são os dados da minha conta do Itaú\nItaú Unibanco (341)\nCPF: 72186810506\nAgência: 7493\nConta: 77838-0",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "pedro Luiz",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "**Contact:**\n\n*Name:* Leo Estancia Sousa\n*Number (1):* +55 79 9883-9319",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "baixar CTE",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Leonardo souza Almeida de lima",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "hoje",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "👏👏",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "tem Teresina?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "A blz obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Claudemir Rodrigues         Axy6a54                            Ate9e16                            Atd4f49",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Paga quanto?",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Deu certo?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tô carregando",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Cheguei aqui",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "E",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Esse",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tô sim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pode deixar pra mim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "🫱🏻‍🫲🏼",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Valeu obg",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Até amanhã",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia! Tudo bem",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Cavalo IUG0A46\nCarreta Bwd1843\nMot iris rodrigo severo dos santos",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ta por ai?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Adriano a Petony que pegou a carga",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Adriano estão dizendo que foi a Cargox que venceu o leilão?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Canhotos Alessandro",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Obrigado Adriano",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "OK OBRIGADA",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Sibeli essa carga de Teresina pra Estância é só pra hoje!",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Canhotos Laedson",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vou tentar marcar",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tô aguardando",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "41",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ok então",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Oi deu certo",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Oi boa tarde desculpa tinha esquecido de avisar a minha marcação",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia veículo vazio ok",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Olha aí",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vou ver",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Me manda a ordem de coleta",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Estou aqui no aguardo",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "🤦‍♂️",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Carrega hoje?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Já saiu os agendamentos",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Só pelo carregamento",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "17997385647",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Parei no posto pra abastecer também, daí já imprimi a CTE",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Cheguei agora na ball de cábo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "👏",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Descarga",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia menino",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom trabalho",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Banco Sicredi",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Estou aguardando",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Manhã",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Marcado pra descarregar",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Sim sim estou aguardando descarga",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Hum",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Conseguiu?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "🙏🏻🙏🏻🙏🏻🙏🏻🙏🏻",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ok, obrigado.",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Blza👍",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia Sibele",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa tarde chegada no cliente.",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tem algum problema se tentar marca?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "9500",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Certinho",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Adriano boa noite",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Oxi",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bl",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tá pronto",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Aqui",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Opa boa noite,  nada ainda pra camaçari ou estância amigo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Aguardando cte",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Olá bom dia",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "09679614913",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "João Vitor straubel Rodrigues",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Viamão",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tou aqui em Extrema vazio",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tou aqui em Extrema",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Deu certo ! Cai hj ?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Posso sim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia amigo !!",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Coloca me coloca aí no na data do dia 18 o momento é esse frete aí né fechar nos sete né dá certo mas as diárias",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "tô na portaria",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Em Teresina",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "tô no aguardo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ou sábado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom diia",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ah entendi",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia. Estou no Paraná. Infelizmente não vou poder.",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ok.",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Olha",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ainda estou aqui",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vou la",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "BUENAS",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pf",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "E vc?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "manda bala",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "já ajuda",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Fechado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Poisé",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Correto?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pode manda",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vou avisar ele",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Por gentileza",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia, tudo certo!",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Na parte da tarde",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Estou a disposição",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vou querer",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Obrigada!",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Com ctz",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Sabe me dizer se vai ter carga essa semana?",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Se sair me avise",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "7500",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "VC tem carga no cabo",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Entrei pra carregar",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Estou aqui na ball",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pô favor",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vê aí pô favor",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Preciso abastecer",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Jacareí ou Extrema",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Manda aí",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Não estou conseguindo",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Obrigado igualmente",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Extrema x Anápolis",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Que bom",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Sei",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Gerson",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vou mandar",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ele tem tudo cadastro fretebras",
+    "intencao": "cadastro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Blz obrigado pela atenção",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Proprietário",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa tarde Lucas a Lucas me marca para o Rio aí para nós carregar final de semana desempregar a quinta ou sexta",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tem alguma programação de carga em Extrema-MG ou Jacarei-SP ??",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Blz valeu",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia tudo certo",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Emerson aqui",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "🫡",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "não entendi",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "bom dia vocês tira pallet aqui em Camaçari na ambev",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "tem como enviar aí ordem de coleta extrema Jacareí",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "👆",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "bom dia pessoal",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "bom dia Adriano tudo bem",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Opa bom dia, tudo certo?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Motorista sou eu Telmo Luis",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "CNPJ pix",
+    "intencao": "pagamento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vai aparecer BH multimarcas",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Lucas Ximendes\n\n🚨🚨🚨🚛🚛🚛🚛🚛🚨🚨🚨\n\nCARGAS DISPONÍVEIS - ARROZ GRANEL\n\nARROZEIRA PELOTAS X ITAPISSUMA\n\n🚨🚨🚨🚛🚛🚛🚛🚛🚨🚨🚨",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pelotas",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Qual o valor de frutal Lages",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Nada de agenda?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "bem tbm",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia que Deus te abençoe sempre",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "🙏🙏",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Senhor motorista WILSON, seu cadastro na portaria da Ball para AB MARANHA foi registrado com sucesso, código de marcação (888227)",
+    "intencao": "cadastro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vou ver com ele",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vazio em Maceió",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Sim marcado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia amiga!",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vc tá tendo carga no Cabo",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Blzz",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa noite meu amigo",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Estou em Teresina",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ptz",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "🙌",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Estância?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pois e",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Fazendo um favor",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ta ok obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pra carregar quando?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "**Location:**\n\n*Latitude:* -31.6821717 \n*Longitude:* -52.4476933 \n*URL:* https://www.google.com/maps/search/?api=1&query=-31.6821717,-52.4476933",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "td bem e vc?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vazio 🤝",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pra vc também",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "🙏🏼🤝",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Deu certo ?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vou tentar carregar",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boaa tarde",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ja estamos no cliente",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Não sei de ninguém",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Fala Lucas!",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa noite Lucas",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Amanhã?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Te aviso",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vou te avisando",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Fala a boa",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tudo bem graças a Deus",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Também",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Sexta feira",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Daí mestre",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Extrema lages",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tá joia",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Posso marcar amanhã cedo?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "To no rastriador ainda",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "consta no sistema da ANTT que o senhor tem uma viagem com CIOT em aberto",
+    "intencao": "cadastro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Nao tô conseguindo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ok entao",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Diaria nao da pra paga as contas pendente que tenho nao",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "800",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vc também 🤝😊",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Continua do mesmo jeito",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "🫡🫡🫡",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Maravilha",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Sandoval Rodrigues Barros",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "ja",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Entrega finalizada.\nFavor encerrar manifesto.",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "🤦🏽‍♂",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia.\nPor favor me envia uma ordem de coleta pra eu tentar carregar os paletes Teresina x Cabo.",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tá longe né.\nE tem alguma coisa pra hoje ou amanhã?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Aparecido Fonseca Pereira",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Consegui",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Muito obrigado Adriano",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa noite descarga concluída",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Deu certo adriano",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Estou desde de manhã aqui",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Kkk",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Opaa",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Quanto tá pagando",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "DAO8D98",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "CUC-6H49",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Carlos Alberto de Toledo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Quanto tá pagando?",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pra carregar",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Leandro Felipe Machado flores",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Leandro de Oliveira flores",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vc tem carga aqui no Cabo pra Estância?",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Muito obrigado! 🙏🏼",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa tarde Lucas não apareceu nada na minha conta cera que deu algum problema e a diária vai entrar hoje continuo no Rio de janeiro estou com pouco dinheiro não tem nada aqui",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia alguma carga disponível em SC ?",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tudo bem??",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pra extrema",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Disponível",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ponta grossa",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Saiu programação",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Não tem ponta grossa",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Quanto o rio",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Segunda vou tá em Cachoeirinha",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa tarde meu patrão",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Opaaa",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Eu fiquei para amanhã cedo acabou arroz hj",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Show obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Carregamos com vcs",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Você consegue me enviar por favor o arquivo XML da CTe?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Rogerio Júlio de Souza \nCPF 88753913787\nNts3g77 \nAaw5672",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Anderson Jefferson Kopke cavalo FEI4E87 carreta FRK7G60",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "E salustiano transporte banco sicoob",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "14991973000144",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Saiu carga?",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa tarde Lucas \nDesculpa a demora em responder, minha carreta é Vanderleia",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Uberlândia",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Rio de Janeiro",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa-tarde",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ah positivo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia tudo bem vc tem programação aqui no cabo",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa tarde tudo bem!",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ok obg",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa noite tudo bem eu estou no rio de janeiro pra descarregar amanhã",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia com JESUS",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "**Location:**\n\n*Latitude:* -23.2352828 \n*Longitude:* -47.5150784 \n*URL:* https://www.google.com/maps/search/?api=1&query=-23.2352828,-47.5150784",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Opa tranquilo m.obrigado pela sua atenção qualquer coisa estamos a disposição abs fica com Deus 🙏🙏🙏",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia. \nOi Adriano ou Sibeli tudo bem vcs tem previsão de carregamento aqui por Cabo de Santo Agostinho PE para Estância Sergipe? \nFico no aguardo abs fica com Deus 🙏🙏🙏",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Estou aqui em Curitiba vazio, qualquer novidade eu agradeço",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Até dia 16 do mês que vem tenho que ficar por perto",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Qualquer coisa prende o grito",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Itapissuma",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Obrigado pra você também",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "😂😂😂😂",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pix no celular",
+    "intencao": "pagamento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "61996530164",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Caixa econômica federal \nMarcelo Góes Moreira",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Quanto",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tem previsão de carga aqui em Alagoinhas?",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Fala mano",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tomara",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Beleza joia",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ta bom obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Kkkkkk",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "thiagovenceslau1987@icloud.com",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Sim sim tranquilo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tudo ok",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa noite vazio",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Paulino carvalho de lima filho",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa noite.",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vixi",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Favor da baixa no CTE",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Desculpa",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Desculpa a demora",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Qual",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Olha ai",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "qual o valor do frete",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "**Contact:**\n\n*Name:* Igo Leonardo Bele Ambeve\n*Number (1):* +55 91 8920-5423",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ok no aguardo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pode passar",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Já te mando",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa tarde Lucas, tranquilo?",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Encostado já",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ontem",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Marco antonio moura antunes 082.103.837-01",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Alguma carga",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Esse Itapissuma",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pode ser assim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom diaaaaaaaaaaaa",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ok.\nObrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "**Adriano**:\n6700",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "**Adriano**:\nisso e 5000 paletes voltando",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Fala dr",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bao",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia tudo certo?",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Adeilson Diniz Nogueira \n049.343.546-89 CPF \nFvy1h92 \nTly7a15",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa noite \nAlguma programação em  três rios?",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Consegui  chegar  nos 16 nao? Diesel  aumentou  muito",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Obrigadaaa 😘",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Já estou carregando",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Não tenho",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Estou em fortaleza",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Três rios",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ta certo obg",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tudo bem?!",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia!!",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "A blz então",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "meu pis 1236341212.7",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa noite tudo bom",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tá tendo alguma carga em Fortaleza",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Marcus Vinicius Pereira Amorim \nCPF 81196385149\nCavalo BTS 8g79 \nCarreta JXA4f61",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa tarde descarga finalizada",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Sem problemas",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom descanso",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Isso msm",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ta bem obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia deixei o celular carregando mais tem problema não deixa pra próxima obrigado",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Eu sou o motorista",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Olá! Aqui estão os dados da minha Conta Bradesco.\n\nBanco: 237 - Banco Bradesco S.A.\nAgência: 556\nConta: 54165-6\nCPF: 588.262.036-87\nNome: MARCIO HELENO DA SILVA",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ball",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tem algo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Joia",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Td certo?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bomdia",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Quanto?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Já tá carregando",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Senhor motorista ADERSON, seu cadastro na portaria da Ball para AB LAGES foi registrado com sucesso, codigo de marcacao (874764)",
+    "intencao": "cadastro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Fv passe o pedido Adriano",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Cheg em externa",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "9",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Paga quanto",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom noite",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tem carga",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "É isso aí mesmo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia Lucas blz",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia Eduardo",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "A ta blz",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tudo sim",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "🙌🏼👏🏻",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Acabei de marca",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Sem pedido",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Blz\nObrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vou verificar agora",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Showww",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Ol",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Deu certo??",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Oi bomdiaa",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "É desse jeito poriso cada qual pra si e Deus pra todos não podemos ter do de nigem foda se",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Fechado   sin",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "👍🏻👍🏻👍🏻",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Quanto paga?",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Vlu",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Até agora nada",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "01143347064",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "CPF",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "🤔",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Hoje nao tenho",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "15",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pix 53 981 22 51 51",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Henry kuhn da silva",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pix 480 819 730 87",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia aguardando descarga no cliente ok",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Blz obrigado.",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Blz então obrigado.",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pix \n58.669.021.0001-84\nJosé olimpio de Souza Almeida",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Já sou cadastrado",
+    "intencao": "cadastro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "To do lado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Meu deus",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Alguma programação?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Sim!",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Justamente",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Blz!",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Alguma programação estância?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "razão social: Transberlandi Transp. e Logistica Ltda",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "CNPJ: 27.243.763/0001-10",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Numero banco:  0717 - Sicredi",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Conta corrente: 39573-7",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "numero do PIS shirlei Montanini : 12354020254",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Blz chego no Recife aí conversamos blz obrigado pela atenção",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "**Sibeli Rosa**:\ntemos cabo x maranhão",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "**Sibeli Rosa**:\neu tenho carga p dia 03, 04 e 05/04 consigo nessas cargas pagar 9.500,00 mas são somente nessas cargas que conseguimos negociação com a Ambev",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Opa, tudo bem? Me confirma os valores para Teresina e Maranhão ?",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tudo bem tbm",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Carregamento concluído com sucesso",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Descarregamento concluído com sucesso",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia Adriano\nNo momento não tenho, estou com 01 LS em\nAlagoinhas BA",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pode fazer a reserva",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pix CPF",
+    "intencao": "pagamento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Iai",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "E aí até agora nada",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "😕",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "😞",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "tem carga?",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pedro Luiz da Silva",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "tem programação no cabo?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom-dia",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Pra lages",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Jóia",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Jonathan dias sanhudo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Não tem pedido",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "👀",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Beleza muito obrigado",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia.. no aguardo",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "boa noite bão",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Nao vai ter nada ak na ball",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tem g3 g6 g7",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Estou em Jacareí SP",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Consegue",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Chave pix CPF 439737-79015",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "👏🏼",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Meu patrão",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Thiago",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Tem palete lá pra eu carregar ?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Eu sei",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa tarde,já estou no destino",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "bom dia Adriano ainda tem carga p Terezina pra hoje",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "teste incoming",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa  noite ainda tem São Luís",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Carrega quando ?",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "R",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Beleza então",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia \nTô no SC \nO Rio é fora da minha rota 👍🙏🏼",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia positivo",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia, que preço Joilson",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia meu amigo Lucas",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Chave pix",
+    "intencao": "pagamento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "03002798924",
+    "intencao": "encerramento",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Fabiana Salido belo",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Nubank",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Boa tarde Lucas  tudo bem  por inquanto não estou trabalhando  ok Deus abençoe por lembrar",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Estou no ms",
+    "intencao": "disponibilidade",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Semana que vem vou estar por aí",
+    "intencao": "outro",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Você tem carga Extrema x Lages",
+    "intencao": "negociacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "Bom dia tudo na paz de Deus com você e sua família",
+    "intencao": "saudacao",
+    "encerramento": false,
+    "ocorrencias": 2
+  },
+  {
+    "texto": "🤝🙏👍",
+    "intencao": "encerramento",
+    "encerramento": true,
+    "ocorrencias": 1
+  }
+]

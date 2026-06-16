@@ -1,0 +1,127 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: iagmx_postgres
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:5433:5432'
+    environment:
+      POSTGRES_DB: iagmx
+      POSTGRES_USER: iagmx
+      POSTGRES_PASSWORD: iagmx_secret
+    volumes:
+      - iagmx_pg_data:/var/lib/postgresql/data
+      - ./postgres/init-evolution.sql:/docker-entrypoint-initdb.d/02-evolution.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U iagmx']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: iagmx_redis
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:6380:6379'
+    command: redis-server --appendonly yes
+    volumes:
+      - iagmx_redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Redis só para scripts no host quando o container principal não expõe porta (fallback)
+  redis-host:
+    image: redis:7-alpine
+    container_name: iagmx_redis_local
+    restart: unless-stopped
+    profiles: ['host']
+    ports:
+      - '127.0.0.1:6380:6379'
+    command: redis-server --appendonly yes
+
+  qdrant:
+    image: qdrant/qdrant:v1.12.5
+    container_name: iagmx_qdrant
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:6333:6333'
+    volumes:
+      - iagmx_qdrant_data:/qdrant/storage
+
+  evolution-api:
+    image: evoapicloud/evolution-api:v2.3.7
+    container_name: iagmx_evolution
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:8094:8080'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - iagmx_evolution_instances:/evolution/instances
+    environment:
+      SERVER_TYPE: http
+      SERVER_PORT: 8080
+      SERVER_URL: https://iagmx.sanjaworks.com/evo
+      AUTHENTICATION_API_KEY: iagmx-evolution-key-2026
+      DATABASE_ENABLED: 'true'
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: postgresql://iagmx:iagmx_secret@postgres:5432/evolution?schema=public
+      DATABASE_CONNECTION_CLIENT_NAME: iagmx_evolution
+      DATABASE_SAVE_DATA_INSTANCE: 'true'
+      DATABASE_SAVE_DATA_NEW_MESSAGE: 'true'
+      DATABASE_SAVE_MESSAGE_UPDATE: 'true'
+      DATABASE_SAVE_DATA_CONTACTS: 'true'
+      DATABASE_SAVE_DATA_CHATS: 'true'
+      CACHE_REDIS_ENABLED: 'true'
+      CACHE_REDIS_URI: redis://redis:6379/1
+      CACHE_REDIS_PREFIX_KEY: iagmx_evolution
+      CACHE_REDIS_SAVE_INSTANCES: 'false'
+      CACHE_LOCAL_ENABLED: 'false'
+      WEBHOOK_GLOBAL_ENABLED: 'false'
+
+  app:
+    build: ./app
+    container_name: iagmx_app
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:8095:8095'
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+      evolution-api:
+        condition: service_started
+    environment:
+      EVOLUTION_URL: http://evolution-api:8080
+      EVOLUTION_API_KEY: iagmx-evolution-key-2026
+      EVOLUTION_INSTANCE: gmx-atendimento
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql://iagmx:iagmx_secret@postgres:5432/iagmx
+      QDRANT_URL: http://qdrant:6333
+      DIRECTUS_URL: http://91.99.137.101:8057
+      DIRECTUS_TOKEN: iagmx-1d3382c3bc7ffaff6ca4e00490eac00620b45c9d17eae5ef
+      IAGMX_ADMIN_KEY: iagmx-pausa-2026
+    volumes:
+      - ./.env:/app/.env:ro
+      - "./prompt inicial para avaliarmos dificuldade:/app/prompt-inicial.txt:ro"
+      - ./data:/app/data:ro
+      - /root/gmx/google-oauth-client.json:/app/secrets/google-oauth-client.json:ro
+      - /root/gmx/.google-token.json:/app/secrets/.google-token.json:rw
+
+volumes:
+  iagmx_pg_data:
+  iagmx_redis_data:
+  iagmx_qdrant_data:
+  iagmx_evolution_instances:

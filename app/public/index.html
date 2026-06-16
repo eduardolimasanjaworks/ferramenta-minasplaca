@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — IA Atendimento GMX</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --surface: #151f32;
+      --surface2: #1c2942;
+      --border: #2a3a55;
+      --text: #e8eef7;
+      --muted: #8fa3bf;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --err: #f87171;
+      --radius: 10px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+      --mono: "Cascadia Code", "Fira Code", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    a { color: #7dd3fc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 100vh;
+    }
+    @media (max-width: 860px) {
+      .shell { grid-template-columns: 1fr; }
+      .sidebar { position: sticky; top: 0; z-index: 10; border-right: none; border-bottom: 1px solid var(--border); }
+      .nav { display: flex; overflow-x: auto; padding-bottom: .5rem; }
+      .nav button { white-space: nowrap; flex-shrink: 0; }
+    }
+
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .brand h1 { font-size: 1.05rem; font-weight: 700; letter-spacing: -.02em; }
+    .brand p { font-size: .78rem; color: var(--muted); margin-top: .25rem; }
+    .links { display: flex; flex-direction: column; gap: .35rem; font-size: .82rem; }
+
+    .nav { display: flex; flex-direction: column; gap: .35rem; }
+    .nav button {
+      text-align: left;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      padding: .55rem .75rem;
+      border-radius: 8px;
+      font-size: .875rem;
+      cursor: pointer;
+      transition: .15s;
+    }
+    .nav button:hover { background: var(--surface2); color: var(--text); }
+    .nav button.ativo {
+      background: rgba(59, 130, 246, .15);
+      border-color: rgba(59, 130, 246, .35);
+      color: #bfdbfe;
+      font-weight: 600;
+    }
+
+    .health-mini { margin-top: auto; font-size: .72rem; color: var(--muted); }
+    .chips { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .5rem; }
+    .chip {
+      display: inline-flex; align-items: center; gap: .3rem;
+      padding: .15rem .45rem; border-radius: 999px;
+      background: var(--surface2); font-size: .68rem;
+    }
+    .chip .dot { width: 6px; height: 6px; border-radius: 50%; }
+    .chip .dot.on { background: var(--ok); }
+    .chip .dot.off { background: var(--err); }
+
+    .main { padding: 1.5rem 1.75rem 2.5rem; max-width: 920px; }
+
+    .topbar {
+      display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar h2 { font-size: 1.35rem; font-weight: 700; }
+    .topbar .hint { font-size: .85rem; color: var(--muted); margin-top: .2rem; }
+    .topbar-actions { display: flex; gap: .5rem; align-items: center; }
+
+    .toast {
+      position: fixed; top: 1rem; right: 1rem; z-index: 100;
+      max-width: 360px; padding: .75rem 1rem;
+      border-radius: var(--radius);
+      font-size: .875rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,.45);
+      opacity: 0; transform: translateY(-8px);
+      transition: .25s; pointer-events: none;
+    }
+    .toast.visivel { opacity: 1; transform: translateY(0); }
+    .toast.ok { background: #064e3b; border: 1px solid #059669; color: #a7f3d0; }
+    .toast.erro { background: #450a0a; border: 1px solid #b91c1c; color: #fecaca; }
+    .toast.info { background: #1e3a5f; border: 1px solid #2563eb; color: #bfdbfe; }
+
+    .panel { display: none; animation: fade .2s ease; }
+    .panel.ativo { display: block; }
+    @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .card-head {
+      display: flex; flex-wrap: wrap; gap: .75rem;
+      justify-content: space-between; align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    .card-head h3 { font-size: 1rem; font-weight: 600; }
+    .card-head p { font-size: .82rem; color: var(--muted); margin-top: .25rem; max-width: 52ch; }
+    .meta { font-size: .75rem; color: var(--muted); white-space: nowrap; }
+
+    textarea, input[type="number"] {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: .85rem 1rem;
+      font-size: .875rem;
+      line-height: 1.55;
+    }
+    textarea {
+      min-height: 320px;
+      resize: vertical;
+      font-family: var(--mono);
+      font-size: .8125rem;
+    }
+    textarea.medio { min-height: 160px; }
+    textarea:focus, input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
+
+    .toolbar {
+      display: flex; flex-wrap: wrap; gap: .5rem; align-items: center;
+      margin-top: .85rem;
+    }
+    .toolbar .spacer { flex: 1; }
+    .chars { font-size: .75rem; color: var(--muted); }
+
+    button.btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: .6rem 1.1rem;
+      border-radius: 8px;
+      font-size: .875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    button.btn:hover { background: var(--accent-hover); }
+    button.btn:disabled { opacity: .45; cursor: not-allowed; }
+    button.btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    button.btn-ghost:hover { background: var(--surface2); color: var(--text); }
+    button.btn-warn { background: #92400e; }
+    button.btn-warn:hover { background: #b45309; }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+    .field label { display: block; font-size: .78rem; font-weight: 600; color: #cbd5e1; margin-bottom: .4rem; }
+    .field small { display: block; font-size: .72rem; color: var(--muted); margin-top: .3rem; }
+
+    .toggle {
+      display: flex; align-items: center; gap: .6rem;
+      margin-top: 1rem; font-size: .875rem; color: #cbd5e1;
+    }
+    .toggle input { width: 1rem; height: 1rem; accent-color: var(--accent); }
+
+    .loading-overlay {
+      position: fixed; inset: 0; background: rgba(11,17,32,.7);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 50; font-size: .95rem; color: var(--muted);
+    }
+    .loading-overlay.oculto { display: none; }
+  </style>
+</head>
+<body>
+  <div id="loading" class="loading-overlay">Carregando configurações…</div>
+  <div id="toast" class="toast"></div>
+
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>IA GMX</h1>
+        <p>Painel de configuração</p>
+      </div>
+      <nav class="nav" id="nav">
+        <button type="button" data-panel="prompt" class="ativo">Prompt do sistema</button>
+        <button type="button" data-panel="ocr">Prompt OCR</button>
+        <button type="button" data-panel="envio">Humanização</button>
+        <button type="button" data-panel="tempo">Reatividade</button>
+        <button type="button" data-panel="deploy">Deploy</button>
+      </nav>
+      <div class="links">
+        <a href="/pipeline">Pipeline ao vivo →</a>
+        <a href="/whatsapp">WhatsApp →</a>
+      </div>
+      <div class="health-mini">
+        <span>Serviços</span>
+        <div class="chips" id="healthChips">…</div>
+        <div id="buildInfo" style="margin-top:.5rem"></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <h2 id="panelTitle">Prompt do sistema</h2>
+          <p class="hint" id="panelHint">Cenários, tom de voz e ferramentas da IA</p>
+        </div>
+        <div class="topbar-actions">
+          <button type="button" class="btn btn-ghost" id="btnRecarregar">Recarregar do servidor</button>
+        </div>
+      </div>
+
+      <!-- Prompt sistema -->
+      <section class="panel ativo" id="panel-prompt">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>Prompt completo</h3>
+              <p>Texto que guia todos os cenários. Carregado do banco — edite e salve.</p>
+            </div>
+            <span class="meta" id="metaPrompt">—</span>
+          </div>
+          <textarea id="prompt" spellcheck="false"></textarea>
+          <div class="toolbar">
+            <button type="button" class="btn" id="salvarPrompt">Salvar prompt</button>
+            <button type="button" class="btn btn-ghost" id="restaurarPrompt">Restaurar padrão do servidor</button>
+            <span class="spacer"></span>
+            <span class="chars" id="charsPrompt">0 caracteres</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- OCR -->
+      <section class="panel" id="panel-ocr">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>Leitura de documentos</h3>
+              <p>Instrução enviada ao modelo ao processar CNH, CRLV, ANTT e comprovantes.</p>
+            </div>
+            <span class="meta" id="metaOcr">—</span>
+          </div>
+          <textarea id="promptOcr" class="medio" spellcheck="false"></textarea>
+          <div class="toolbar">
+            <button type="button" class="btn" id="salvarOcr">Salvar prompt OCR</button>
+            <button type="button" class="btn btn-ghost" id="restaurarOcr">Restaurar padrão</button>
+            <span class="spacer"></span>
+            <span class="chars" id="charsOcr">0 caracteres</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Envio -->
+      <section class="panel" id="panel-envio">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>Humanização do envio</h3>
+              <p>Pausas entre bolhas e simulação de "digitando…" via Evolution API.</p>
+            </div>
+          </div>
+          <div class="grid">
+            <div class="field">
+              <label for="delayMin">Delay mínimo entre mensagens (ms)</label>
+              <input type="number" id="delayMin" min="0" step="100" />
+              <small>Tempo mínimo entre cada bolha picotada</small>
+            </div>
+            <div class="field">
+              <label for="delayMax">Delay máximo entre mensagens (ms)</label>
+              <input type="number" id="delayMax" min="0" step="100" />
+            </div>
+            <div class="field">
+              <label for="digMin">Digitando — duração mínima (ms)</label>
+              <input type="number" id="digMin" min="0" step="100" />
+            </div>
+            <div class="field">
+              <label for="digMax">Digitando — duração máxima (ms)</label>
+              <input type="number" id="digMax" min="0" step="100" />
+            </div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="digAtivo" checked />
+            Mostrar "digitando…" antes de cada mensagem
+          </label>
+          <div class="toolbar">
+            <button type="button" class="btn" id="salvarEnvio">Salvar humanização</button>
+            <button type="button" class="btn btn-ghost" id="restaurarEnvio">Restaurar padrão</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tempo -->
+      <section class="panel" id="panel-tempo">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>Reatividade (debounce)</h3>
+              <p>Quanto espera o motorista parar de digitar antes de responder. Efeito imediato.</p>
+            </div>
+          </div>
+          <div class="grid">
+            <div class="field">
+              <label for="debounceMs">Debounce (ms)</label>
+              <input type="number" id="debounceMs" min="300" max="5000" step="100" />
+              <small>Padrão recomendado: 800 ms</small>
+            </div>
+            <div class="field">
+              <label for="debounceWorker">Worker poll (ms)</label>
+              <input type="number" id="debounceWorker" min="100" max="2000" step="50" />
+            </div>
+          </div>
+          <div class="toolbar">
+            <button type="button" class="btn" id="salvarTempo">Salvar tempos</button>
+            <button type="button" class="btn btn-ghost" id="restaurarTempo">Restaurar padrão</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Deploy -->
+      <section class="panel" id="panel-deploy">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>Recarregar processo</h3>
+              <p>Após deploy de código no servidor, reinicia o Node dentro do container (sem derrubar o Docker).</p>
+            </div>
+            <span class="meta" id="metaBuild">build —</span>
+          </div>
+          <div class="toolbar">
+            <button type="button" class="btn btn-warn" id="reloadApp">Recarregar processo agora</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const toastEl = $('toast');
+    const loadingEl = $('loading');
+
+    const jsonHeaders = { 'Content-Type': 'application/json' };
+
+    const panels = {
+      prompt: { title: 'Prompt do sistema', hint: 'Cenários, tom de voz e ferramentas da IA' },
+      ocr: { title: 'Prompt OCR', hint: 'Instrução de leitura de documentos' },
+      envio: { title: 'Humanização', hint: 'Delays e digitando no WhatsApp' },
+      tempo: { title: 'Reatividade', hint: 'Debounce e worker' },
+      deploy: { title: 'Deploy', hint: 'Reload do processo Node' },
+    };
+
+    let padroes = { promptLoaded: '', ocrPadrao: '', envio: null, tempo: null };
+
+    function toast(msg, tipo = 'info') {
+      toastEl.textContent = msg;
+      toastEl.className = 'toast visivel ' + tipo;
+      clearTimeout(toastEl._t);
+      toastEl._t = setTimeout(() => { toastEl.className = 'toast'; }, 4200);
+    }
+
+    function fmtData(iso) {
+      if (!iso) return 'sem registro de alteração';
+      try {
+        return 'Atualizado ' + new Date(iso).toLocaleString('pt-BR');
+      } catch { return ''; }
+    }
+
+    function atualizarChars(el, counterId) {
+      $(counterId).textContent = (el.value.length).toLocaleString('pt-BR') + ' caracteres';
+    }
+
+    async function carregarTudo() {
+      loadingEl.classList.remove('oculto');
+      try {
+        const [rPrompt, rOcr, rEnvio, rTempo] = await Promise.all([
+          fetch('/api/prompt').then(r => r.json()),
+          fetch('/api/config/ocr').then(r => r.json()),
+          fetch('/api/config/envio').then(r => r.json()),
+          fetch('/api/config/tempo').then(r => r.json()),
+        ]);
+
+        $('prompt').value = rPrompt.prompt || '';
+        padroes.promptLoaded = rPrompt.prompt || '';
+        $('metaPrompt').textContent = fmtData(rPrompt.atualizadoEm) + ' · ' + (rPrompt.caracteres || 0).toLocaleString('pt-BR') + ' chars';
+
+        $('promptOcr').value = rOcr.prompt || '';
+        padroes.ocrPadrao = rOcr.padrao || '';
+        $('metaOcr').textContent = fmtData(rOcr.atualizadoEm);
+
+        const c = rEnvio.config || {};
+        padroes.envio = rEnvio.padrao || c;
+        $('delayMin').value = c.delayMinMs ?? 200;
+        $('delayMax').value = c.delayMaxMs ?? 600;
+        $('digMin').value = c.digitandoMinMs ?? 300;
+        $('digMax').value = c.digitandoMaxMs ?? 800;
+        $('digAtivo').checked = c.digitandoAtivo !== false;
+
+        padroes.tempo = rTempo.padrao || rTempo.config;
+        $('debounceMs').value = rTempo.config?.debounceMs ?? 800;
+        $('debounceWorker').value = rTempo.config?.debounceWorkerMs ?? 300;
+        $('metaBuild').textContent = 'build ' + (rTempo.build || '?');
+        $('buildInfo').textContent = 'Build ' + (rTempo.build || '?');
+
+        atualizarChars($('prompt'), 'charsPrompt');
+        atualizarChars($('promptOcr'), 'charsOcr');
+        toast('Configurações carregadas', 'ok');
+      } catch (e) {
+        toast(e.message || 'Erro ao carregar', 'erro');
+      } finally {
+        loadingEl.classList.add('oculto');
+      }
+    }
+
+    async function salvarPrompt() {
+      $('salvarPrompt').disabled = true;
+      try {
+        const res = await fetch('/api/prompt', {
+          method: 'PUT', headers: jsonHeaders,
+          body: JSON.stringify({ prompt: $('prompt').value }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.erro || 'Erro ao salvar');
+        toast(data.mensagem || 'Prompt salvo!', 'ok');
+        padroes.promptLoaded = $('prompt').value;
+        $('metaPrompt').textContent = fmtData(new Date().toISOString()) + ' · ' + $('prompt').value.length.toLocaleString('pt-BR') + ' chars';
+      } catch (e) { toast(e.message, 'erro'); }
+      finally { $('salvarPrompt').disabled = false; }
+    }
+
+    async function salvarOcr() {
+      $('salvarOcr').disabled = true;
+      try {
+        const res = await fetch('/api/config/ocr', {
+          method: 'PUT', headers: jsonHeaders,
+          body: JSON.stringify({ prompt: $('promptOcr').value }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.erro || 'Erro');
+        toast(data.mensagem || 'Prompt OCR salvo!', 'ok');
+        $('metaOcr').textContent = fmtData(new Date().toISOString());
+      } catch (e) { toast(e.message, 'erro'); }
+      finally { $('salvarOcr').disabled = false; }
+    }
+
+    async function salvarEnvio() {
+      $('salvarEnvio').disabled = true;
+      try {
+        const res = await fetch('/api/config/envio', {
+          method: 'PUT', headers: jsonHeaders,
+          body: JSON.stringify({
+            delayMinMs: parseInt($('delayMin').value, 10),
+            delayMaxMs: parseInt($('delayMax').value, 10),
+            digitandoMinMs: parseInt($('digMin').value, 10),
+            digitandoMaxMs: parseInt($('digMax').value, 10),
+            digitandoAtivo: $('digAtivo').checked,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.erro || 'Erro');
+        toast('Humanização salva!', 'ok');
+      } catch (e) { toast(e.message, 'erro'); }
+      finally { $('salvarEnvio').disabled = false; }
+    }
+
+    async function salvarTempo() {
+      $('salvarTempo').disabled = true;
+      try {
+        const res = await fetch('/api/config/tempo', {
+          method: 'PUT', headers: jsonHeaders,
+          body: JSON.stringify({
+            debounceMs: parseInt($('debounceMs').value, 10),
+            debounceWorkerMs: parseInt($('debounceWorker').value, 10),
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.erro || 'Erro');
+        toast(data.mensagem || 'Tempos salvos!', 'ok');
+      } catch (e) { toast(e.message, 'erro'); }
+      finally { $('salvarTempo').disabled = false; }
+    }
+
+    async function reloadApp() {
+      if (!confirm('Reiniciar o processo Node agora?')) return;
+      $('reloadApp').disabled = true;
+      try {
+        const res = await fetch('/api/admin/reload-processo', { method: 'POST', headers: jsonHeaders });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.erro || 'Erro');
+        toast(data.mensagem + ' (build ' + (data.build || '?') + ')', 'ok');
+      } catch (e) { toast(e.message, 'erro'); }
+      finally { $('reloadApp').disabled = false; }
+    }
+
+    async function verificarSaude() {
+      try {
+        const res = await fetch('/health');
+        const data = await res.json();
+        const s = data.servicos || {};
+        const nomes = ['redis', 'postgres', 'qdrant', 'evolution', 'openai', 'groq'];
+        $('healthChips').innerHTML = nomes.map(n => {
+          const ok = s[n];
+          const label = n.charAt(0).toUpperCase() + n.slice(1);
+          return `<span class="chip"><span class="dot ${ok ? 'on' : 'off'}"></span>${label}</span>`;
+        }).join('');
+        if (data.servicos?.provedorAtivo) {
+          $('buildInfo').textContent = 'Build ' + (data.build || '?') + ' · ' + data.servicos.provedorAtivo;
+        }
+      } catch { $('healthChips').textContent = 'offline'; }
+    }
+
+    // Nav tabs
+    document.querySelectorAll('.nav button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.panel;
+        document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('ativo', b === btn));
+        document.querySelectorAll('.panel').forEach(p => p.classList.toggle('ativo', p.id === 'panel-' + id));
+        const p = panels[id];
+        $('panelTitle').textContent = p.title;
+        $('panelHint').textContent = p.hint;
+      });
+    });
+
+    $('prompt').addEventListener('input', () => atualizarChars($('prompt'), 'charsPrompt'));
+    $('promptOcr').addEventListener('input', () => atualizarChars($('promptOcr'), 'charsOcr'));
+
+    $('btnRecarregar').addEventListener('click', carregarTudo);
+    $('salvarPrompt').addEventListener('click', salvarPrompt);
+    $('salvarOcr').addEventListener('click', salvarOcr);
+    $('salvarEnvio').addEventListener('click', salvarEnvio);
+    $('salvarTempo').addEventListener('click', salvarTempo);
+    $('reloadApp').addEventListener('click', reloadApp);
+
+    $('restaurarPrompt').addEventListener('click', () => {
+      if (confirm('Descartar alterações e voltar ao texto carregado do servidor?')) {
+        $('prompt').value = padroes.promptLoaded || '';
+        atualizarChars($('prompt'), 'charsPrompt');
+      }
+    });
+    $('restaurarOcr').addEventListener('click', () => {
+      if (padroes.ocrPadrao && confirm('Restaurar prompt OCR padrão de fábrica?')) {
+        $('promptOcr').value = padroes.ocrPadrao;
+        atualizarChars($('promptOcr'), 'charsOcr');
+      }
+    });
+    $('restaurarEnvio').addEventListener('click', () => {
+      const p = padroes.envio;
+      if (!p) return;
+      $('delayMin').value = p.delayMinMs;
+      $('delayMax').value = p.delayMaxMs;
+      $('digMin').value = p.digitandoMinMs;
+      $('digMax').value = p.digitandoMaxMs;
+      $('digAtivo').checked = p.digitandoAtivo !== false;
+      toast('Valores padrão restaurados — salve para aplicar', 'info');
+    });
+    $('restaurarTempo').addEventListener('click', () => {
+      const p = padroes.tempo;
+      if (!p) return;
+      $('debounceMs').value = p.debounceMs;
+      $('debounceWorker').value = p.debounceWorkerMs;
+      toast('Valores padrão restaurados — salve para aplicar', 'info');
+    });
+
+    carregarTudo();
+    verificarSaude();
+    setInterval(verificarSaude, 20000);
+  </script>
+</body>
+</html>

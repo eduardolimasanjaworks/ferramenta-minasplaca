@@ -1,0 +1,194 @@
+[
+  {
+    "texto": "mudei de carro",
+    "intencao": "troca_veiculo",
+    "acao_recomendada": "perguntar",
+    "nota": "Pode ser cavalo, carreta ou conjunto — pergunte qual e peça CRLV/foto antes de gravar"
+  },
+  {
+    "texto": "troquei o caminhão",
+    "intencao": "troca_veiculo",
+    "acao_recomendada": "perguntar",
+    "nota": "Atualização de CRLV do cavalo ou troca de placa — confirme e peça documento"
+  },
+  {
+    "texto": "peguei outro cavalo",
+    "intencao": "troca_veiculo",
+    "acao_recomendada": "pedir_crlv_cavalo",
+    "nota": "Intenção clara no cavalo — peça foto do CRLV, depois grava_ocr tipo crlv"
+  },
+  {
+    "texto": "comprei caminhão novo",
+    "intencao": "troca_veiculo",
+    "acao_recomendada": "perguntar",
+    "nota": "Confirmar se é cavalo e pedir CRLV; não assumir placa antiga do ERP"
+  },
+  {
+    "texto": "tá na mão outra carreta",
+    "intencao": "troca_carreta",
+    "acao_recomendada": "perguntar_indice_carreta",
+    "nota": "Pergunte carreta 1/2/3 e peça placa ou CRLV"
+  },
+  {
+    "texto": "mudei a placa",
+    "intencao": "troca_veiculo",
+    "acao_recomendada": "perguntar",
+    "nota": "Placa de cavalo ou carreta? Peça CRLV correspondente"
+  },
+  {
+    "texto": "atualizei os dados do caminhão",
+    "intencao": "troca_veiculo",
+    "acao_recomendada": "perguntar",
+    "nota": "Vago — pode ser CRLV, foto lateral ou carreta"
+  },
+  {
+    "texto": "vendi o bitrem",
+    "intencao": "troca_veiculo",
+    "acao_recomendada": "perguntar",
+    "nota": "Entenda o que mudou no conjunto e o que precisa atualizar no cadastro"
+  },
+  {
+    "texto": "tô com outro truck",
+    "intencao": "troca_veiculo",
+    "acao_recomendada": "perguntar",
+    "nota": "Gíria por cavalo — confirme e peça CRLV"
+  },
+  {
+    "texto": "arrumei outra carroça",
+    "intencao": "troca_carreta",
+    "acao_recomendada": "perguntar_indice_carreta",
+    "nota": "Carroça = carreta no jargão — qual número e documento"
+  },
+  {
+    "texto": "manda atualizar meu crlv",
+    "intencao": "atualizar_documento",
+    "acao_recomendada": "pedir_foto_crlv",
+    "nota": "Intenção clara — peça foto e use grava_ocr crlv"
+  },
+  {
+    "texto": "renovei a cnh",
+    "intencao": "atualizar_documento",
+    "acao_recomendada": "pedir_foto_cnh",
+    "nota": "Peça foto da CNH nova"
+  },
+  {
+    "texto": "mudou minha chave pix",
+    "intencao": "atualizar_dados",
+    "acao_recomendada": "pedir_pix",
+    "nota": "Colete nova chave — atualizar_motorista forma_pagamento"
+  },
+  {
+    "texto": "to em guarulhos",
+    "intencao": "disponibilidade",
+    "acao_recomendada": "confirmar_vazio_carregado",
+    "nota": "Tem local mas falta status — pergunte se está vazio ou carregado"
+  },
+  {
+    "texto": "to por aqui",
+    "intencao": "disponibilidade",
+    "acao_recomendada": "perguntar_local",
+    "nota": "Local vago — peça cidade/UF"
+  },
+  {
+    "texto": "manda o canhoto",
+    "intencao": "canhoto",
+    "acao_recomendada": "pedir_foto",
+    "nota": "Peça foto do canhoto; grava_comprovante só com mídia"
+  },
+  {
+    "texto": "entreguei ontem",
+    "intencao": "canhoto",
+    "acao_recomendada": "perguntar",
+    "nota": "Pode querer enviar canhoto ou só informar — confirme e peça foto se for o caso"
+  },
+  {
+    "texto": "quero mudar meus dados",
+    "intencao": "atualizar_dados",
+    "acao_recomendada": "perguntar_campo",
+    "nota": "Nome, cidade, PIX, carroceria — pergunte o que"
+  },
+  {
+    "texto": "fiz balão",
+    "intencao": "atualizar_dados",
+    "acao_recomendada": "perguntar",
+    "nota": "Pode ser tipo carroceria — confirme se é carroceria baú/sider"
+  },
+  {
+    "texto": "agora to de sider",
+    "intencao": "atualizar_dados",
+    "acao_recomendada": "confirmar_carroceria",
+    "nota": "Atualizar tipo_carroceria se confirmar"
+  },
+  {
+    "texto": "descarreguei",
+    "intencao": "disponibilidade",
+    "acao_recomendada": "confirmar_local_disponivel",
+    "nota": "Provável que ficou vazio — confirme cidade"
+  },
+  {
+    "texto": "tô livre",
+    "intencao": "disponibilidade",
+    "acao_recomendada": "pedir_local",
+    "nota": "Vazio — peça localização para registrar_disponibilidade"
+  },
+  {
+    "texto": "fechou comigo aquela carga",
+    "intencao": "oferta",
+    "acao_recomendada": "confirmar_aceite",
+    "nota": "Aceite de oferta — use resposta_oferta_carga se valor/rota claros"
+  },
+  {
+    "texto": "não rola esse valor",
+    "intencao": "oferta",
+    "acao_recomendada": "negociar",
+    "nota": "Recusa ou contraproposta — não grave aceite"
+  },
+  {
+    "texto": "cadastra aí",
+    "intencao": "cadastro",
+    "acao_recomendada": "iniciar_cnh",
+    "nota": "Inicie fluxo documentos pela CNH"
+  },
+  {
+    "texto": "gostaria de saber sobr hshshsh",
+    "intencao": "entrada_confusa",
+    "acao_recomendada": "pedir_reformular",
+    "nota": "Mensagem cortada ou erro de digitação — peça pra mandar de novo, sem tom robótico"
+  },
+  {
+    "texto": "hshshsh",
+    "intencao": "entrada_confusa",
+    "acao_recomendada": "pedir_reformular",
+    "nota": "Teclado aleatório — assuma que não entendeu, peça reformular"
+  },
+  {
+    "texto": "o abacate de calças cantou no chuveiro",
+    "intencao": "entrada_confusa",
+    "acao_recomendada": "perguntar_contexto",
+    "nota": "Fora de contexto — surpresa leve, pergunte se era brincadeira ou tem algo de frete"
+  },
+  {
+    "texto": "asdfghjkl",
+    "intencao": "entrada_confusa",
+    "acao_recomendada": "pedir_reformular",
+    "nota": "Spam de teclado — peça pra mandar de novo"
+  },
+  {
+    "texto": "sei lá mano",
+    "intencao": "entrada_confusa",
+    "acao_recomendada": "redirecionar_menu",
+    "nota": "Vago após menu — redirecione cadastro, disponibilidade ou pagamento"
+  },
+  {
+    "texto": "aquela parada lá",
+    "intencao": "entrada_confusa",
+    "acao_recomendada": "perguntar_especificar",
+    "nota": "Referência ambígua sem contexto — cite o trecho e peça detalhe"
+  },
+  {
+    "texto": "mudei de carroça",
+    "intencao": "troca_veiculo",
+    "acao_recomendada": "perguntar",
+    "nota": "Carroça pode ser carreta ou gíria geral — confirme cavalo ou carreta antes de gravar"
+  }
+]

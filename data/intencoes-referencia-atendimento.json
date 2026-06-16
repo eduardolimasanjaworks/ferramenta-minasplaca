@@ -1,0 +1,443 @@
+{
+  "geradoEm": "2026-06-15T15:14:21.360Z",
+  "fonte": "docs/referencia-atendimento",
+  "total": 49,
+  "catalogo": [
+    {
+      "arquivo": "01-localizacao.md",
+      "intencao": "localizacao",
+      "secoes": 7,
+      "exemplos": 9
+    },
+    {
+      "arquivo": "02-disponibilidade-vazio-carregado.md",
+      "intencao": "disponibilidade",
+      "secoes": 8,
+      "exemplos": 10
+    },
+    {
+      "arquivo": "03-agenda-quando-libera.md",
+      "intencao": "agenda_liberacao",
+      "secoes": 6,
+      "exemplos": 4
+    },
+    {
+      "arquivo": "04-oferta-carga.md",
+      "intencao": "oferta",
+      "secoes": 6,
+      "exemplos": 7
+    },
+    {
+      "arquivo": "05-negociacao-frete.md",
+      "intencao": "negociacao",
+      "secoes": 10,
+      "exemplos": 7
+    },
+    {
+      "arquivo": "06-cadastro-documentos.md",
+      "intencao": "cadastro",
+      "secoes": 11,
+      "exemplos": 9
+    },
+    {
+      "arquivo": "07-negociacao-portal-rotas.md",
+      "intencao": "negociacao",
+      "secoes": 7,
+      "exemplos": 3
+    }
+  ],
+  "exemplos": [
+    {
+      "texto": "pode sim",
+      "intencao": "localizacao",
+      "secao": "Fluxo padrão — cidade escrita",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 01-localizacao — Fluxo padrão — cidade escrita",
+      "fonte": "01-localizacao"
+    },
+    {
+      "texto": "vazio",
+      "intencao": "localizacao",
+      "secao": "Fluxo padrão — cidade escrita",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 01-localizacao — Fluxo padrão — cidade escrita",
+      "fonte": "01-localizacao"
+    },
+    {
+      "texto": "Campinas SP",
+      "intencao": "localizacao",
+      "secao": "Fluxo padrão — cidade escrita",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 01-localizacao — Fluxo padrão — cidade escrita",
+      "fonte": "01-localizacao"
+    },
+    {
+      "texto": "[anexo mídia]",
+      "intencao": "localizacao",
+      "secao": "Fluxo padrão — pin GPS (Localização atual)",
+      "acao_recomendada": "registrar_disponibilidade",
+      "nota": "Referência: 01-localizacao — Fluxo padrão — pin GPS (Localização atual)",
+      "fonte": "01-localizacao"
+    },
+    {
+      "texto": "tô perto do posto na rodovia",
+      "intencao": "localizacao",
+      "secao": "V1 — Referência vaga",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 01-localizacao — V1 — Referência vaga",
+      "fonte": "01-localizacao"
+    },
+    {
+      "texto": "sim",
+      "intencao": "localizacao",
+      "secao": "V2 — Só “sim” / “ok” na pergunta vazio/carregado",
+      "acao_recomendada": "perguntar",
+      "nota": "Referência: 01-localizacao — V2 — Só “sim” / “ok” na pergunta vazio/carregado",
+      "fonte": "01-localizacao"
+    },
+    {
+      "texto": "tô em Campinas",
+      "intencao": "localizacao",
+      "secao": "V3 — Cidade sem UF",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 01-localizacao — V3 — Cidade sem UF",
+      "fonte": "01-localizacao"
+    },
+    {
+      "texto": "[pin] e tô em Sumaré",
+      "intencao": "localizacao",
+      "secao": "V4 — Pin + cidade redundante",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 01-localizacao — V4 — Pin + cidade redundante",
+      "fonte": "01-localizacao"
+    },
+    {
+      "texto": "to em SP interior",
+      "intencao": "localizacao",
+      "secao": "V5 — Localização no meio da oferta (Cenário 5)",
+      "acao_recomendada": "registrar_disponibilidade",
+      "nota": "Referência: 01-localizacao — V5 — Localização no meio da oferta (Cenário 5)",
+      "fonte": "01-localizacao"
+    },
+    {
+      "texto": "ok / pode / manda",
+      "intencao": "disponibilidade",
+      "secao": "Fluxo padrão — entrada proativa",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 02-disponibilidade-vazio-carregado — Fluxo padrão — entrada proativa",
+      "fonte": "02-disponibilidade-vazio-carregado"
+    },
+    {
+      "texto": "vazio / to livre / disponível",
+      "intencao": "disponibilidade",
+      "secao": "Ramo A — VAZIO",
+      "acao_recomendada": "registrar_disponibilidade",
+      "nota": "Referência: 02-disponibilidade-vazio-carregado — Ramo A — VAZIO",
+      "fonte": "02-disponibilidade-vazio-carregado"
+    },
+    {
+      "texto": "carregado / em viagem / to cheio",
+      "intencao": "disponibilidade",
+      "secao": "Ramo B — CARREGADO",
+      "acao_recomendada": "registrar_disponibilidade",
+      "nota": "Referência: 02-disponibilidade-vazio-carregado — Ramo B — CARREGADO",
+      "fonte": "02-disponibilidade-vazio-carregado"
+    },
+    {
+      "texto": "Rio de Janeiro RJ",
+      "intencao": "disponibilidade",
+      "secao": "Ramo B — CARREGADO",
+      "acao_recomendada": "registrar_disponibilidade",
+      "nota": "Referência: 02-disponibilidade-vazio-carregado — Ramo B — CARREGADO",
+      "fonte": "02-disponibilidade-vazio-carregado"
+    },
+    {
+      "texto": "libero sexta-feira",
+      "intencao": "disponibilidade",
+      "secao": "Ramo B — CARREGADO",
+      "acao_recomendada": "registrar_disponibilidade",
+      "nota": "Referência: 02-disponibilidade-vazio-carregado — Ramo B — CARREGADO",
+      "fonte": "02-disponibilidade-vazio-carregado"
+    },
+    {
+      "texto": "mais ou menos / depende",
+      "intencao": "disponibilidade",
+      "secao": "V1 — Resposta ambígua",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 02-disponibilidade-vazio-carregado — V1 — Resposta ambígua",
+      "fonte": "02-disponibilidade-vazio-carregado"
+    },
+    {
+      "texto": "vazio, queria algo pro sul",
+      "intencao": "disponibilidade",
+      "secao": "V2 — Vazio com destino preferido espontâneo",
+      "acao_recomendada": "registrar_disponibilidade",
+      "nota": "Referência: 02-disponibilidade-vazio-carregado — V2 — Vazio com destino preferido espontâneo",
+      "fonte": "02-disponibilidade-vazio-carregado"
+    },
+    {
+      "texto": "logo / não sei",
+      "intencao": "disponibilidade",
+      "secao": "V3 — Carregado com data vaga",
+      "acao_recomendada": "registrar_disponibilidade",
+      "nota": "Referência: 02-disponibilidade-vazio-carregado — V3 — Carregado com data vaga",
+      "fonte": "02-disponibilidade-vazio-carregado"
+    },
+    {
+      "texto": "disponibilidade",
+      "intencao": "disponibilidade",
+      "secao": "V4 — Via menu (sem mensagem proativa)",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 02-disponibilidade-vazio-carregado — V4 — Via menu (sem mensagem proativa)",
+      "fonte": "02-disponibilidade-vazio-carregado"
+    },
+    {
+      "texto": "valeu",
+      "intencao": "disponibilidade",
+      "secao": "V5 — Encerramento + silêncio",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 02-disponibilidade-vazio-carregado — V5 — Encerramento + silêncio",
+      "fonte": "02-disponibilidade-vazio-carregado"
+    },
+    {
+      "texto": "dia 20/06 / sexta / libero amanhã",
+      "intencao": "agenda_liberacao",
+      "secao": "Fluxo padrão",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 03-agenda-quando-libera — Fluxo padrão",
+      "fonte": "03-agenda-quando-libera"
+    },
+    {
+      "texto": "libero sexta às 14h",
+      "intencao": "agenda_liberacao",
+      "secao": "V1 — Data + hora explícita",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 03-agenda-quando-libera — V1 — Data + hora explícita",
+      "fonte": "03-agenda-quando-libera"
+    },
+    {
+      "texto": "to indo pro RJ",
+      "intencao": "agenda_liberacao",
+      "secao": "V2 — Só destino, sem data ainda",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 03-agenda-quando-libera — V2 — Só destino, sem data ainda",
+      "fonte": "03-agenda-quando-libera"
+    },
+    {
+      "texto": "na verdade só libero segunda",
+      "intencao": "agenda_liberacao",
+      "secao": "V3 — Motorista corrige data",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 03-agenda-quando-libera — V3 — Motorista corrige data",
+      "fonte": "03-agenda-quando-libera"
+    },
+    {
+      "texto": "to em Guarulhos, topo sim",
+      "intencao": "oferta",
+      "secao": "Fluxo padrão — aceite direto",
+      "acao_recomendada": "oferta",
+      "nota": "Referência: 04-oferta-carga — Fluxo padrão — aceite direto",
+      "fonte": "04-oferta-carga"
+    },
+    {
+      "texto": "topo sim",
+      "intencao": "oferta",
+      "secao": "Fluxo padrão — falta localização",
+      "acao_recomendada": "registrar_disponibilidade",
+      "nota": "Referência: 04-oferta-carga — Fluxo padrão — falta localização",
+      "fonte": "04-oferta-carga"
+    },
+    {
+      "texto": "to em Campinas",
+      "intencao": "oferta",
+      "secao": "Fluxo padrão — falta interesse",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 04-oferta-carga — Fluxo padrão — falta interesse",
+      "fonte": "04-oferta-carga"
+    },
+    {
+      "texto": "não rola / to longe",
+      "intencao": "oferta",
+      "secao": "Fluxo padrão — recusa",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 04-oferta-carga — Fluxo padrão — recusa",
+      "fonte": "04-oferta-carga"
+    },
+    {
+      "texto": "quanto paga?",
+      "intencao": "oferta",
+      "secao": "V1 — Só pergunta valor sem contexto de oferta",
+      "acao_recomendada": "perguntar",
+      "nota": "Referência: 04-oferta-carga — V1 — Só pergunta valor sem contexto de oferta",
+      "fonte": "04-oferta-carga"
+    },
+    {
+      "texto": "interesse mas só se for amanhã",
+      "intencao": "oferta",
+      "secao": "V2 — Interesse com ressalva",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 04-oferta-carga — V2 — Interesse com ressalva",
+      "fonte": "04-oferta-carga"
+    },
+    {
+      "texto": "to carregado ainda",
+      "intencao": "oferta",
+      "secao": "V5 — Motorista já carregado recebe oferta",
+      "acao_recomendada": "registrar_disponibilidade",
+      "nota": "Referência: 04-oferta-carga — V5 — Motorista já carregado recebe oferta",
+      "fonte": "04-oferta-carga"
+    },
+    {
+      "texto": "fechado nesse valor",
+      "intencao": "negociacao",
+      "secao": "Fluxo padrão — aceita valor ofertado",
+      "acao_recomendada": "oferta",
+      "nota": "Referência: 05-negociacao-frete — Fluxo padrão — aceita valor ofertado",
+      "fonte": "05-negociacao-frete"
+    },
+    {
+      "texto": "só faço por 4.800",
+      "intencao": "negociacao",
+      "secao": "Fluxo padrão — contraproposta dentro da faixa",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 05-negociacao-frete — Fluxo padrão — contraproposta dentro da faixa",
+      "fonte": "05-negociacao-frete"
+    },
+    {
+      "texto": "4.800 é o mínimo",
+      "intencao": "negociacao",
+      "secao": "Fluxo padrão — contraproposta dentro da faixa",
+      "acao_recomendada": "oferta",
+      "nota": "**Expectativa que precisamos confirmar com você:** **Opção A (prompt atual):** teto rígido = valor ofertado; 4.800 → só aceita se equipe aprovar **Opção B (flex):** margem oculta no ERP acima do valor anunciado",
+      "fonte": "05-negociacao-frete"
+    },
+    {
+      "texto": "faço por 3.000",
+      "intencao": "negociacao",
+      "secao": "Fluxo padrão — abaixo do piso",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 05-negociacao-frete — Fluxo padrão — abaixo do piso",
+      "fonte": "05-negociacao-frete"
+    },
+    {
+      "texto": "4.200 topa?",
+      "intencao": "negociacao",
+      "secao": "V1 — Contraproposta aceitável no meio",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 05-negociacao-frete — V1 — Contraproposta aceitável no meio",
+      "fonte": "05-negociacao-frete"
+    },
+    {
+      "texto": "então não rola",
+      "intencao": "negociacao",
+      "secao": "V2 — Motorista recusa após negociar",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 05-negociacao-frete — V2 — Motorista recusa após negociar",
+      "fonte": "05-negociacao-frete"
+    },
+    {
+      "texto": "e as diárias?",
+      "intencao": "negociacao",
+      "secao": "V4 — Negocia diária / pedágio",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 05-negociacao-frete — V4 — Negocia diária / pedágio",
+      "fonte": "05-negociacao-frete"
+    },
+    {
+      "texto": "quero me cadastrar",
+      "intencao": "cadastro",
+      "secao": "Fluxo padrão — início",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 06-cadastro-documentos — Fluxo padrão — início",
+      "fonte": "06-cadastro-documentos"
+    },
+    {
+      "texto": "[foto CNH]",
+      "intencao": "cadastro",
+      "secao": "Fluxo padrão — imagem CNH",
+      "acao_recomendada": "pedir_documento",
+      "nota": "Referência: 06-cadastro-documentos — Fluxo padrão — imagem CNH",
+      "fonte": "06-cadastro-documentos"
+    },
+    {
+      "texto": "[PDF ANTT]",
+      "intencao": "cadastro",
+      "secao": "Fluxo padrão — PDF",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 06-cadastro-documentos — Fluxo padrão — PDF",
+      "fonte": "06-cadastro-documentos"
+    },
+    {
+      "texto": "12345678900",
+      "intencao": "cadastro",
+      "secao": "Fluxo padrão — texto no lugar de foto",
+      "acao_recomendada": "pedir_documento",
+      "nota": "Referência: 06-cadastro-documentos — Fluxo padrão — texto no lugar de foto",
+      "fonte": "06-cadastro-documentos"
+    },
+    {
+      "texto": "[foto caminhão]",
+      "intencao": "cadastro",
+      "secao": "Fluxo padrão — último documento",
+      "acao_recomendada": "pedir_documento",
+      "nota": "Referência: 06-cadastro-documentos — Fluxo padrão — último documento",
+      "fonte": "06-cadastro-documentos"
+    },
+    {
+      "texto": "[foto comprovante de luz]",
+      "intencao": "cadastro",
+      "secao": "V2 — Motorista manda documento errado",
+      "acao_recomendada": "pedir_documento",
+      "nota": "Referência: 06-cadastro-documentos — V2 — Motorista manda documento errado",
+      "fonte": "06-cadastro-documentos"
+    },
+    {
+      "texto": "[CNH] [CRLV] [ANTT]",
+      "intencao": "cadastro",
+      "secao": "V3 — Motorista manda vários de uma vez",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 06-cadastro-documentos — V3 — Motorista manda vários de uma vez",
+      "fonte": "06-cadastro-documentos"
+    },
+    {
+      "texto": "[áudio: \"tô sem CNH física\"]",
+      "intencao": "cadastro",
+      "secao": "V4 — Áudio explicando documento",
+      "acao_recomendada": "pedir_documento",
+      "nota": "Referência: 06-cadastro-documentos — V4 — Áudio explicando documento",
+      "fonte": "06-cadastro-documentos"
+    },
+    {
+      "texto": "manda você aí kkk",
+      "intencao": "cadastro",
+      "secao": "V6 — Evasiva / piada",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "**Expectativa:** mesmo fluxo que Evolution quando **🔧** webhook baixar anexo.",
+      "fonte": "06-cadastro-documentos"
+    },
+    {
+      "texto": "só faço por 5.000",
+      "intencao": "negociacao",
+      "secao": "Fluxo de negociação (referência)",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 07-negociacao-portal-rotas — Fluxo de negociação (referência)",
+      "fonte": "07-negociacao-portal-rotas"
+    },
+    {
+      "texto": "4.650",
+      "intencao": "negociacao",
+      "secao": "Fluxo de negociação (referência)",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 07-negociacao-portal-rotas — Fluxo de negociação (referência)",
+      "fonte": "07-negociacao-portal-rotas"
+    },
+    {
+      "texto": "abaixo de 5.000 não rola de jeito nenhum",
+      "intencao": "negociacao",
+      "secao": "Fluxo de negociação (referência)",
+      "acao_recomendada": "interpretar_contexto",
+      "nota": "Referência: 07-negociacao-portal-rotas — Fluxo de negociação (referência)",
+      "fonte": "07-negociacao-portal-rotas"
+    }
+  ]
+}

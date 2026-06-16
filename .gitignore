@@ -1,0 +1,11 @@
+node_modules/
+app/node_modules/
+app/dist/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+.cursor/
+VERIFICAR possibilidade de treinar baseado em historico*/
+scripts/relatorios-simulacao/*.json

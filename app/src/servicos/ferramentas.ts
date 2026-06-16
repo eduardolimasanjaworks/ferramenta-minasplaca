@@ -1,0 +1,423 @@
+/**
+ * Detecção e execução de ferramentas — integração Directus GMX.
+ */
+import type { ItemDebounce } from '../tipos/evolution.js';
+import { obterMidiaCache } from './midia-cache.js';
+import {
+  atualizarMotorista,
+  buscarMotoristaPorTelefone,
+  garantirMotorista,
+  gravarDocumentoMotorista,
+  registrarDisponibilidade,
+  registrarRespostaOfertaCarga,
+  salvarCarretaMotorista,
+  verificarDisponibilidadeNoErp,
+} from './motorista-gmx.js';
+import { gravarCanhotoEmbarque, obterEmbarqueAtivoPrincipal } from './embarque-motorista.js';
+import { escalonarNegociacao } from './escalonar-negociacao.js';
+import { jidParaTelefone } from '../util/telefone.js';
+import { directusConfigurado } from './directus.js';
+import { logEvento } from '../util/log-eventos.js';
+import { invalidarCacheContextoErp } from './contexto-erp-motorista.js';
+
+export interface ContextoFerramenta {
+  remoteJid: string;
+  instance: string;
+  itens: ItemDebounce[];
+}
+
+const FERRAMENTAS = [
+  'grava_ocr',
+  'grava_comprovante',
+  'resposta_oferta_carga',
+  'registrar_disponibilidade',
+  'atualizar_motorista',
+  'salvar_carreta',
+  'escalonar_negociacao',
+  'escalonar_equipe',
+] as const;
+
+type NomeFerramenta = (typeof FERRAMENTAS)[number];
+
+export interface BlocoFerramenta {
+  ferramenta: string;
+  dados: Record<string, unknown>;
+  raw: string;
+}
+
+const ALIAS_FERRAMENTA: Record<string, NomeFerramenta> = {
+  escalonar_equipe: 'escalonar_negociacao',
+};
+
+export function serializarBlocoFerramenta(
+  ferramenta: string,
+  dados: Record<string, unknown>,
+): string {
+  return JSON.stringify({ ferramenta, dados });
+}
+
+function normalizarTextoParaExtracao(texto: string): string {
+  return texto
+    .replace(/```json\s*/gi, '')
+    .replace(/```\s*/g, '')
+    .trim();
+}
+
+/** Localiza início de objeto JSON de ferramenta (aspas simples ou duplas). */
+function indiceProximaFerramenta(texto: string, from: number): number {
+  const padroes = ['{"ferramenta"', "{'ferramenta'", '{"ferramenta" :', '{ "ferramenta"'];
+  let menor = -1;
+  for (const p of padroes) {
+    const i = texto.indexOf(p.replace(/'/g, '"'), from);
+    if (i === -1) continue;
+    if (menor === -1 || i < menor) menor = i;
+  }
+  const aspasSimples = texto.indexOf("{'ferramenta'", from);
+  if (aspasSimples !== -1 && (menor === -1 || aspasSimples < menor)) menor = aspasSimples;
+  return menor;
+}
+
+/** Extrai blocos JSON {"ferramenta":"...","dados":{...}} da resposta */
+export function extrairBlocosFerramenta(texto: string): BlocoFerramenta[] {
+  const blocos: BlocoFerramenta[] = [];
+  const normalizado = normalizarTextoParaExtracao(texto);
+  let i = 0;
+
+  while (i < normalizado.length) {
+    const start = indiceProximaFerramenta(normalizado, i);
+    if (start === -1) break;
+
+    let depth = 0;
+    let end = -1;
+    let emString = false;
+    let escape = false;
+    let quote = '';
+
+    for (let j = start; j < normalizado.length; j++) {
+      const ch = normalizado[j];
+      if (emString) {
+        if (escape) {
+          escape = false;
+          continue;
+        }
+        if (ch === '\\') {
+          escape = true;
+          continue;
+        }
+        if (ch === quote) emString = false;
+        continue;
+      }
+      if (ch === '"' || ch === "'") {
+        emString = true;
+        quote = ch;
+        continue;
+      }
+      if (ch === '{') depth++;
+      if (ch === '}') {
+        depth--;
+        if (depth === 0) {
+          end = j + 1;
+          break;
+        }
+      }
+    }
+
+    if (end === -1) break;
+    const raw = normalizado.slice(start, end);
+    try {
+      const parsed = JSON.parse(raw.replace(/'/g, '"')) as {
+        ferramenta?: string;
+        dados?: Record<string, unknown>;
+      };
+      if (parsed.ferramenta) {
+        blocos.push({
+          ferramenta: parsed.ferramenta,
+          dados: parsed.dados ?? {},
+          raw,
+        });
+      }
+    } catch {
+      try {
+        const reparado = raw.replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
+        const parsed = JSON.parse(reparado.replace(/'/g, '"')) as {
+          ferramenta?: string;
+          dados?: Record<string, unknown>;
+        };
+        if (parsed.ferramenta) {
+          blocos.push({ ferramenta: parsed.ferramenta, dados: parsed.dados ?? {}, raw });
+        }
+      } catch {
+        /* ignora JSON inválido */
+      }
+    }
+    i = end;
+  }
+  return blocos;
+}
+
+/** Preserva JSON de rascunhos anteriores se a revisão removeu. */
+export function mesclarFerramentasPreservadas(
+  textosAnteriores: string[],
+  textoFinal: string,
+): string {
+  const presentes = new Set(extrairBlocosFerramenta(textoFinal).map((b) => b.ferramenta));
+  let saida = textoFinal;
+
+  for (const anterior of textosAnteriores) {
+    for (const bloco of extrairBlocosFerramenta(anterior)) {
+      const canon = ALIAS_FERRAMENTA[bloco.ferramenta] ?? bloco.ferramenta;
+      if (presentes.has(canon) || presentes.has(bloco.ferramenta)) continue;
+      saida += `\n${bloco.raw}`;
+      presentes.add(canon);
+    }
+  }
+
+  return saida.trim();
+}
+
+function telefoneDoContexto(ctx: ContextoFerramenta, dados: Record<string, unknown>): string {
+  if (typeof dados.telefone === 'string' && dados.telefone) {
+    return dados.telefone.replace(/\D/g, '');
+  }
+  return jidParaTelefone(ctx.remoteJid);
+}
+
+async function midiaDoContexto(
+  ctx: ContextoFerramenta,
+  dados: Record<string, unknown>,
+) {
+  const id = (dados.midia_id as string) ?? ctx.itens.find((i) => i.midiaId)?.midiaId;
+  if (!id) return null;
+  const midia = await obterMidiaCache(id);
+  if (!midia) return null;
+  return { ...midia, midiaId: id };
+}
+
+function resolverNomeFerramenta(nome: string): NomeFerramenta | null {
+  const canon = ALIAS_FERRAMENTA[nome] ?? nome;
+  return FERRAMENTAS.includes(canon as NomeFerramenta) ? (canon as NomeFerramenta) : null;
+}
+
+async function executarFerramenta(
+  nome: NomeFerramenta,
+  dados: Record<string, unknown>,
+  ctx: ContextoFerramenta,
+): Promise<void> {
+  if (!directusConfigurado() && nome !== 'escalonar_negociacao') {
+    logEvento('ferramenta', 'Directus não configurado — ferramenta ignorada', { nome }, 'warn');
+    return;
+  }
+
+  const telefone = telefoneDoContexto(ctx, dados);
+
+  switch (nome) {
+    case 'grava_comprovante': {
+      const midia = await midiaDoContexto(ctx, dados);
+      if (!midia) {
+        console.warn(`[ferramenta] grava_comprovante: sem mídia em cache para ${telefone}`);
+        return;
+      }
+      const embId =
+        (dados.embarque_id as string | number | undefined) ??
+        (await obterEmbarqueAtivoPrincipal(telefone))?.id;
+      if (embId) {
+        const r = await gravarCanhotoEmbarque({
+          telefone,
+          embarqueId: embId,
+          midia,
+          textoExtraido:
+            (dados.texto_extraido as string) ??
+            ctx.itens.map((i) => i.conteudo).join('\n'),
+        });
+        console.log(`[ferramenta] grava_comprovante embarque OK`, r);
+      } else {
+        await gravarDocumentoMotorista({
+          telefone,
+          midia,
+          tipo: 'comprovante_entrega',
+          textoExtraido:
+            (dados.texto_extraido as string) ??
+            ctx.itens.map((i) => i.conteudo).join('\n'),
+        });
+      }
+      invalidarCacheContextoErp(telefone);
+      break;
+    }
+
+    case 'grava_ocr': {
+      const midia = await midiaDoContexto(ctx, dados);
+      if (!midia) {
+        console.warn(`[ferramenta] grava_ocr: sem mídia em cache para ${telefone}`);
+        return;
+      }
+      const tipo = (dados.tipo as string) ?? 'cnh';
+      const textoExtraido =
+        (dados.texto_extraido as string) ??
+        ctx.itens.map((i) => i.conteudo).join('\n');
+      const resultado = await gravarDocumentoMotorista({
+        telefone,
+        midia,
+        tipo,
+        textoExtraido,
+        campos: dados.campos as Record<string, unknown> | undefined,
+      });
+      console.log(`[ferramenta] grava_ocr OK`, resultado);
+      invalidarCacheContextoErp(telefone);
+      break;
+    }
+
+    case 'registrar_disponibilidade': {
+      const r = await registrarDisponibilidade({
+        telefone,
+        disponivel: dados.disponivel as boolean | undefined,
+        status: dados.status as string | undefined,
+        localizacao_atual: (dados.localizacao_atual ?? dados.local) as string | undefined,
+        latitude: dados.latitude as number | undefined,
+        longitude: dados.longitude as number | undefined,
+        data_previsao_disponibilidade: dados.data_previsao_disponibilidade as string | undefined,
+        observacao: dados.observacao as string | undefined,
+      });
+
+      const verificacao = await verificarDisponibilidadeNoErp(telefone, {
+        disponivel: dados.disponivel as boolean | undefined,
+        status: dados.status as string | undefined,
+        localizacao_atual: (dados.localizacao_atual ?? dados.local) as string | undefined,
+      });
+
+      if (!verificacao.ok) {
+        console.error(
+          `[ferramenta] registrar_disponibilidade VERIFICAÇÃO FALHOU telefone=${telefone}`,
+          verificacao.motivo,
+        );
+        throw new Error(
+          verificacao.motivo ?? 'Disponibilidade não confirmada no ERP após gravação',
+        );
+      }
+
+      console.log(`[ferramenta] registrar_disponibilidade OK ERP confirmado`, {
+        telefone,
+        id: verificacao.registro?.id ?? r.id,
+        local: dados.localizacao_atual ?? dados.local,
+        status: dados.status,
+      });
+      invalidarCacheContextoErp(telefone);
+      break;
+    }
+
+    case 'atualizar_motorista': {
+      let motorista = await buscarMotoristaPorTelefone(telefone);
+      if (!motorista) {
+        motorista = await garantirMotorista(telefone, dados.nome as string | undefined);
+      }
+      const atualizado = await atualizarMotorista(motorista.id, dados);
+      console.log(`[ferramenta] atualizar_motorista OK id=${atualizado.id}`);
+      invalidarCacheContextoErp(telefone);
+      break;
+    }
+
+    case 'salvar_carreta': {
+      const indice = Number(dados.indice) as 1 | 2 | 3;
+      if (![1, 2, 3].includes(indice)) {
+        console.warn('[ferramenta] salvar_carreta: indice inválido', dados.indice);
+        return;
+      }
+      const midia = await midiaDoContexto(ctx, dados);
+      const campos = (dados.campos as Record<string, unknown>) ?? {};
+      const r = await salvarCarretaMotorista({
+        telefone,
+        indice,
+        campos,
+        midia: midia ?? undefined,
+      });
+      console.log(`[ferramenta] salvar_carreta OK`, r);
+      invalidarCacheContextoErp(telefone);
+      break;
+    }
+
+    case 'resposta_oferta_carga': {
+      const aceite = dados.aceite === true;
+      const registro = await registrarRespostaOfertaCarga({
+        telefone,
+        aceite,
+        valor_aceito: dados.valor_aceito as number | undefined,
+        valor_ofertado: dados.valor_ofertado as number | undefined,
+        origem: dados.origem as string | undefined,
+        destino: dados.destino as string | undefined,
+        observacao: dados.observacao as string | undefined,
+        match_id: dados.match_id as number | null | undefined,
+      });
+      logEvento('ferramenta', 'resposta_oferta_carga', {
+        telefone,
+        aceite,
+        historico_id: registro.id,
+        valor_aceito: dados.valor_aceito,
+        origem: dados.origem,
+        destino: dados.destino,
+      });
+      console.log(`[ferramenta] resposta_oferta_carga OK id=${registro.id}`);
+      invalidarCacheContextoErp(telefone);
+      break;
+    }
+
+    case 'escalonar_negociacao': {
+      const r = await escalonarNegociacao({
+        telefoneMotorista: telefone,
+        origem: dados.origem as string | undefined,
+        destino: dados.destino as string | undefined,
+        valorPedido: dados.valor_pedido_motorista as number | undefined,
+        valorMinimo: dados.valor_minimo as number | undefined,
+        valorMaximo: dados.valor_maximo as number | undefined,
+        motivo: (dados.motivo as string) ?? 'negociacao_sem_acordo',
+      });
+      console.log(`[ferramenta] escalonar_negociacao OK`, r);
+      break;
+    }
+  }
+}
+
+/**
+ * Executa ferramentas na resposta da IA e remove blocos JSON do texto ao usuário.
+ */
+export async function processarFerramentas(
+  resposta: string,
+  ctx: ContextoFerramenta,
+): Promise<string> {
+  let texto = resposta;
+  const blocos = extrairBlocosFerramenta(resposta);
+
+  for (const bloco of blocos) {
+    const nome = resolverNomeFerramenta(bloco.ferramenta);
+    if (nome) {
+      try {
+        await executarFerramenta(nome, bloco.dados, ctx);
+      } catch (err) {
+        console.error(`[ferramenta] Erro em ${bloco.ferramenta}:`, err);
+      }
+    } else {
+      logEvento('ferramenta', 'Ferramenta desconhecida ignorada', { nome: bloco.ferramenta }, 'warn');
+    }
+    texto = texto.replace(bloco.raw, '').trim();
+  }
+
+  return texto.trim();
+}
+
+/** Instruções de ferramentas para o modelo */
+export function instrucoesFerramentas(): string {
+  return `
+=== FERRAMENTAS INTERNAS GMX (OBRIGATÓRIO QUANDO O CENÁRIO MANDAR GRAVAR) ===
+Inclua AO FINAL da resposta, uma linha por ferramenta, JSON em linha única. O motorista NÃO vê isso.
+SEM JSON = dado NÃO salvo no ERP. A revisão remove seu texto mas NÃO pode remover os JSON.
+
+{"ferramenta":"grava_ocr","dados":{"tipo":"cnh","midia_id":"ID_SE_HOUVER"}}
+{"ferramenta":"grava_comprovante","dados":{"midia_id":"ID_SE_HOUVER"}}
+{"ferramenta":"registrar_disponibilidade","dados":{"disponivel":true,"status":"disponivel","localizacao_atual":"Cidade UF"}}
+{"ferramenta":"resposta_oferta_carga","dados":{"aceite":true,"valor_aceito":4500,"valor_ofertado":4500,"origem":"X","destino":"Y"}}
+{"ferramenta":"atualizar_motorista","dados":{"cidade":"Guarulhos","estado":"SP"}}
+{"ferramenta":"salvar_carreta","dados":{"indice":1,"campos":{"placa":"ABC1D23"}}}
+{"ferramenta":"grava_comprovante","dados":{"midia_id":"ID","embarque_id":123}}
+{"ferramenta":"escalonar_negociacao","dados":{"motivo":"negociacao_sem_acordo","valor_pedido_motorista":5000,"origem":"X","destino":"Y"}}
+
+Alias aceito: escalonar_equipe → escalonar_negociacao (pausa IA + avisa operadores).
+Use midia_id dos anexos quando houver imagem ou PDF.`;
+}
