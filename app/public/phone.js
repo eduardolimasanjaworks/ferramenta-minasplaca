@@ -89,7 +89,8 @@
     };
     return state.lines.filter((linha) => {
       if (filtros.phone && linha.phone !== filtros.phone) return false;
-      if (filtros.origin && linha.origem !== filtros.origin) return false;
+      if (filtros.origin === 'cliente' && linha.origem !== 'cliente') return false;
+      if (filtros.origin === 'gmx' && linha.origem === 'cliente') return false;
       if (filtros.status && !String(linha.status || '').toLowerCase().includes(filtros.status)) return false;
       if (filtros.type && !String(linha.tipo || '').toLowerCase().includes(filtros.type)) return false;
       if (filtros.text && !`${linha.mensagem} ${linha.tipo} ${linha.status}`.toLowerCase().includes(filtros.text)) return false;
