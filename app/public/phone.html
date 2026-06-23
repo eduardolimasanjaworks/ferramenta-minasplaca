@@ -251,16 +251,6 @@
       </div>
       <div class="section-divider">
         <div class="table-title">2. Nova regra para a IA</div>
-        <div class="grid-2">
-          <div class="field">
-            <label for="trainerPhone">Autor da regra - telefone opcional</label>
-            <input id="trainerPhone" type="text" inputmode="numeric" placeholder="Use um autorizado ou deixe vazio" />
-          </div>
-          <div class="field">
-            <label for="trainerName">Autor da regra - nome opcional</label>
-            <input id="trainerName" type="text" placeholder="Nome que vai aparecer no historico" />
-          </div>
-        </div>
         <div class="field" style="margin-top:.9rem">
           <label for="trainingInstruction">Regra nova</label>
           <textarea id="trainingInstruction" placeholder="Ex.: Quando o motorista disser que esta livre, confirme a localizacao antes de encerrar o atendimento."></textarea>
@@ -300,8 +290,22 @@
         </div>
         <div class="progress-bar"><span id="simConversationProgressBar" style="width:100%"></span></div>
       </div>
-      <div id="simMessages" class="messages"></div>
-      <div id="simAuditPanel" class="audit-stack"></div>
+      <div class="sim-layout">
+        <div class="sim-chat-panel">
+          <div class="sim-panel-head">
+            <div class="table-title">Chat simulado</div>
+            <div class="muted">Clique em uma mensagem da IA para abrir a auditoria ao lado.</div>
+          </div>
+          <div id="simMessages" class="messages"></div>
+        </div>
+        <aside class="sim-audit-panel">
+          <div class="sim-panel-head">
+            <div class="table-title">Auditoria da mensagem</div>
+            <div class="muted">Motivo, prompt e escrita operacional ficam separados do chat.</div>
+          </div>
+          <div id="simAuditPanel" class="audit-stack"></div>
+        </aside>
+      </div>
     </section>
 
     <section id="editorPanel" class="card admin-panel" hidden>
@@ -533,7 +537,9 @@
   <script src="/phone-ops.js"></script>
   <script src="/phone-pause.js"></script>
   <script src="/phone-simulator.js"></script>
+  <script src="/phone-training.js"></script>
   <script src="/phone-editor.js"></script>
+  <script src="/phone-ocr-editor.js"></script>
   <script src="/phone-editor-core.js"></script>
   <script src="/phone-whatsapp.js"></script>
 </body>

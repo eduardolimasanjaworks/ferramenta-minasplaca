@@ -42,11 +42,40 @@
   background: linear-gradient(90deg, #2563eb 0%, #60a5fa 100%);
 }
 
+.sim-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.sim-chat-panel,
+.sim-audit-panel {
+  border: 2px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  padding: 1rem;
+}
+
+.sim-audit-panel {
+  position: sticky;
+  top: 1rem;
+  background: #f8fbff;
+}
+
+.sim-panel-head {
+  display: grid;
+  gap: .2rem;
+  padding-bottom: .85rem;
+  margin-bottom: .85rem;
+  border-bottom: 2px solid var(--line);
+}
+
 .messages {
   display: flex;
   flex-direction: column;
   gap: .8rem;
-  margin-top: 1rem;
+  margin-top: 0;
 }
 
 .message-row {
@@ -112,7 +141,7 @@
 .audit-stack {
   display: grid;
   gap: .75rem;
-  margin-top: 1rem;
+  margin-top: 0;
 }
 
 .audit-box {
@@ -191,6 +220,14 @@
 }
 
 @media (max-width: 760px) {
+  .sim-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sim-audit-panel {
+    position: static;
+  }
+
   .structured-grid {
     grid-template-columns: 1fr;
   }

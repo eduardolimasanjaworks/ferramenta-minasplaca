@@ -43,7 +43,6 @@
           <div class="field compact-field"><label>Status</label><input type="text" value="${item.ativo ? 'ativo' : 'inativo'}" readonly /></div>
         </div>
         <div class="pending-actions">
-          <button type="button" data-use-trainer="${item.id}">Usar como autor</button>
           <button type="button" data-toggle-trainer="${item.id}" data-next-active="${item.ativo ? 'false' : 'true'}">${item.ativo ? 'Desativar' : 'Ativar'}</button>
           <button type="button" data-delete-trainer="${item.id}">Excluir</button>
         </div>
@@ -54,14 +53,6 @@
     $('trainerManagePhone').value = '';
     $('trainerManageName').value = '';
     $('trainerManageRole').value = '';
-  }
-
-  function usarComoAutor(id) {
-    const item = state.treinadores.find((row) => String(row.id) === String(id));
-    if (!item) return;
-    $('trainerPhone').value = item.telefone || '';
-    $('trainerName').value = item.nome || '';
-    setBox('trainingStatus', `Autor da regra preenchido com ${item.nome || item.telefone}.`, 'ok');
   }
 
   async function carregarTreinamento() {
@@ -96,7 +87,7 @@
     if (texto.length < 10) return setBox('trainingStatus', 'Escreva uma regra mais completa antes de enviar.', 'warn');
     const data = await state.json('/api/admin/treinamento/instrucao-direta', {
       method: 'POST',
-      body: JSON.stringify({ telefoneAutor: $('trainerPhone').value.trim() || undefined, nomeAutor: $('trainerName').value.trim() || undefined, texto, aplicarAgora }),
+      body: JSON.stringify({ texto, aplicarAgora }),
     });
     $('trainingInstruction').value = '';
     await carregarTreinamento();
@@ -135,7 +126,6 @@
     $('trainingTrainerList').addEventListener('click', (event) => {
       const btn = event.target.closest('button');
       if (!btn) return;
-      if (btn.dataset.useTrainer) usarComoAutor(btn.dataset.useTrainer);
       if (btn.dataset.toggleTrainer) atualizarTreinador(btn.dataset.toggleTrainer, btn.dataset.nextActive === 'true').catch((error) => setBox('trainingStatus', error.message || 'Falha ao atualizar telefone autorizado.', 'warn'));
       if (btn.dataset.deleteTrainer) excluirTreinador(btn.dataset.deleteTrainer).catch((error) => setBox('trainingStatus', error.message || 'Falha ao excluir telefone autorizado.', 'warn'));
     });
