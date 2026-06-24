@@ -8,6 +8,8 @@ export interface EvolutionStatusInput {
   fetchConnectionStatus?: string | null;
   hasOwnerJid?: boolean;
   hasProfileName?: boolean;
+  fetchDisconnectionReasonCode?: number | null;
+  hasDisconnectionObject?: boolean;
 }
 
 export interface EvolutionStatusOutput {
@@ -28,21 +30,31 @@ export function resolverStatusEvolution(input: EvolutionStatusInput): EvolutionS
   const state = normalizarEstado(input.connectionState);
   const fetchState = normalizarEstado(input.fetchConnectionStatus);
   const hasIdentity = Boolean(input.hasOwnerJid || input.hasProfileName);
+  const hasDisconnectionMarker =
+    typeof input.fetchDisconnectionReasonCode === 'number'
+    || Boolean(input.hasDisconnectionObject);
+  const fetchLooksOpen = OPEN_STATES.has(fetchState) && hasIdentity;
 
   if (OPEN_STATES.has(state)) {
     return { state: 'open', conectado: true, fonte: 'connectionState' };
   }
 
-  if (OPEN_STATES.has(fetchState) && hasIdentity) {
-    return { state: 'open', conectado: true, fonte: 'fetchInstances' };
-  }
-
   if (state) {
+    if (fetchLooksOpen && hasDisconnectionMarker) {
+      return { state: 'stale_open', conectado: false, fonte: 'connectionState' };
+    }
     return { state, conectado: false, fonte: 'connectionState' };
   }
 
+  if (fetchLooksOpen && !hasDisconnectionMarker) {
+    return { state: 'open', conectado: true, fonte: 'fetchInstances' };
+  }
+
   if (fetchState) {
-    return { state: fetchState, conectado: OPEN_STATES.has(fetchState), fonte: 'fetchInstances' };
+    if (fetchLooksOpen && hasDisconnectionMarker) {
+      return { state: 'stale_open', conectado: false, fonte: 'fetchInstances' };
+    }
+    return { state: fetchState, conectado: false, fonte: 'fetchInstances' };
   }
 
   return { state: 'desconhecido', conectado: false, fonte: 'fallback' };

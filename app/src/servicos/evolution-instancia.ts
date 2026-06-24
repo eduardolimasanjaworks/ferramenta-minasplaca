@@ -3,6 +3,7 @@
  */
 import { config } from '../config.js';
 import { resolverStatusEvolution } from './evolution-status.js';
+import { existsSync, readFileSync } from 'node:fs';
 
 interface AlvoWhatsapp {
   nomeLogico: 'ia_local' | 'chatwoot_futuro';
@@ -16,6 +17,43 @@ const headers = (apiKey: string) => ({
   'Content-Type': 'application/json',
   apikey: apiKey,
 });
+
+function reportarDebugEvolution(
+  etapa: string,
+  extra?: Record<string, unknown>,
+) {
+  let url = 'http://127.0.0.1:7777/event';
+  let sessionId = 'whatsapp-false-open';
+  try {
+    const caminho = '.dbg/whatsapp-false-open.env';
+    if (existsSync(caminho)) {
+      const env = readFileSync(caminho, 'utf8');
+      url = env.match(/DEBUG_SERVER_URL=(.+)/)?.[1]?.trim() || url;
+      sessionId = env.match(/DEBUG_SESSION_ID=(.+)/)?.[1]?.trim() || sessionId;
+    }
+  } catch {
+    /* noop */
+  }
+
+  // #region debug-point A:evolution-status
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sessionId,
+      runId: 'pre-fix',
+      hypothesisId: 'A',
+      location: `evolution-instancia.ts:${etapa}`,
+      msg: `[DEBUG] evolution ${etapa}`,
+      data: {
+        etapa,
+        ...extra,
+      },
+      ts: Date.now(),
+    }),
+  }).catch(() => undefined);
+  // #endregion
+}
 
 export interface StatusConexao {
   instance: string;
@@ -101,6 +139,11 @@ async function obterStatusConexaoPorAlvo(alvo: AlvoWhatsapp): Promise<StatusCone
   const url = `${alvo.url}/instance/connectionState/${alvo.instancia}`;
   const res = await fetch(url, { headers: headers(alvo.apiKey), signal: AbortSignal.timeout(15000) });
   if (res.status === 404) {
+    reportarDebugEvolution('connectionState:not_found', {
+      instancia: alvo.instancia,
+      url,
+      statusCode: 404,
+    });
     return {
       instance: alvo.instancia,
       state: 'not_found',
@@ -114,9 +157,20 @@ async function obterStatusConexaoPorAlvo(alvo: AlvoWhatsapp): Promise<StatusCone
   }
   if (!res.ok) {
     const corpo = await res.text();
+    reportarDebugEvolution('connectionState:error', {
+      instancia: alvo.instancia,
+      url,
+      statusCode: res.status,
+      body: corpo,
+    });
     throw new Error(`connectionState falhou (${res.status}): ${corpo}`);
   }
   const dados = (await res.json()) as { instance?: { state?: string } };
+  reportarDebugEvolution('connectionState:ok', {
+    instancia: alvo.instancia,
+    url,
+    state: dados.instance?.state ?? null,
+  });
 
   let motivoDesconexao: string | undefined;
   let instanciaDetalhe: InstanciaEvolution | undefined;
@@ -130,6 +184,17 @@ async function obterStatusConexaoPorAlvo(alvo: AlvoWhatsapp): Promise<StatusCone
       if (listRes.ok) {
         const lista = (await listRes.json()) as InstanciaEvolution[];
         instanciaDetalhe = lista.find((i) => i.name === alvo.instancia);
+        reportarDebugEvolution('fetchInstances:ok', {
+          instancia: alvo.instancia,
+          url: `${alvo.url}/instance/fetchInstances`,
+          statusCode: listRes.status,
+          found: Boolean(instanciaDetalhe),
+          fetchConnectionStatus: instanciaDetalhe?.connectionStatus ?? null,
+          ownerJid: instanciaDetalhe?.ownerJid ?? null,
+          profileName: instanciaDetalhe?.profileName ?? null,
+          disconnectionReasonCode: instanciaDetalhe?.disconnectionReasonCode ?? null,
+          updatedAt: instanciaDetalhe?.updatedAt ?? null,
+        });
       }
     } catch {
       /* ignora */
@@ -141,6 +206,19 @@ async function obterStatusConexaoPorAlvo(alvo: AlvoWhatsapp): Promise<StatusCone
     fetchConnectionStatus: instanciaDetalhe?.connectionStatus,
     hasOwnerJid: Boolean(instanciaDetalhe?.ownerJid),
     hasProfileName: Boolean(instanciaDetalhe?.profileName),
+    fetchDisconnectionReasonCode: instanciaDetalhe?.disconnectionReasonCode ?? null,
+    hasDisconnectionObject: Boolean(instanciaDetalhe?.disconnectionObject),
+  });
+  reportarDebugEvolution('status:resolved', {
+    instancia: alvo.instancia,
+    connectionState: dados.instance?.state ?? null,
+    fetchConnectionStatus: instanciaDetalhe?.connectionStatus ?? null,
+    hasOwnerJid: Boolean(instanciaDetalhe?.ownerJid),
+    hasProfileName: Boolean(instanciaDetalhe?.profileName),
+    resolvedState: statusResolvido.state,
+    conectado: statusResolvido.conectado,
+    fonte: statusResolvido.fonte,
+    disconnectionReasonCode: instanciaDetalhe?.disconnectionReasonCode ?? null,
   });
 
   if (!statusResolvido.conectado && instanciaDetalhe?.disconnectionObject) {
@@ -158,6 +236,11 @@ async function obterStatusConexaoPorAlvo(alvo: AlvoWhatsapp): Promise<StatusCone
     } catch {
       /* ignora */
     }
+  }
+
+  if (statusResolvido.state === 'stale_open') {
+    motivoDesconexao =
+      'A Evolution manteve um status antigo como aberto, mas a sessao atual nao responde. Desconecte e gere um novo QR.';
   }
 
   return {
@@ -192,9 +275,23 @@ async function obterQrCodePorAlvo(alvo: AlvoWhatsapp): Promise<QrCodeResposta> {
   const res = await fetch(url, { headers: headers(alvo.apiKey), signal: AbortSignal.timeout(30000) });
   if (!res.ok) {
     const corpo = await res.text();
+    reportarDebugEvolution('connect:error', {
+      instancia: alvo.instancia,
+      url,
+      statusCode: res.status,
+      body: corpo,
+    });
     throw new Error(`connect falhou (${res.status}): ${corpo}`);
   }
   const dados = (await res.json()) as QrCodeResposta;
+  reportarDebugEvolution('connect:ok', {
+    instancia: alvo.instancia,
+    url,
+    statusCode: res.status,
+    hasBase64: Boolean(dados.base64),
+    hasPairingCode: Boolean(dados.pairingCode),
+    count: dados.count ?? null,
+  });
   return {
     base64: dados.base64 ?? null,
     pairingCode: dados.pairingCode ?? null,
@@ -214,7 +311,20 @@ async function reconectarPorAlvo(alvo: AlvoWhatsapp): Promise<QrCodeResposta> {
     method: 'DELETE',
     headers: headers(alvo.apiKey),
     signal: AbortSignal.timeout(15000),
-  }).catch(() => {
+  }).then(async (res) => {
+    const body = await res.text().catch(() => '');
+    reportarDebugEvolution('logout:result', {
+      instancia: alvo.instancia,
+      url: logoutUrl,
+      statusCode: res.status,
+      body,
+    });
+  }).catch((error) => {
+    reportarDebugEvolution('logout:error', {
+      instancia: alvo.instancia,
+      url: logoutUrl,
+      error: error instanceof Error ? error.message : String(error),
+    });
     /* logout pode falhar se já desconectado */
   });
   await new Promise((r) => setTimeout(r, 1500));

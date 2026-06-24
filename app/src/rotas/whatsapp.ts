@@ -40,10 +40,10 @@ function reportarDebugWhatsapp(
   etapa: 'entrada' | 'cooldown' | 'permitido',
   extra?: Record<string, unknown>,
 ) {
-  let url = 'http://2.24.201.28:7778/event';
-  let sessionId = 'whatsapp-qr-connection';
+  let url = 'http://127.0.0.1:7777/event';
+  let sessionId = 'whatsapp-false-open';
   try {
-    const caminho = '.dbg/whatsapp-qr-connection.env';
+    const caminho = '.dbg/whatsapp-false-open.env';
     if (existsSync(caminho)) {
       const env = readFileSync(caminho, 'utf8');
       url = env.match(/DEBUG_SERVER_URL=(.+)/)?.[1]?.trim() || url;
@@ -125,6 +125,14 @@ export async function rotasWhatsapp(app: FastifyInstance): Promise<void> {
     }
     reportarDebugWhatsapp(req, 'status', 'permitido');
     const status = await obterStatusConexao();
+    reportarDebugWhatsapp(req, 'status', 'permitido', {
+      statusRetornado: status.state,
+      conectado: status.conectado,
+      podeEnviar: status.podeEnviar,
+      numeroConectado: status.numeroConectado ?? null,
+      nomePerfil: status.nomePerfil ?? null,
+      motivoDesconexao: status.motivoDesconexao ?? null,
+    });
     return {
       ...status,
       escopo: 'conexao_ativa_da_ia',
@@ -146,6 +154,11 @@ export async function rotasWhatsapp(app: FastifyInstance): Promise<void> {
     }
     reportarDebugWhatsapp(req, 'qrcode', 'permitido');
     const status = await obterStatusConexao();
+    reportarDebugWhatsapp(req, 'qrcode', 'permitido', {
+      statusAntesQr: status.state,
+      conectadoAntesQr: status.conectado,
+      podeEnviarAntesQr: status.podeEnviar,
+    });
     if (status.conectado) {
       return {
         conectado: true,
@@ -156,8 +169,18 @@ export async function rotasWhatsapp(app: FastifyInstance): Promise<void> {
       };
     }
     const qr = await obterQrCode();
+    reportarDebugWhatsapp(req, 'qrcode', 'permitido', {
+      hasBase64: Boolean(qr.base64),
+      hasPairingCode: Boolean(qr.pairingCode),
+      count: qr.count ?? null,
+    });
     if (!qr.base64) {
       const statusAtualizado = await obterStatusConexao();
+      reportarDebugWhatsapp(req, 'qrcode', 'permitido', {
+        statusDepoisQr: statusAtualizado.state,
+        conectadoDepoisQr: statusAtualizado.conectado,
+        podeEnviarDepoisQr: statusAtualizado.podeEnviar,
+      });
       if (statusAtualizado.conectado) {
         return {
           conectado: true,
@@ -192,6 +215,16 @@ export async function rotasWhatsapp(app: FastifyInstance): Promise<void> {
     const status = await obterStatusConexao();
     const qr = await reconectar();
     const statusAtualizado = await obterStatusConexao();
+    reportarDebugWhatsapp(req, 'reconectar', 'permitido', {
+      statusAntesReconectar: status.state,
+      conectadoAntesReconectar: status.conectado,
+      statusDepoisReconectar: statusAtualizado.state,
+      conectadoDepoisReconectar: statusAtualizado.conectado,
+      podeEnviarDepoisReconectar: statusAtualizado.podeEnviar,
+      hasBase64: Boolean(qr.base64),
+      hasPairingCode: Boolean(qr.pairingCode),
+      count: qr.count ?? null,
+    });
     if (!qr.base64 && !statusAtualizado.conectado) {
       return reply.status(503).send({
         erro: 'Nao foi possivel gerar novo QR para esta sessao.',

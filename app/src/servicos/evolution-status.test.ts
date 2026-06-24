@@ -20,17 +20,19 @@ test('mantem open quando connectionState ja confirma conexao', () => {
   });
 });
 
-test('promove para open quando fetchInstances mostra sessao aberta com identidade', () => {
+test('nao promove para open quando connectionState diverge e ha marcador de desconexao residual', () => {
   const resultado = resolverStatusEvolution({
     connectionState: 'connecting',
     fetchConnectionStatus: 'open',
     hasOwnerJid: true,
+    fetchDisconnectionReasonCode: 401,
+    hasDisconnectionObject: true,
   });
 
   assert.deepEqual(resultado, {
-    state: 'open',
-    conectado: true,
-    fonte: 'fetchInstances',
+    state: 'stale_open',
+    conectado: false,
+    fonte: 'connectionState',
   });
 });
 
@@ -46,5 +48,20 @@ test('mantem connecting quando fetchInstances nao confirma sessao utilizavel', (
     state: 'connecting',
     conectado: false,
     fonte: 'connectionState',
+  });
+});
+
+test('aceita fetchInstances como fallback apenas quando connectionState nao veio e nao ha desconexao residual', () => {
+  const resultado = resolverStatusEvolution({
+    connectionState: '',
+    fetchConnectionStatus: 'open',
+    hasOwnerJid: true,
+    hasDisconnectionObject: false,
+  });
+
+  assert.deepEqual(resultado, {
+    state: 'open',
+    conectado: true,
+    fonte: 'fetchInstances',
   });
 });
