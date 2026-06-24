@@ -31,6 +31,7 @@ export interface ExtracaoDisponibilidadeIa {
   disponivel: boolean;
   status: 'disponivel' | 'carregado' | 'indisponivel';
   localizacao_atual: string | null;
+  local_destino_atual: string | null;
   local_disponibilidade: string | null;
   data_previsao_disponibilidade: string | null;
   confianca: number;
@@ -97,6 +98,7 @@ async function extrairDisponibilidadeComIa(
     disponivel: consenso.disponivel === true,
     status: consenso.status === 'indefinido' ? 'indisponivel' : consenso.status,
     localizacao_atual: consenso.localizacaoAtual,
+    local_destino_atual: consenso.localDestinoAtual,
     local_disponibilidade: consenso.localDisponibilidade,
     data_previsao_disponibilidade: consenso.dataPrevisaoDisponibilidade,
     confianca: consenso.confianca,
@@ -238,7 +240,9 @@ export async function executarReconciliacaoDisponibilidade(): Promise<ResultadoR
         disponivel: ext.disponivel,
         status: ext.status,
         localizacao_atual: ext.localizacao_atual ?? undefined,
+        local_destino_atual: ext.local_destino_atual ?? undefined,
         local_disponibilidade: ext.local_disponibilidade ?? undefined,
+        local_liberacao_prevista: ext.local_disponibilidade ?? undefined,
         data_previsao_disponibilidade: ext.data_previsao_disponibilidade ?? undefined,
       });
 

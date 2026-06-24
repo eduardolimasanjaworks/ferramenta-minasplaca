@@ -17,6 +17,7 @@ export interface ConfigMensagensFluxo {
   c7_pede_localizacao: string;
   c7_local_invalida: string;
   c7_pergunta_local_atual_carregado: string;
+  c7_pergunta_destino_atual_carregado: string;
   c7_pergunta_data: string;
   c7_pergunta_local_disponibilidade: string;
   c7_data_vaga: string;
@@ -73,6 +74,8 @@ export const MENSAGENS_FLUXO_PADRAO: ConfigMensagensFluxo = {
     'Preciso do nome da cidade e estado onde você está (ou mande a localização pelo clipe)',
   c7_pergunta_local_atual_carregado:
     'Entendido parceiro, me fala sua localização atual agora com cidade e estado',
+  c7_pergunta_destino_atual_carregado:
+    'E qual é a cidade e estado do destino da viagem atual que você está levando agora?',
   c7_pergunta_data: 'E em que data você estará liberado para carregar?',
   c7_pergunta_local_disponibilidade:
     'E quando liberar, em qual cidade e estado você vai estar disponível para carregar?',
@@ -160,6 +163,7 @@ function normalizar(
     c7_pede_localizacao: String(base.c7_pede_localizacao).trim(),
     c7_local_invalida: String(base.c7_local_invalida).trim(),
     c7_pergunta_local_atual_carregado: String(base.c7_pergunta_local_atual_carregado).trim(),
+    c7_pergunta_destino_atual_carregado: String(base.c7_pergunta_destino_atual_carregado).trim(),
     c7_pergunta_data: String(base.c7_pergunta_data).trim(),
     c7_pergunta_local_disponibilidade: String(base.c7_pergunta_local_disponibilidade).trim(),
     c7_data_vaga: String(base.c7_data_vaga).trim(),

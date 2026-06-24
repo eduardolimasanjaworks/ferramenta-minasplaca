@@ -10,6 +10,7 @@ import { parseDataLiberacao } from './fluxo-disponibilidade.js';
 export type CampoDisponibilidadeFaltante =
   | 'status'
   | 'localizacao_atual'
+  | 'local_destino_atual'
   | 'data_previsao_disponibilidade'
   | 'local_disponibilidade';
 
@@ -24,6 +25,7 @@ interface ExtracaoModeloDisponibilidade {
   status: 'disponivel' | 'carregado' | 'indisponivel' | 'indefinido';
   disponivel: boolean | null;
   localizacao_atual: string | null;
+  local_destino_atual: string | null;
   local_disponibilidade: string | null;
   data_previsao_disponibilidade: string | null;
   faltando: CampoDisponibilidadeFaltante[];
@@ -36,6 +38,7 @@ export interface ConsensoDisponibilidade {
   status: 'disponivel' | 'carregado' | 'indisponivel' | 'indefinido';
   disponivel: boolean | null;
   localizacaoAtual: string | null;
+  localDestinoAtual: string | null;
   localDisponibilidade: string | null;
   dataPrevisaoDisponibilidade: string | null;
   faltando: CampoDisponibilidadeFaltante[];
@@ -111,6 +114,7 @@ function normalizarCamposFaltantes(valor: unknown): CampoDisponibilidadeFaltante
   const permitidos: CampoDisponibilidadeFaltante[] = [
     'status',
     'localizacao_atual',
+    'local_destino_atual',
     'data_previsao_disponibilidade',
     'local_disponibilidade',
   ];
@@ -136,6 +140,7 @@ function normalizarExtracao(valor: ExtracaoModeloDisponibilidade | null): Extrac
           ? null
           : status === 'disponivel',
     localizacao_atual: normalizarLocal(valor.localizacao_atual),
+    local_destino_atual: normalizarLocal(valor.local_destino_atual),
     local_disponibilidade: normalizarLocal(valor.local_disponibilidade),
     data_previsao_disponibilidade: normalizarData(valor.data_previsao_disponibilidade),
     faltando: normalizarCamposFaltantes(valor.faltando),
@@ -166,6 +171,7 @@ function uniaoFaltantes(extracoes: ExtracaoModeloDisponibilidade[]): CampoDispon
   const ordem: CampoDisponibilidadeFaltante[] = [
     'status',
     'localizacao_atual',
+    'local_destino_atual',
     'data_previsao_disponibilidade',
     'local_disponibilidade',
   ];
@@ -194,18 +200,20 @@ async function extrairComModelo(
   "status": "disponivel" | "carregado" | "indisponivel" | "indefinido",
   "disponivel": true | false | null,
   "localizacao_atual": "Cidade UF" ou null,
+  "local_destino_atual": "Cidade UF" ou null,
   "local_disponibilidade": "Cidade UF" ou null,
   "data_previsao_disponibilidade": "AAAA-MM-DD HH:mm:ss" ou null,
-  "faltando": ["status","localizacao_atual","data_previsao_disponibilidade","local_disponibilidade"],
+  "faltando": ["status","localizacao_atual","local_destino_atual","data_previsao_disponibilidade","local_disponibilidade"],
   "confianca": 0.0 a 1.0,
   "evidencia": "trecho curto"
 }
 
 Regras:
 - O objetivo operacional da GMX e sempre saber disponibilidade para carregar e localizacao atual.
-- Se o motorista estiver carregado, tambem precisa saber quando vai liberar e onde vai estar disponivel para carregar.
+- Se o motorista estiver carregado, tambem precisa saber o destino da viagem atual, quando vai liberar e onde vai estar disponivel para carregar.
 - Se o motorista disser que nao esta disponivel, use "indisponivel" como status.
 - localizacao_atual e o lugar onde ele esta agora.
+- local_destino_atual e para onde ele esta indo com a carga atual.
 - local_disponibilidade e onde ele vai estar quando liberar para nova carga.
 - Se houver conflito ou ambiguidade, use "indefinido" e marque o campo faltando.
 - Nunca invente cidade nem data.
@@ -257,12 +265,23 @@ export async function resolverDisponibilidadeComRedundancia(opts: {
   const faltando = uniaoFaltantes(extracoes);
   if (status === 'disponivel') {
     const semCampoCarregado = faltando.filter(
-      (campo) => campo !== 'data_previsao_disponibilidade' && campo !== 'local_disponibilidade',
+      (campo) =>
+        campo !== 'local_destino_atual' &&
+        campo !== 'data_previsao_disponibilidade' &&
+        campo !== 'local_disponibilidade',
     );
     faltando.splice(0, faltando.length, ...semCampoCarregado);
   }
+  if (status === 'indisponivel') {
+    const semDestinoAtual = faltando.filter((campo) => campo !== 'local_destino_atual');
+    faltando.splice(0, faltando.length, ...semDestinoAtual);
+  }
 
   const localizacaoAtual = primeiroNaoNulo(...extracoes.map((item) => item.localizacao_atual));
+  const localDestinoAtual =
+    status === 'carregado'
+      ? primeiroNaoNulo(...extracoes.map((item) => item.local_destino_atual))
+      : null;
   const localDisponibilidade =
     status === 'carregado' || status === 'indisponivel'
       ? primeiroNaoNulo(...extracoes.map((item) => item.local_disponibilidade))
@@ -289,6 +308,7 @@ export async function resolverDisponibilidadeComRedundancia(opts: {
     status,
     disponivel: status === 'indefinido' ? null : status === 'disponivel',
     localizacaoAtual,
+    localDestinoAtual,
     localDisponibilidade,
     dataPrevisaoDisponibilidade,
     faltando,

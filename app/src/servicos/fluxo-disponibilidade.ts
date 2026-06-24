@@ -27,9 +27,11 @@ interface EstadoC7 {
     | 'indisponivel_data'
     | 'indisponivel_local_disponibilidade'
     | 'carregado_local_atual'
+    | 'carregado_destino_atual'
     | 'carregado_data'
     | 'carregado_local_disponibilidade';
   localizacaoAtual?: string;
+  localDestinoAtual?: string;
   dataPrevisaoDisponibilidade?: string;
   latitudeAtual?: number;
   longitudeAtual?: number;
@@ -55,14 +57,22 @@ type ContextoC7 =
     }
   | { tipo: 'carregado_local_atual' }
   | {
+      tipo: 'carregado_destino_atual';
+      localizacaoAtual: string;
+      latitudeAtual?: number;
+      longitudeAtual?: number;
+    }
+  | {
       tipo: 'carregado_data';
       localizacaoAtual: string;
+      localDestinoAtual: string;
       latitudeAtual?: number;
       longitudeAtual?: number;
     }
   | {
       tipo: 'carregado_local_disponibilidade';
       localizacaoAtual: string;
+      localDestinoAtual: string;
       dataPrevisaoDisponibilidade: string;
       latitudeAtual?: number;
       longitudeAtual?: number;
@@ -93,6 +103,10 @@ function perguntouLocalizacao(texto: string): boolean {
 
 function perguntouLocalAtualCarregado(texto: string): boolean {
   return /localiza[cç][aã]o atual agora|onde voc[eê] est[aá] agora/i.test(texto);
+}
+
+function perguntouDestinoAtualCarregado(texto: string): boolean {
+  return /destino da viagem atual|destino .*est[aá] levando agora/i.test(texto);
 }
 
 function perguntouData(texto: string): boolean {
@@ -255,6 +269,7 @@ function inferirContexto(
 
   if (perguntouLocalDisponibilidade(ultimaAssist)) {
     const localizacaoAtual = extrairLocalAtualDoHistorico(historico) ?? '';
+    const localDestinoAtual = extrairDestinoAtualDoHistorico(historico) ?? '';
     const dataPrevisaoDisponibilidade = extrairDataDoHistorico(historico) ?? '';
     return historicoTemStatusIndisponivel(historico)
       ? {
@@ -265,6 +280,7 @@ function inferirContexto(
       : {
           tipo: 'carregado_local_disponibilidade',
           localizacaoAtual,
+          localDestinoAtual,
           dataPrevisaoDisponibilidade,
         };
   }
@@ -281,7 +297,18 @@ function inferirContexto(
     const usuarioFalouIndisponivel = historicoTemStatusIndisponivel(historico);
     return usuarioFalouIndisponivel
       ? { tipo: 'indisponivel_data', localizacaoAtual }
-      : { tipo: 'carregado_data', localizacaoAtual };
+      : {
+          tipo: 'carregado_data',
+          localizacaoAtual,
+          localDestinoAtual: extrairDestinoAtualDoHistorico(historico) ?? '',
+        };
+  }
+
+  if (perguntouDestinoAtualCarregado(ultimaAssist)) {
+    return {
+      tipo: 'carregado_destino_atual',
+      localizacaoAtual: extrairLocalAtualDoHistorico(historico) ?? '',
+    };
   }
 
   if (perguntouLocalAtualCarregado(ultimaAssist)) return { tipo: 'carregado_local_atual' };
@@ -313,6 +340,23 @@ function extrairLocalAtualDoHistorico(
     if (h.role !== 'user') continue;
     const loc = extrairLocalizacaoTexto(h.content);
     if (loc) return loc;
+  }
+  return null;
+}
+
+function extrairDestinoAtualDoHistorico(
+  historico: Array<{ role: string; content: string }>,
+): string | null {
+  for (let i = historico.length - 1; i >= 0; i--) {
+    const atual = historico[i];
+    const anterior = historico[i - 1];
+    if (
+      atual?.role === 'user' &&
+      anterior?.role === 'assistant' &&
+      perguntouDestinoAtualCarregado(anterior.content)
+    ) {
+      return extrairLocalizacaoTexto(atual.content);
+    }
   }
   return null;
 }
@@ -406,10 +450,19 @@ export async function tentarFluxoDisponibilidade(opts: {
       };
     }
     if (estadoRedis.passo === 'carregado_local_atual') contexto = { tipo: 'carregado_local_atual' };
+    if (estadoRedis.passo === 'carregado_destino_atual' && estadoRedis.localizacaoAtual) {
+      contexto = {
+        tipo: 'carregado_destino_atual',
+        localizacaoAtual: estadoRedis.localizacaoAtual,
+        latitudeAtual: estadoRedis.latitudeAtual,
+        longitudeAtual: estadoRedis.longitudeAtual,
+      };
+    }
     if (estadoRedis.passo === 'carregado_data' && estadoRedis.localizacaoAtual) {
       contexto = {
         tipo: 'carregado_data',
         localizacaoAtual: estadoRedis.localizacaoAtual,
+        localDestinoAtual: estadoRedis.localDestinoAtual ?? '',
         latitudeAtual: estadoRedis.latitudeAtual,
         longitudeAtual: estadoRedis.longitudeAtual,
       };
@@ -422,6 +475,7 @@ export async function tentarFluxoDisponibilidade(opts: {
       contexto = {
         tipo: 'carregado_local_disponibilidade',
         localizacaoAtual: estadoRedis.localizacaoAtual,
+        localDestinoAtual: estadoRedis.localDestinoAtual ?? '',
         dataPrevisaoDisponibilidade: estadoRedis.dataPrevisaoDisponibilidade,
         latitudeAtual: estadoRedis.latitudeAtual,
         longitudeAtual: estadoRedis.longitudeAtual,
@@ -577,10 +631,36 @@ export async function tentarFluxoDisponibilidade(opts: {
     await salvarEstadoFluxo(
       telefone,
       {
-        passo: 'carregado_data',
+        passo: 'carregado_destino_atual',
         localizacaoAtual: localAtual.localizacao,
         latitudeAtual: localAtual.latitude,
         longitudeAtual: localAtual.longitude,
+      } satisfies EstadoC7,
+    );
+    return montarResultado(
+      msgs.c7_pergunta_destino_atual_carregado,
+      undefined,
+      'pede_destino_atual',
+    );
+  }
+
+  if (contexto.tipo === 'carregado_destino_atual') {
+    const localDestinoAtual = extrairLocalizacaoTexto(mensagem);
+    if (!localDestinoAtual || localizacaoVaga(mensagem)) {
+      return montarResultado(
+        msgs.c7_pergunta_destino_atual_carregado,
+        undefined,
+        'destino_atual_invalido',
+      );
+    }
+    await salvarEstadoFluxo(
+      telefone,
+      {
+        passo: 'carregado_data',
+        localizacaoAtual: contexto.localizacaoAtual,
+        localDestinoAtual,
+        latitudeAtual: contexto.latitudeAtual,
+        longitudeAtual: contexto.longitudeAtual,
       } satisfies EstadoC7,
     );
     return montarResultado(msgs.c7_pergunta_data, undefined, 'pede_data');
@@ -599,6 +679,7 @@ export async function tentarFluxoDisponibilidade(opts: {
       {
         passo: 'carregado_local_disponibilidade',
         localizacaoAtual: contexto.localizacaoAtual,
+        localDestinoAtual: contexto.localDestinoAtual,
         dataPrevisaoDisponibilidade: dataIso,
         latitudeAtual: contexto.latitudeAtual,
         longitudeAtual: contexto.longitudeAtual,
@@ -629,7 +710,9 @@ export async function tentarFluxoDisponibilidade(opts: {
           disponivel: false,
           status: 'carregado',
           localizacao_atual: contexto.localizacaoAtual,
+          local_destino_atual: contexto.localDestinoAtual,
           local_disponibilidade: localDisponibilidade,
+          local_liberacao_prevista: localDisponibilidade,
           data_previsao_disponibilidade: contexto.dataPrevisaoDisponibilidade,
           latitude: contexto.latitudeAtual,
           longitude: contexto.longitudeAtual,
@@ -653,6 +736,7 @@ export function estaEmFluxoDisponibilidade(
     perguntouStatus(u) ||
     perguntouLocalizacao(u) ||
     perguntouLocalAtualCarregado(u) ||
+    perguntouDestinoAtualCarregado(u) ||
     perguntouData(u) ||
     perguntouLocalDisponibilidade(u) ||
     GMX_PROATIVA.test(u)

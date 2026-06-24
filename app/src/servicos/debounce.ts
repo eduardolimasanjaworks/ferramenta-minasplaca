@@ -531,6 +531,8 @@ async function processarLote(remoteJid: string): Promise<void> {
                 consenso.status === 'carregado'
                   ? msgsFluxo.c7_pergunta_local_atual_carregado
                   : msgsFluxo.c7_pede_localizacao;
+            } else if (proximoCampo === 'local_destino_atual') {
+              respostaFinal = msgsFluxo.c7_pergunta_destino_atual_carregado;
             } else if (proximoCampo === 'data_previsao_disponibilidade') {
               respostaFinal = msgsFluxo.c7_pergunta_data;
             } else if (proximoCampo === 'local_disponibilidade') {
@@ -543,6 +545,7 @@ async function processarLote(remoteJid: string): Promise<void> {
                   consenso.dataPrevisaoDisponibilidade &&
                   consenso.localDisponibilidade) ||
                 (consenso.status === 'carregado' &&
+                  consenso.localDestinoAtual &&
                   consenso.dataPrevisaoDisponibilidade &&
                   consenso.localDisponibilidade))
             ) {
@@ -551,7 +554,13 @@ async function processarLote(remoteJid: string): Promise<void> {
                 disponivel: consenso.disponivel,
                 status: consenso.status,
                 localizacao_atual: consenso.localizacaoAtual,
+                local_destino_atual:
+                  consenso.status === 'carregado' ? consenso.localDestinoAtual : undefined,
                 local_disponibilidade:
+                  consenso.status === 'disponivel'
+                    ? undefined
+                    : consenso.localDisponibilidade ?? consenso.localizacaoAtual,
+                local_liberacao_prevista:
                   consenso.status === 'disponivel'
                     ? undefined
                     : consenso.localDisponibilidade ?? consenso.localizacaoAtual,
@@ -571,6 +580,7 @@ async function processarLote(remoteJid: string): Promise<void> {
                 faltando: consenso.faltando,
                 confianca: consenso.confianca,
                 localizacaoAtual: consenso.localizacaoAtual,
+                localDestinoAtual: consenso.localDestinoAtual,
                 localDisponibilidade: consenso.localDisponibilidade,
               },
               0,
