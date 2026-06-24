@@ -50,8 +50,7 @@ import {
   listarFilaHumanaOfertas,
   resolverFilaHumanaOferta,
 } from '../servicos/oferta-fila-humana.js';
-import type { BlocoEquipe } from '../servicos/config-painel-equipe.js';
-import { painelAdmin, painelAutenticado, painelPodeVer } from '../servicos/painel-acesso.js';
+import { painelAdmin, painelAutenticado } from '../servicos/painel-acesso.js';
 import { resetarContatoTeste } from '../servicos/reset-contato-teste.js';
 import {
   aplicarInstrucaoTreinamentoDireto,
@@ -85,23 +84,15 @@ function exigirAdmin(req: Parameters<typeof painelAdmin>[0], reply: { status: (c
 }
 
 async function exigirLeituraBloco(
-  req: Parameters<typeof painelAdmin>[0],
+  req: Parameters<typeof painelAutenticado>[0],
   reply: { status: (code: number) => { send: (body: unknown) => unknown } },
-  bloco: BlocoEquipe,
-  blocosAlternativos: BlocoEquipe[] = [],
 ) {
-  if (!exigirPainel(req, reply)) return false;
-  if (painelAdmin(req)) return true;
-  for (const item of [bloco, ...blocosAlternativos]) {
-    if (await painelPodeVer(req, item)) return true;
-  }
-  reply.status(403).send({ erro: 'Seu login nao pode acessar este bloco' });
-  return false;
+  return exigirPainel(req, reply);
 }
 
 export async function rotasAdmin(app: FastifyInstance): Promise<void> {
   app.get('/api/prompt', async (req, reply) => {
-    if (!(await exigirLeituraBloco(req, reply, 'prompt_principal', ['editor_visual']))) return;
+    if (!(await exigirLeituraBloco(req, reply))) return;
     return obterPromptMeta();
   });
 
@@ -122,7 +113,7 @@ export async function rotasAdmin(app: FastifyInstance): Promise<void> {
   });
 
   app.get('/api/config/ocr', async (req, reply) => {
-    if (!(await exigirLeituraBloco(req, reply, 'prompt_ocr', ['editor_visual']))) return;
+    if (!(await exigirLeituraBloco(req, reply))) return;
     const meta = await obterPromptOcrMeta();
     return { ...meta, padrao: OCR_PADRAO, padraoForcado: OCR_PROMPT_FORCADO };
   });
@@ -157,7 +148,7 @@ export async function rotasAdmin(app: FastifyInstance): Promise<void> {
   });
 
   app.get('/api/config/envio', async (req, reply) => {
-    if (!(await exigirLeituraBloco(req, reply, 'operacao_avancada', ['editor_visual']))) return;
+    if (!(await exigirLeituraBloco(req, reply))) return;
     const cfg = await obterConfigHumanizacao();
     return { config: cfg, padrao: HUMANIZACAO_PADRAO };
   });
@@ -184,7 +175,7 @@ export async function rotasAdmin(app: FastifyInstance): Promise<void> {
   });
 
   app.get('/api/config/tempo', async (req, reply) => {
-    if (!(await exigirLeituraBloco(req, reply, 'operacao_avancada', ['editor_visual']))) return;
+    if (!(await exigirLeituraBloco(req, reply))) return;
     const cfg = await obterConfigTempo();
     return { config: cfg, padrao: TEMPO_PADRAO, build: config.buildId };
   });
@@ -202,7 +193,7 @@ export async function rotasAdmin(app: FastifyInstance): Promise<void> {
   });
 
   app.get('/api/config/orquestracao-texto', async (req, reply) => {
-    if (!(await exigirLeituraBloco(req, reply, 'estilo_formatacao', ['editor_visual']))) return;
+    if (!(await exigirLeituraBloco(req, reply))) return;
     return obterConfigOrquestracaoTextoMeta();
   });
 
@@ -239,7 +230,7 @@ export async function rotasAdmin(app: FastifyInstance): Promise<void> {
   );
 
   app.get('/api/config/mensagens-fluxo', async (req, reply) => {
-    if (!(await exigirLeituraBloco(req, reply, 'mensagens_fluxo', ['editor_visual']))) return;
+    if (!(await exigirLeituraBloco(req, reply))) return;
     return obterConfigMensagensFluxoMeta();
   });
 
@@ -265,7 +256,7 @@ export async function rotasAdmin(app: FastifyInstance): Promise<void> {
   );
 
   app.get<{ Querystring: { limite?: string } }>('/api/config/historico', async (req, reply) => {
-    if (!(await exigirLeituraBloco(req, reply, 'editor_visual'))) return;
+    if (!(await exigirLeituraBloco(req, reply))) return;
     const limite = Math.min(Math.max(Number(req.query?.limite ?? 20) || 20, 1), 100);
     return { itens: await listarHistoricoConfiguracao(limite) };
   });

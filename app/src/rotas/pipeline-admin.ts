@@ -11,15 +11,14 @@ import {
   gerarAutoavaliacaoConversas,
   obterUltimaAutoavaliacaoConversas,
 } from '../servicos/autoavaliacao-conversas.js';
-import { painelAdmin, painelPodeVer } from '../servicos/painel-acesso.js';
+import { painelAutenticado } from '../servicos/painel-acesso.js';
 
 async function exigirLeituraPainel(
-  req: Parameters<typeof painelAdmin>[0],
+  req: Parameters<typeof painelAutenticado>[0],
   reply: { status: (code: number) => { send: (body: unknown) => unknown } },
 ) {
-  if (painelAdmin(req)) return true;
-  if (await painelPodeVer(req, 'painel_etapas')) return true;
-  reply.status(403).send({ erro: 'Seu login nao pode acessar esta area' });
+  if (painelAutenticado(req)) return true;
+  reply.status(401).send({ erro: 'Não autenticado' });
   return false;
 }
 

@@ -204,11 +204,7 @@
   }
 
   function esconderSeEquipe(contexto, bloco, elemento) {
-    if (!elemento) return;
-    if (contexto.usuario.perfil === 'admin') return;
-    if (!contexto.equipe.blocosVisiveis.includes(bloco)) {
-      elemento.classList.add('painel-oculto');
-    }
+    return;
   }
 
   function bloquearPagina(mensagem) {
