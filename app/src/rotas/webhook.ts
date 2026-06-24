@@ -53,7 +53,7 @@ export async function rotasWebhook(app: FastifyInstance): Promise<void> {
       try {
         const telefone = jidParaTelefone(remoteJid);
         // #region debug-point A:webhook-received
-        if (telefone === '5512982787368') fetch('http://2.24.201.28:7777/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'chat-sync-no-response',runId:'pre-fix',hypothesisId:'A',location:'webhook.ts:53',msg:'[DEBUG] webhook recebeu mensagem do telefone alvo',data:{instance:payload.instance,remoteJid,telefone,messageId:dados.key?.id ?? null,pushName:dados.pushName ?? null,event:payload.event},ts:Date.now()})}).catch(()=>{});
+        if (telefone === '5512997918525') fetch('http://2.24.201.28:7777/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'chat-no-response-8525',runId:'pre-fix',hypothesisId:'A',location:'webhook.ts:53',msg:'[DEBUG] webhook recebeu mensagem do telefone alvo',data:{instance:payload.instance,remoteJid,telefone,messageId:dados.key?.id ?? null,pushName:dados.pushName ?? null,event:payload.event},ts:Date.now()})}).catch(()=>{});
         // #endregion
         // #region debug-point A:webhook-start
         fetch('http://2.24.201.28:7778/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'whatsapp-delay-response',runId:'pre-fix',hypothesisId:'A',location:'webhook.ts:49',msg:'[DEBUG] webhook iniciou processamento da mensagem',data:{instance:payload.instance,remoteJid,telefone,messageId:dados.key?.id ?? null,pushName:dados.pushName ?? null},ts:Date.now()})}).catch(()=>{});
@@ -64,7 +64,7 @@ export async function rotasWebhook(app: FastifyInstance): Promise<void> {
           payload.instance,
         );
         // #region debug-point A:webhook-content-target
-        if (telefone === '5512982787368') fetch('http://2.24.201.28:7777/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'chat-sync-no-response',runId:'pre-fix',hypothesisId:'A',location:'webhook.ts:68',msg:'[DEBUG] webhook extraiu conteudo do telefone alvo',data:{telefone,remoteJid,tipo,midiaId:midiaId ?? null,mimetype:mimetype ?? null,fileName:fileName ?? null,conteudoPreview:conteudo.slice(0,200)},ts:Date.now()})}).catch(()=>{});
+        if (telefone === '5512997918525') fetch('http://2.24.201.28:7777/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'chat-no-response-8525',runId:'pre-fix',hypothesisId:'A',location:'webhook.ts:68',msg:'[DEBUG] webhook extraiu conteudo do telefone alvo',data:{telefone,remoteJid,tipo,midiaId:midiaId ?? null,mimetype:mimetype ?? null,fileName:fileName ?? null,conteudoPreview:conteudo.slice(0,200)},ts:Date.now()})}).catch(()=>{});
         // #endregion
         // #region debug-point A:webhook-content
         fetch('http://2.24.201.28:7778/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'whatsapp-delay-response',runId:'pre-fix',hypothesisId:'A',location:'webhook.ts:61',msg:'[DEBUG] webhook concluiu processamento do conteudo',data:{remoteJid,telefone,tipo,midiaId:midiaId ?? null,mimetype:mimetype ?? null,fileName:fileName ?? null,conteudoPreview:conteudo.slice(0,160)},ts:Date.now()})}).catch(()=>{});
@@ -73,7 +73,7 @@ export async function rotasWebhook(app: FastifyInstance): Promise<void> {
         const podeResponder = await iaPodeResponder(telefone);
         if (!podeResponder) {
           // #region debug-point B:webhook-paused
-          if (telefone === '5512982787368') fetch('http://2.24.201.28:7777/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'chat-sync-no-response',runId:'post-fix',hypothesisId:'B',location:'webhook.ts:75',msg:'[DEBUG] webhook registrou inbound mas bloqueou resposta por pausa',data:{telefone,remoteJid,tipo,conteudoPreview:conteudo.slice(0,200)},ts:Date.now()})}).catch(()=>{});
+          if (telefone === '5512997918525') fetch('http://2.24.201.28:7777/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'chat-no-response-8525',runId:'pre-fix',hypothesisId:'B',location:'webhook.ts:75',msg:'[DEBUG] webhook registrou inbound mas bloqueou resposta por pausa',data:{telefone,remoteJid,tipo,conteudoPreview:conteudo.slice(0,200)},ts:Date.now()})}).catch(()=>{});
           // #endregion
           await adicionarAoHistorico(remoteJid, 'user', conteudo);
           await salvarEstadoMonitorTelefone(telefone, {
@@ -111,7 +111,7 @@ export async function rotasWebhook(app: FastifyInstance): Promise<void> {
           origem: 'evolution',
         });
         // #region debug-point A:webhook-enqueued
-        if (telefone === '5512982787368') fetch('http://2.24.201.28:7777/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'chat-sync-no-response',runId:'pre-fix',hypothesisId:'A',location:'webhook.ts:97',msg:'[DEBUG] webhook enfileirou mensagem no debounce',data:{telefone,remoteJid,tipo,traceId,midiaId:midiaId ?? null},ts:Date.now()})}).catch(()=>{});
+        if (telefone === '5512997918525') fetch('http://2.24.201.28:7777/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'chat-no-response-8525',runId:'pre-fix',hypothesisId:'A',location:'webhook.ts:97',msg:'[DEBUG] webhook enfileirou mensagem no debounce',data:{telefone,remoteJid,tipo,traceId,midiaId:midiaId ?? null},ts:Date.now()})}).catch(()=>{});
         // #endregion
         logEvento('webhook', 'Mensagem enfileirada no debounce', {
           tipo,

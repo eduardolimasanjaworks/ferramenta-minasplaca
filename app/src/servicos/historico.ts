@@ -30,7 +30,7 @@ export async function adicionarAoHistorico(
   await redis.ltrim(chave, -config.historicoMaxMensagens, -1);
   await redis.expire(chave, 86400 * 7); // 7 dias
   // #region debug-point C:historico-write
-  if (jidParaTelefone(remoteJid) === '5512982787368') fetch('http://2.24.201.28:7777/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'chat-sync-no-response',runId:'pre-fix',hypothesisId:'C',location:'historico.ts:32',msg:'[DEBUG] historico recebeu nova mensagem do telefone alvo',data:{remoteJid,papel,conteudoPreview:conteudo.slice(0,200),timestamp:msg.timestamp},ts:Date.now()})}).catch(()=>{});
+  if (jidParaTelefone(remoteJid) === '5512997918525') fetch('http://2.24.201.28:7777/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'chat-no-response-8525',runId:'pre-fix',hypothesisId:'C',location:'historico.ts:32',msg:'[DEBUG] historico recebeu nova mensagem do telefone alvo',data:{remoteJid,papel,conteudoPreview:conteudo.slice(0,200),timestamp:msg.timestamp},ts:Date.now()})}).catch(()=>{});
   // #endregion
   if (papel !== 'system') {
     const telefone = jidParaTelefone(remoteJid);

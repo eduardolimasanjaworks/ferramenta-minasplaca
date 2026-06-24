@@ -335,7 +335,7 @@ export async function rotasMonitorTelefone(app: FastifyInstance): Promise<void> 
       listarTracesRecentes(80),
     ]);
     // #region debug-point E:monitor-load
-    if (telefone === '5512982787368') fetch('http://2.24.201.28:7777/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'chat-sync-no-response',runId:'pre-fix',hypothesisId:'E',location:'monitor-telefone.ts:337',msg:'[DEBUG] monitor carregou snapshot do telefone alvo',data:{telefone,remoteJid,historico:historico.length,pendentes:pendentes.filter((item)=>item.telefone===telefone).length,debounce:debounce ? debounce.itens.length : 0,estadoEnvio:estadoEnvio?.fase ?? null,traces:traces.filter((trace)=>trace.telefone===telefone).length,ultimosPapeis:historico.slice(-6).map((item)=>item.papel)},ts:Date.now()})}).catch(()=>{});
+    if (telefone === '5512997918525') fetch('http://2.24.201.28:7777/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'chat-no-response-8525',runId:'pre-fix',hypothesisId:'E',location:'monitor-telefone.ts:337',msg:'[DEBUG] monitor carregou snapshot do telefone alvo',data:{telefone,remoteJid,historico:historico.length,pendentes:pendentes.filter((item)=>item.telefone===telefone).length,debounce:debounce ? debounce.itens.length : 0,estadoEnvio:estadoEnvio?.fase ?? null,traces:traces.filter((trace)=>trace.telefone===telefone).length,ultimosPapeis:historico.slice(-6).map((item)=>item.papel)},ts:Date.now()})}).catch(()=>{});
     // #endregion
 
     const linhas: LinhaMonitorTelefone[] = [];
@@ -544,7 +544,7 @@ export async function rotasMonitorTelefone(app: FastifyInstance): Promise<void> 
 
     linhas.sort((a, b) => b.horarioMs - a.horarioMs);
     // #region debug-point E:monitor-built
-    if (telefone === '5512982787368') fetch('http://2.24.201.28:7777/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'chat-sync-no-response',runId:'pre-fix',hypothesisId:'E',location:'monitor-telefone.ts:545',msg:'[DEBUG] monitor montou linhas do telefone alvo',data:{telefone,totalLinhas:linhas.length,primeirasLinhas:linhas.slice(0,6).map((item)=>({origem:item.origem,tipo:item.tipo,status:item.status,mensagem:item.mensagem.slice(0,120)}))},ts:Date.now()})}).catch(()=>{});
+    if (telefone === '5512997918525') fetch('http://2.24.201.28:7777/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'chat-no-response-8525',runId:'pre-fix',hypothesisId:'E',location:'monitor-telefone.ts:545',msg:'[DEBUG] monitor montou linhas do telefone alvo',data:{telefone,totalLinhas:linhas.length,primeirasLinhas:linhas.slice(0,6).map((item)=>({origem:item.origem,tipo:item.tipo,status:item.status,mensagem:item.mensagem.slice(0,120)}))},ts:Date.now()})}).catch(()=>{});
     // #endregion
 
     const ultimaLinha = linhas[0] ?? null;

@@ -255,6 +255,7 @@ async function processarLote(remoteJid: string): Promise<void> {
   }
 
   // #region debug-point B:debounce-start
+  if (numero === '5512997918525') fetch('http://2.24.201.28:7777/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'chat-no-response-8525',runId:'pre-fix',hypothesisId:'B',location:'debounce.ts:257',msg:'[DEBUG] lote entrou em processamento no debounce',data:{traceId,telefone:numero,remoteJid,mensagens:mensagens.length,tiposEntrada,origem:origem ?? null,primeiroTs,debounceAguardouMs:Math.max(0,debounceAguardouMs)},ts:Date.now()})}).catch(()=>{});
   fetch('http://2.24.201.28:7778/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'whatsapp-delay-response',runId:'pre-fix',hypothesisId:'B',location:'debounce.ts:143',msg:'[DEBUG] lote entrou em processamento no debounce',data:{traceId,telefone:numero,remoteJid,mensagens:mensagens.length,tiposEntrada,origem:origem ?? null,primeiroTs,debounceAguardouMs:Math.max(0,debounceAguardouMs)},ts:Date.now()})}).catch(()=>{});
   // #endregion
 
