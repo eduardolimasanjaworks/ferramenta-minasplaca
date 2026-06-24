@@ -9,7 +9,6 @@ import {
   listarStatusConexaoWhatsapp,
   obterQrCode,
   obterQrCodeDeterministicoPorNome,
-  obterQrCodePorNome,
   reconectar,
   reconectarPorNome,
 } from '../servicos/evolution-instancia.js';
@@ -231,7 +230,7 @@ export async function rotasWhatsapp(app: FastifyInstance): Promise<void> {
       }
       return reply.status(503).send({
         erro:
-          'O painel desconectou e tentou recriar a sessao automaticamente, mas a Evolution ainda nao devolveu um QR base64 para este alvo.',
+          'O painel desconectou e tentou recriar a sessao automaticamente, mas o servico de conexao ainda nao devolveu um QR base64 para este alvo.',
         alvo: req.params.alvo,
         escopo: 'conexao_dupla_ia',
         state: statusAtualizado.state,

@@ -79,11 +79,17 @@
     return !item?.conectado && (item?.state === 'stale_open' || item?.podeEnviar === false);
   }
 
+  function resumoCanal(item) {
+    if (item?.alvo === 'oficial_gmx') return 'Numero oficial GMX';
+    if (item?.alvo === 'auxiliar_teste') return 'Numero auxiliar da IA';
+    return 'Canal em leitura';
+  }
+
   function htmlQr(item) {
     const qr = state.qr[item.alvo];
     if (item.conectado && !qr?.base64) return '<div class="qr-placeholder">Conectado nesta instancia.</div>';
     if (qrBloqueadoNoPainel(item)) {
-      return '<div class="qr-placeholder">Este alvo auxiliar ficou preso em uma sessao residual da Evolution. Voce ainda pode clicar para ver a explicacao operacional, mas estes dados nao valem como conexao ativa.</div>';
+      return '<div class="qr-placeholder">Este alvo auxiliar ficou preso em uma sessao residual de conexao. Voce ainda pode clicar para ver a explicacao operacional, mas estes dados nao valem como conexao ativa.</div>';
     }
     if (qr?.base64) {
       const src = qr.base64.startsWith('data:') ? qr.base64 : `data:image/png;base64,${qr.base64}`;
@@ -119,7 +125,7 @@
         </div>
         <div class="wa-meta-grid">
           <div class="wa-meta-card"><div class="wa-meta-label">${dadosResiduais(item) ? 'Ultimo numero visto' : 'Numero conectado'}</div><div class="wa-meta-value">${dadosResiduais(item) && !item.numeroConectado ? 'Sem conexao valida' : formatarNumero(item.numeroConectado)}</div></div>
-          <div class="wa-meta-card"><div class="wa-meta-label">Instancia atual</div><div class="wa-meta-value">${item.instance || 'Aguardando leitura'}</div></div>
+          <div class="wa-meta-card"><div class="wa-meta-label">Canal do QR</div><div class="wa-meta-value">${resumoCanal(item)}</div></div>
           <div class="wa-meta-card"><div class="wa-meta-label">${dadosResiduais(item) ? 'Ultimo registro residual' : 'Ultima atualizacao'}</div><div class="wa-meta-value">${formatarData(item.atualizadoEm)}</div></div>
         </div>
         <div class="wa-note-box">
