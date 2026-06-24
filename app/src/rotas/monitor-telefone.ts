@@ -29,6 +29,12 @@ interface LinhaMonitorTelefone {
   status: string;
   variante?: 'chat' | 'previsto' | 'erp' | 'sistema';
   previstoParaMs?: number;
+  detalhe?: {
+    titulo: string;
+    resumo: string;
+    itens: string[];
+    revisao?: string;
+  };
 }
 
 interface ResumoMonitorTelefone {
@@ -87,7 +93,7 @@ function novaLinha(
   mensagem: string,
   tipo: string,
   status: string,
-  extras?: Partial<Pick<LinhaMonitorTelefone, 'variante' | 'previstoParaMs'>>,
+  extras?: Partial<Pick<LinhaMonitorTelefone, 'variante' | 'previstoParaMs' | 'detalhe'>>,
 ): LinhaMonitorTelefone {
   return {
     horarioMs,
@@ -99,6 +105,7 @@ function novaLinha(
     status,
     variante: extras?.variante,
     previstoParaMs: extras?.previstoParaMs,
+    detalhe: extras?.detalhe,
   };
 }
 
@@ -357,17 +364,8 @@ export async function rotasMonitorTelefone(app: FastifyInstance): Promise<void> 
       if (item.papel === 'assistant') {
         const justificativa = montarJustificativaRespostaIa(item.conteudo, item.timestamp, tracesContato);
         if (justificativa) {
-          linhas.push(
-            novaLinha(
-              telefone,
-              item.timestamp - 1,
-              'sistema',
-              justificativa,
-              'justificativa_ia',
-              'explicacao do envio',
-              { variante: 'sistema' },
-            ),
-          );
+          linhas[linhas.length - 1].detalhe = justificativa;
+          linhas[linhas.length - 1].tipo = 'mensagem_ia';
         }
       }
     }
@@ -521,6 +519,9 @@ export async function rotasMonitorTelefone(app: FastifyInstance): Promise<void> 
           );
           continue;
         }
+        if (['contexto', 'roteamento', 'geracao', 'envio', 'webhook', 'debounce'].includes(etapa.etapa)) {
+          continue;
+        }
         const detalhe = formatarDetalheTrace(etapa.detalhe);
         linhas.push(
           novaLinha(
@@ -528,8 +529,8 @@ export async function rotasMonitorTelefone(app: FastifyInstance): Promise<void> 
             etapa.ts,
             'sistema',
             detalhe ? `${etapa.rotulo}\n${detalhe}` : etapa.rotulo,
-            `trace:${trace.id}:${etapa.etapa}`,
-            `trace ${trace.id} · etapa ${etapa.ordem}`,
+            etapa.etapa,
+            etapa.rotulo,
             { variante: 'sistema' },
           ),
         );

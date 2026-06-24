@@ -5,6 +5,13 @@
  */
 import type { TracePipeline } from './trace-pipeline.js';
 
+export interface JustificativaRespostaIa {
+  titulo: string;
+  resumo: string;
+  itens: string[];
+  revisao?: string;
+}
+
 function normalizar(texto: string): string {
   return String(texto || '')
     .replace(/\s+/g, ' ')
@@ -37,19 +44,19 @@ export function montarJustificativaRespostaIa(
   resposta: string,
   timestamp: number,
   traces: TracePipeline[],
-): string | null {
+): JustificativaRespostaIa | null {
   const trace = traces.find((item) => matchResposta(item, resposta, timestamp));
   if (!trace) return null;
 
   const contexto = detalheEtapa(trace, 'contexto') || {};
   const roteamento = detalheEtapa(trace, 'roteamento') || {};
   const geracao = detalheEtapa(trace, 'geracao') || {};
-  const linhas: string[] = ['Justificativa do envio:'];
+  const itens: string[] = [];
 
   if (Array.isArray(contexto.mensagensLote) && contexto.mensagensLote.length) {
-    linhas.push(`- lote considerado: ${truncar(contexto.mensagensLote.join(' | '), 220)}`);
+    itens.push(`Lote considerado: ${truncar(contexto.mensagensLote.join(' | '), 220)}`);
   } else {
-    linhas.push(`- entrada considerada: ${truncar(trace.entrada, 220)}`);
+    itens.push(`Entrada considerada: ${truncar(trace.entrada, 220)}`);
   }
 
   const intencao = typeof roteamento.intencao === 'string' ? roteamento.intencao : '';
@@ -58,20 +65,36 @@ export function montarJustificativaRespostaIa(
   const decisao = [intencao && `intencao ${intencao}`, passo && `passo ${passo}`, cenario && `cenario ${cenario}`]
     .filter(Boolean)
     .join(' · ');
-  if (decisao) linhas.push(`- decisao operacional: ${decisao}`);
+  if (decisao) itens.push(`Decisao operacional: ${decisao}`);
 
   if (typeof contexto.ultimaSaida === 'string' && contexto.ultimaSaida.trim()) {
-    linhas.push(`- ultima saida lembrada: ${truncar(contexto.ultimaSaida, 160)}`);
+    itens.push(`Ultima saida lembrada: ${truncar(contexto.ultimaSaida, 160)}`);
   }
   if (typeof contexto.memoriaMesmoDia === 'string' && contexto.memoriaMesmoDia.trim()) {
-    linhas.push(`- memoria do mesmo dia usada: ${truncar(contexto.memoriaMesmoDia, 180)}`);
+    itens.push(`Memoria do mesmo dia usada: ${truncar(contexto.memoriaMesmoDia, 180)}`);
   }
   if (typeof contexto.memoriaSemantica === 'string' && contexto.memoriaSemantica.trim()) {
-    linhas.push(`- memoria semantica usada: ${truncar(contexto.memoriaSemantica, 180)}`);
+    itens.push(`Memoria semantica usada: ${truncar(contexto.memoriaSemantica, 180)}`);
   }
   if (typeof geracao.preview === 'string' && geracao.preview.trim()) {
-    linhas.push(`- preview planejado: ${truncar(geracao.preview, 180)}`);
+    itens.push(`Preview planejado: ${truncar(geracao.preview, 180)}`);
   }
 
-  return linhas.join('\n');
+  const passadas = Number(geracao.passadas);
+  const revisoes = Array.isArray(geracao.revisoes)
+    ? geracao.revisoes.map((item) => truncar(String(item), 120)).filter(Boolean)
+    : [];
+  const revisao =
+    passadas > 1
+      ? `A IA revisou a resposta ${passadas} vezes antes do envio final${revisoes.length ? ` · ${revisoes.join(' -> ')}` : ''}`
+      : revisoes.length
+        ? `A IA ajustou a resposta antes de enviar · ${revisoes.join(' -> ')}`
+        : undefined;
+
+  return {
+    titulo: 'Motivo da resposta',
+    resumo: revisao || 'Resposta enviada com o contexto disponivel naquele momento',
+    itens,
+    revisao,
+  };
 }

@@ -126,6 +126,56 @@
   padding-right: .35rem;
 }
 
+.bubble.clickable {
+  cursor: pointer;
+}
+
+.bubble.clickable:hover,
+.bubble.clickable:focus {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+  outline: 0;
+}
+
+.chat-audit-panel {
+  border-top: 2px solid var(--line);
+  padding-top: .85rem;
+  display: grid;
+  gap: .6rem;
+}
+
+.chat-audit-title {
+  font-size: .94rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.chat-audit-meta {
+  font-size: .78rem;
+  color: var(--muted);
+}
+
+.chat-audit-summary,
+.chat-audit-empty {
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  padding: .8rem;
+  color: var(--text);
+}
+
+.chat-audit-empty {
+  color: var(--muted);
+  background: var(--surface);
+}
+
+.chat-audit-list {
+  margin: 0;
+  padding-left: 1.15rem;
+  color: var(--text);
+  display: grid;
+  gap: .45rem;
+}
+
 .chat-monitor-empty {
   border: 2px dashed var(--line);
   border-radius: 18px;

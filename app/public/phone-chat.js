@@ -1,11 +1,16 @@
 /**
  * Renderiza as conversas reais do /phone em formato de bolhas.
- * Mostra mensagens, envios previstos e eventos de ERP na mesma timeline.
- * Mantem a tabela original como visao secundaria para auditoria detalhada.
+ * Mantem o chat principal limpo, com explicacoes sob demanda ao clicar na mensagem da IA.
+ * Evita rerender destrutivo para preservar scroll e leitura durante a atualizacao automatica.
  */
 (() => {
   const $ = (id) => document.getElementById(id);
-  const state = { view: 'chat' };
+  const state = {
+    view: 'chat',
+    selectedByPhone: new Map(),
+    lastSignature: '',
+    scrollByPhone: new Map(),
+  };
 
   function escapeHtml(valor) {
     return String(valor || '').replace(/[&<>"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[char]));
@@ -58,10 +63,7 @@
       return `Vai ser enviado ${fmtHora(linha.previstoParaMs)}`;
     }
     if (linha.variante === 'erp') {
-      return 'ERP confirmado';
-    }
-    if (linha.tipo === 'justificativa_ia') {
-      return 'Motivo da resposta';
+      return 'Banco atualizado';
     }
     if (String(linha.status || '').toLowerCase().includes('erro')) {
       return 'Atencao';
@@ -69,20 +71,86 @@
     return '';
   }
 
+  function linhasDoChat(data) {
+    return dedupeLinhas([...(data?.linhas || [])])
+      .filter((linha) => {
+        if (linha.variante === 'previsto' || linha.variante === 'erp') return true;
+        return linha.origem === 'cliente' || linha.origem === 'ia' || linha.origem === 'empresa';
+      })
+      .sort((a, b) => a.horarioMs - b.horarioMs);
+  }
+
+  function chaveLinha(linha) {
+    return [linha.horarioMs, linha.origem, linha.tipo, linha.status, linha.mensagem].join('|');
+  }
+
+  function assinaturaSnapshot(snapshot) {
+    const contatos = new Map(snapshot.contactsByPhone || []);
+    const map = new Map(snapshot.dataByPhone || []);
+    return JSON.stringify((snapshot.phones || []).map((phone) => {
+      const data = map.get(phone) || {};
+      const contato = contatos.get(phone) || {};
+      return {
+        phone,
+        active: phone === snapshot.activePhone,
+        nome: contato.nome || '',
+        local: contato.local || '',
+        resumo: resumoCard(data),
+        selecionada: state.selectedByPhone.get(phone) || '',
+        linhas: linhasDoChat(data).map((linha) => ({
+          key: chaveLinha(linha),
+          previsto: linha.previstoParaMs || 0,
+          detalhe: linha.detalhe?.resumo || '',
+        })),
+      };
+    }));
+  }
+
+  function salvarScrollAtual() {
+    document.querySelectorAll('.monitor-messages').forEach((el) => {
+      const phone = el.dataset.phone;
+      if (!phone) return;
+      const distanceToBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+      state.scrollByPhone.set(phone, {
+        stickBottom: distanceToBottom < 28,
+        scrollTop: el.scrollTop,
+      });
+    });
+  }
+
+  function restaurarScroll() {
+    document.querySelectorAll('.monitor-messages').forEach((el) => {
+      const phone = el.dataset.phone;
+      const saved = phone ? state.scrollByPhone.get(phone) : null;
+      if (!saved) return;
+      if (saved.stickBottom) {
+        el.scrollTop = el.scrollHeight;
+        return;
+      }
+      el.scrollTop = saved.scrollTop;
+    });
+  }
+
   function renderLinha(linha) {
     const legenda = legendaLinha(linha);
     const badge = legenda ? `<div class="chat-inline-note">${escapeHtml(legenda)}</div>` : '';
-    const tags = [linha.tipo, linha.status].filter(Boolean).slice(0, 2).map((item) => `<span class="tag">${escapeHtml(item)}</span>`).join('');
+    const tags = [];
+    if (linha.variante === 'previsto') tags.push('previsto');
+    if (linha.variante === 'erp') tags.push('ERP');
+    if (linha.detalhe) tags.push('clique para ver motivo');
+    const bubbleAttrs = linha.detalhe
+      ? ` role="button" tabindex="0" data-open-detail="${escapeHtml(chaveLinha(linha))}"`
+      : '';
     return `
       <div class="message-row ${classeLinha(linha)}">
-        <div class="bubble ${classeLinha(linha)}${linha.variante === 'previsto' ? ' selected' : ''}">
+        <div class="bubble ${classeLinha(linha)}${linha.variante === 'previsto' ? ' selected' : ''}${linha.detalhe ? ' clickable' : ''}"${bubbleAttrs}>
           <div class="bubble-head">
             <span>${escapeHtml(tituloLinha(linha))}</span>
             <span>${escapeHtml(fmtHora(linha.horarioMs))}</span>
           </div>
           ${badge}
           <div class="bubble-body">${escapeHtml(linha.mensagem)}</div>
-          ${tags ? `<div class="bubble-tags">${tags}</div>` : ''}
+          ${tags.length ? `<div class="bubble-tags">${tags.map((item) => `<span class="tag">${escapeHtml(item)}</span>`).join('')}</div>` : ''}
         </div>
       </div>`;
   }
@@ -98,9 +166,11 @@
   }
 
   function renderCard(phone, data, activePhone, contato) {
-    const linhas = dedupeLinhas([...(data?.linhas || [])])
-      .sort((a, b) => a.horarioMs - b.horarioMs)
-      .slice(-(phone === activePhone ? 18 : 10));
+    const linhas = linhasDoChat(data).slice(-(phone === activePhone ? 28 : 12));
+    const detailMap = new Map(linhas.filter((linha) => linha.detalhe).map((linha) => [chaveLinha(linha), linha]));
+    const selectedKey = state.selectedByPhone.get(phone);
+    const selected = (selectedKey && detailMap.get(selectedKey)) || linhas.find((linha) => linha.detalhe) || null;
+    if (selected?.detalhe) state.selectedByPhone.set(phone, chaveLinha(selected));
     const body = linhas.length
       ? linhas.map(renderLinha).join('')
       : '<div class="chat-monitor-empty">Nenhuma atividade recente para este telefone.</div>';
@@ -115,21 +185,44 @@
           </div>
           <button type="button" class="chat-focus-btn" data-focus-phone="${escapeHtml(phone)}">Colocar em foco</button>
         </div>
-        <div class="messages monitor-messages">${body}</div>
+        <div class="messages monitor-messages" data-phone="${escapeHtml(phone)}">${body}</div>
+        <div class="chat-audit-panel">
+          ${selected?.detalhe ? renderDetalhe(selected) : '<div class="chat-audit-empty">Clique em uma mensagem da IA para ver o motivo do envio.</div>'}
+        </div>
       </section>`;
+  }
+
+  function renderDetalhe(linha) {
+    const detalhe = linha?.detalhe;
+    if (!detalhe) return '';
+    const itens = (detalhe.itens || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('');
+    const revisao = detalhe.revisao ? `<div class="chat-audit-summary">${escapeHtml(detalhe.revisao)}</div>` : '';
+    return `
+      <div class="chat-audit-title">${escapeHtml(detalhe.titulo || 'Motivo da resposta')}</div>
+      <div class="chat-audit-meta">Mensagem enviada ${escapeHtml(fmtHora(linha.horarioMs))}</div>
+      <div class="chat-audit-summary">${escapeHtml(detalhe.resumo || '')}</div>
+      ${revisao}
+      ${itens ? `<ul class="chat-audit-list">${itens}</ul>` : ''}
+    `;
   }
 
   function render() {
     const root = $('chatCards');
     if (!root || !window.PhoneMonitorPage?.getSnapshot) return;
     const snapshot = window.PhoneMonitorPage.getSnapshot();
+    const signature = assinaturaSnapshot(snapshot);
     if (!snapshot.phones.length) {
+      state.lastSignature = '';
       root.innerHTML = '<div class="chat-monitor-empty">Abra um ou mais contatos vindos do ERP para ver as conversas reais.</div>';
       return;
     }
+    if (signature === state.lastSignature) return;
+    salvarScrollAtual();
     const map = new Map(snapshot.dataByPhone || []);
     const contatos = new Map(snapshot.contactsByPhone || []);
     root.innerHTML = snapshot.phones.map((phone) => renderCard(phone, map.get(phone), snapshot.activePhone, contatos.get(phone))).join('');
+    state.lastSignature = signature;
+    restaurarScroll();
   }
 
   function renderView() {
@@ -151,8 +244,25 @@
     });
     $('chatCards')?.addEventListener('click', (event) => {
       const btn = event.target.closest('[data-focus-phone]');
-      if (!btn) return;
-      window.PhoneMonitorPage?.abrirTelefone?.(btn.dataset.focusPhone || '');
+      if (btn) {
+        window.PhoneMonitorPage?.abrirTelefone?.(btn.dataset.focusPhone || '');
+        return;
+      }
+      const detailBtn = event.target.closest('[data-open-detail]');
+      if (!detailBtn) return;
+      const card = detailBtn.closest('.chat-card');
+      const phone = card?.querySelector('.monitor-messages')?.dataset.phone;
+      if (!phone) return;
+      state.selectedByPhone.set(phone, detailBtn.dataset.openDetail || '');
+      state.lastSignature = '';
+      render();
+    });
+    $('chatCards')?.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const detailBtn = event.target.closest('[data-open-detail]');
+      if (!detailBtn) return;
+      event.preventDefault();
+      detailBtn.click();
     });
   }
 

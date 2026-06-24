@@ -480,7 +480,7 @@ async function processarLote(remoteJid: string): Promise<void> {
               })
             : promptCompleto;
 
-        const { texto: respostaBruta, plano, passadas, analise, cadeiaPensamento } =
+        const { texto: respostaBruta, plano, passadas, revisoes, analise, cadeiaPensamento } =
           await gerarRespostaRefinada(
             promptSistema,
             mensagens,
@@ -508,6 +508,7 @@ async function processarLote(remoteJid: string): Promise<void> {
           {
             cenario: plano.cenario,
             passadas,
+            revisoes,
             ferramentas: plano.ferramentas,
             preview: respostaBruta.slice(0, 120),
           },
