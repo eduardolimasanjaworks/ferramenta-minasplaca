@@ -70,10 +70,7 @@ export async function criarServidor() {
       return reply.code(204).send();
     }
 
-    if (!req.url.startsWith('/api/atendimento/contato/')) return;
-    // #region debug-point B:atendimento-onrequest
-    fetch('http://127.0.0.1:7777/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'gmx-iagmx-integration', runId: 'pre-fix', hypothesisId: 'B', location: 'iagmx-atendimento/app/src/servidor.ts:onRequest', msg: '[DEBUG] atendimento request chegou no iagmx', data: { method: req.method, url: req.url, origin: req.headers.origin ?? null, acrMethod: req.headers['access-control-request-method'] ?? null, acrHeaders: req.headers['access-control-request-headers'] ?? null, hasAdminKey: Boolean(req.headers['x-iagmx-key']) }, ts: Date.now() }) }).catch(() => {});
-    // #endregion
+    return;
   });
 
   app.addHook('onSend', async (req, reply, payload) => {
