@@ -15,6 +15,8 @@ import {
   novoEventoHistoricoId,
   registrarEventoHistoricoOferta,
 } from '../servicos/historico-ofertas-gmx.js';
+import { iniciarSimulacaoOferta } from '../servicos/simulacao-ofertas.js';
+import { simulacaoAtivaParaTelefone } from '../servicos/simulacao-cenario.js';
 
 function verificarAdmin(req: FastifyRequest): boolean {
   if (!config.adminKey) return true;
@@ -73,6 +75,7 @@ export async function rotasDispararOferta(app: FastifyInstance): Promise<void> {
     });
 
     if (envio.enviado) {
+      const telefoneSimulado = await simulacaoAtivaParaTelefone(telefone);
       await marcarEnvioIa(telefone, 8);
       await adicionarAoHistorico(remoteJid, 'assistant', texto);
       await registrarEventoHistoricoOferta({
@@ -89,6 +92,7 @@ export async function rotasDispararOferta(app: FastifyInstance): Promise<void> {
         valor_maximo: body.valor_maximo != null ? Number(body.valor_maximo) : null,
         origem: body.origem.trim(),
         destino: body.destino.trim(),
+        observacao: telefoneSimulado ? '__GMX_SIMULACAO_NAO_ENVIAR__oferta_disparada__' : null,
       }).catch(() => undefined);
       if (body.embarque_id != null) {
         await directusPatch('embarques', body.embarque_id, {
@@ -105,6 +109,19 @@ export async function rotasDispararOferta(app: FastifyInstance): Promise<void> {
         event_id: eventId,
         fragmentos: envio.fragmentos,
       });
+      if (telefoneSimulado) {
+        await iniciarSimulacaoOferta({
+          telefone,
+          embarqueId: body.embarque_id,
+          motoristaId: body.motorista_id ?? null,
+          origem: body.origem.trim(),
+          destino: body.destino.trim(),
+          valorOfertado: Number(body.valor_ofertado),
+          valorMinimo: body.valor_minimo != null ? Number(body.valor_minimo) : null,
+          valorMaximo: body.valor_maximo != null ? Number(body.valor_maximo) : null,
+          observacaoTag: '__GMX_SIMULACAO_NAO_ENVIAR__',
+        }).catch(() => undefined);
+      }
     } else {
       logEvento(
         'oferta',

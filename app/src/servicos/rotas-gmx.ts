@@ -37,7 +37,7 @@ function normalizar(s: string): string {
     .trim();
 }
 
-/** Busca rota por origem/destino/operação (match flexível por substring). */
+/** Busca rota por origem/destino/operação (operação exata normalizada). */
 export async function buscarConfigRota(opts: {
   id?: number | string | null;
   origem?: string;
@@ -78,7 +78,7 @@ export async function buscarConfigRota(opts: {
     const rcap = r.capacidade ? normalizar(r.capacidade) : '';
     const origemOk = ro.includes(o) || o.includes(ro);
     const destinoOk = rd.includes(d) || d.includes(rd);
-    const opOk = !op || !rop || rop.includes(op) || op.includes(rop);
+    const opOk = !op || !rop || rop === op;
     const capOk = !cap || !rcap || rcap.includes(cap) || cap.includes(rcap);
     return origemOk && destinoOk && opOk && capOk;
   });

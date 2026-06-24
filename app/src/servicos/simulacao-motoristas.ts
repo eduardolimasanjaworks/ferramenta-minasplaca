@@ -5,8 +5,8 @@ import { normalizarTelefone } from '../util/telefone.js';
 type CidadeBase = { cidade: string; uf: string; lat: number; lng: number };
 type MotoristaSim = { id: number; telefone: string; nome: string; sobrenome: string };
 
-export const TAG_SIMULACAO_MOTORISTAS = 'SIMULACAO_MOTORISTAS_V1';
-export const TAG_SIMULACAO_EMBARQUES = 'SIMULACAO_EMBARQUES_V1';
+export const TAG_SIMULACAO_MOTORISTAS = '__GMX_SIMULACAO_NAO_ENVIAR__MOTORISTAS__V2__';
+export const TAG_SIMULACAO_EMBARQUES = '__GMX_SIMULACAO_NAO_ENVIAR__EMBARQUES__V2__';
 const CIDADES: CidadeBase[] = [{ cidade: 'Guarulhos', uf: 'SP', lat: -23.4543, lng: -46.5337 }, { cidade: 'Campinas', uf: 'SP', lat: -22.9099, lng: -47.0626 }, { cidade: 'São Paulo', uf: 'SP', lat: -23.5505, lng: -46.6333 }, { cidade: 'Rio de Janeiro', uf: 'RJ', lat: -22.9068, lng: -43.1729 }, { cidade: 'Belo Horizonte', uf: 'MG', lat: -19.9167, lng: -43.9345 }, { cidade: 'Curitiba', uf: 'PR', lat: -25.4284, lng: -49.2733 }, { cidade: 'Porto Alegre', uf: 'RS', lat: -30.0346, lng: -51.2177 }, { cidade: 'Goiânia', uf: 'GO', lat: -16.6869, lng: -49.2648 }, { cidade: 'Brasília', uf: 'DF', lat: -15.7939, lng: -47.8828 }, { cidade: 'Salvador', uf: 'BA', lat: -12.9777, lng: -38.5016 }, { cidade: 'Recife', uf: 'PE', lat: -8.0578, lng: -34.8829 }, { cidade: 'Fortaleza', uf: 'CE', lat: -3.7319, lng: -38.5267 }];
 const OPERACOES = ['ARROZ', 'LATA', 'GRANEL', 'CIMENTO', 'SACARIA', 'SIDER', 'FARINHA', 'AÇÚCAR'];
 const NOMES = ['João', 'Carlos', 'Pedro', 'Marcos', 'Ricardo', 'André', 'Fernando', 'Luiz', 'Paulo', 'Sérgio', 'Roberto', 'Márcia', 'Diego', 'Antônio', 'Felipe', 'Bruno', 'Rafael', 'Gustavo', 'Leandro', 'Vitor'];
@@ -70,7 +70,7 @@ async function criarMotoristaSimulado(opts: {
   const nome = pick(rnd, NOMES);
   const sobrenome = pick(rnd, SOBRENOMES);
   const cidade = pick(rnd, CIDADES);
-  const tel = String(5599900000000 + i);
+  const tel = String(5500000000000 + i);
   const tipo_rota = pickOperacoes(rnd);
   const observacao = `${TAG_SIMULACAO_MOTORISTAS} ${opts.seedTag} #${i}`;
 

@@ -1,6 +1,8 @@
 import { obterRedis } from '../lib/redis.js';
 import { directusConfigurado, directusDelete, directusListar } from './directus.js';
-import { normalizarTelefone } from '../util/telefone.js';
+import { normalizarTelefone, telefoneParaJid } from '../util/telefone.js';
+import { limparHistorico } from './historico.js';
+import { cancelarSimulacaoOfertaPorTelefone } from './simulacao-ofertas.js';
 import {
   TAG_SIMULACAO_EMBARQUES,
   TAG_SIMULACAO_MOTORISTAS,
@@ -143,16 +145,18 @@ export async function iniciarCenarioSimulado(opts?: Partial<Pick<CenarioSimulado
 
 export async function apagarTudoDoCenarioSimulado(): Promise<{ ok: true; apagados: { motoristas: number; disponibilidades: number; embarques: number } }> {
   if (!directusConfigurado()) throw new Error('Directus não configurado (DIRECTUS_URL/DIRECTUS_TOKEN)');
-  const motoristas = await directusListar<{ id: number }>('cadastro_motorista', {
+  const motoristas = await directusListar<{ id: number; telefone?: string }>('cadastro_motorista', {
     'filter[observacao][_contains]': TAG_SIMULACAO_MOTORISTAS,
     fields: 'id',
     limit: '5000',
   });
   let removidosMotoristas = 0;
   let removidasDisp = 0;
+  const telefones = new Set<string>();
   for (const m of motoristas) {
     const id = Number(m.id);
     if (!Number.isFinite(id)) continue;
+    if (m.telefone) telefones.add(normalizarTelefone(String(m.telefone)));
     const disp = await directusListar<{ id: number }>('disponivel', {
       'filter[motorista_id][_eq]': String(id),
       fields: 'id',
@@ -179,6 +183,22 @@ export async function apagarTudoDoCenarioSimulado(): Promise<{ ok: true; apagado
     if (!Number.isFinite(id)) continue;
     await directusDelete('embarques', id).catch(() => undefined);
     removidosEmb++;
+  }
+
+  const historicoOfertas = await directusListar<{ id: number }>('historico_ofertas', {
+    'filter[descricao][_contains]': '__GMX_SIMULACAO_NAO_ENVIAR__',
+    fields: 'id',
+    limit: '5000',
+  }).catch(() => []);
+  for (const item of historicoOfertas) {
+    const id = Number(item.id);
+    if (!Number.isFinite(id)) continue;
+    await directusDelete('historico_ofertas', id).catch(() => undefined);
+  }
+
+  for (const telefone of telefones) {
+    await limparHistorico(telefoneParaJid(telefone)).catch(() => undefined);
+    await cancelarSimulacaoOfertaPorTelefone(telefone).catch(() => undefined);
   }
 
   cache.ateMs = 0;
