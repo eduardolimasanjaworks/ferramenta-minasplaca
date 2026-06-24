@@ -146,6 +146,11 @@ export const config = {
   whatsappIaApiKey,
   whatsappIaInstance,
   whatsappIaOrigem: process.env.WHATSAPP_IA_ORIGEM ?? 'local',
+  envioSimuladoHabilitado: bool('IAGMX_ENVIO_SIMULADO', false),
+  simulacaoMotoristasHabilitada: bool('SIMULACAO_MOTORISTAS', false),
+  simulacaoMotoristasQtd: Math.max(1, parseInt(process.env.SIMULACAO_MOTORISTAS_QTD ?? '100', 10)),
+  simulacaoMotoristasTickMs: Math.max(1500, parseInt(process.env.SIMULACAO_MOTORISTAS_TICK_MS ?? '6000', 10)),
+  simulacaoMotoristasSeed: parseInt(process.env.SIMULACAO_MOTORISTAS_SEED ?? '42', 10),
 
   /**
    * Conexão futura do outro fluxo.

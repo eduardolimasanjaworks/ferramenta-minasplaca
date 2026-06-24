@@ -20,6 +20,13 @@ function limparTemplateRenderizado(texto: string): string {
     .trim();
 }
 
+function saudacaoHorarioAgora(): string {
+  const h = new Date().getHours();
+  if (h >= 5 && h <= 11) return 'Bom dia';
+  if (h >= 12 && h <= 17) return 'Boa tarde';
+  return 'Boa noite';
+}
+
 export function montarMensagemOferta(
   dados: DadosOfertaDisparo,
   template?: string | null,
@@ -43,20 +50,15 @@ export function montarMensagemOferta(
     );
   }
 
+  const saudacao = saudacaoHorarioAgora();
   const linhas = [
-    'Adriano - GMX / CargoX',
+    saudacao,
     '',
-    `Temos carga ${dados.origem} → ${dados.destino}`,
+    `Temos ${dados.origem} → ${dados.destino}`,
+    `Valor: ${valorFmt}`,
+    '',
+    'Tem interesse?',
   ];
 
-  if (dados.produto?.trim()) {
-    linhas.push(`Produto: ${dados.produto.trim()}`);
-  }
-  if (dados.operacao?.trim()) {
-    linhas.push(`Operação: ${dados.operacao.trim()}`);
-  }
-
-  linhas.push(`Valor: ${valorFmt}`, '', 'Tem interesse?');
-
-  return linhas.join('\n');
+  return linhas.join('\n').trim();
 }

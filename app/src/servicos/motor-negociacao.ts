@@ -180,6 +180,12 @@ function valorDentroDaFaixa(valor: number, faixa: FaixaNegociacao): boolean {
   return valor >= faixa.valorMinimo && valor <= faixa.valorMaximo;
 }
 
+function passoNegociacao(faixa: FaixaNegociacao): number {
+  const range = Math.max(0, faixa.valorMaximo - faixa.valorMinimo);
+  if (range <= 0) return 0;
+  return Math.max(100, Math.ceil(range / RODADAS_MAX));
+}
+
 /**
  * Decide ação de negociação para a mensagem atual.
  * Regra: só aceita valores dentro de [valor_minimo, valor_maximo] do ERP.
@@ -232,10 +238,39 @@ export function avaliarNegociacao(opts: {
       return { tipo: 'aceite', valorAceito: valorMsg };
     }
 
+    const ofertaBase = valorDentroDaFaixa(faixa.valorOfertado, faixa)
+      ? faixa.valorOfertado
+      : faixa.valorMinimo;
+    const ultima = estado.ultimaContraofertaIa != null && valorDentroDaFaixa(estado.ultimaContraofertaIa, faixa)
+      ? estado.ultimaContraofertaIa
+      : null;
+    const atual = ultima ?? ofertaBase;
+
+    const passo = passoNegociacao(faixa);
+    const rodadas = estado.rodadas + 1;
+
+    if (valorMsg <= atual) {
+      return {
+        tipo: 'contraproposta_ia',
+        valorProposto: atual,
+        mensagem: `Fechamos em R$ ${formatarValor(atual)} parceiro, pode ser?`,
+      };
+    }
+
+    const proposta = Math.min(faixa.valorMaximo, Math.min(valorMsg, atual + passo));
+
+    if (rodadas >= RODADAS_MAX && proposta < valorMsg) {
+      return {
+        tipo: 'contraproposta_ia',
+        valorProposto: faixa.valorMaximo,
+        mensagem: `Entendi os R$ ${formatarValor(valorMsg)} parceiro, o máximo que consigo nessa rota é R$ ${formatarValor(faixa.valorMaximo)}, topa?`,
+      };
+    }
+
     return {
       tipo: 'contraproposta_ia',
-      valorProposto: valorMsg,
-      mensagem: `Entendi R$ ${formatarValor(valorMsg)} parceiro, fechamos nesse valor?`,
+      valorProposto: proposta,
+      mensagem: `Consigo melhorar pra R$ ${formatarValor(proposta)} parceiro, se topar eu já confirmo aqui`,
     };
   }
 

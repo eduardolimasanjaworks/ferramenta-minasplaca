@@ -10,6 +10,7 @@ import { marcarEnvioIa } from './envio-ia.js';
 import { salvarEstadoMonitorTelefone } from './monitor-telefone.js';
 import { aleatorioEntre, obterConfigHumanizacao } from './config-humanizacao.js';
 import { jidEhGrupoOuLista } from '../util/telefone.js';
+import { config } from '../config.js';
 
 export interface ResultadoEnvio {
   enviado: boolean;
@@ -62,6 +63,23 @@ export async function tentarEnviarResposta(
     opts.fragmentar === false
       ? [textoCompleto.trim() || 'Ok']
       : dividirResposta(textoCompleto);
+
+  if (config.envioSimuladoHabilitado) {
+    logEvento('envio', 'Envio simulado habilitado — não enviando ao WhatsApp', {
+      telefone,
+      fragmentos: fragmentos.length,
+      texto: textoCompleto.slice(0, 120),
+    });
+    await salvarEstadoMonitorTelefone(telefone, {
+      fase: 'concluido',
+      mensagem: 'Envio simulado (sem WhatsApp)',
+      desdeMs: Date.now(),
+      detalhe: `fragmentos ${fragmentos.length}`,
+    }).catch(() => undefined);
+    await marcarEnvioIa(telefone, 8).catch(() => undefined);
+    return { enviado: true, pendente: false, fragmentos: fragmentos.length, motivo: 'envio_simulado' };
+  }
+
   const canal = await podeEnviarParaTelefone(telefone);
 
   if (!canal.pode) {

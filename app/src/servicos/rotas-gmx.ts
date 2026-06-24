@@ -104,7 +104,7 @@ export function formatarContextoRotaNegociacao(
 ): string {
   const min = Number(rota.valor_minimo);
   const max = Number(rota.valor_maximo);
-  const oferta = valorOfertadoMensagem ?? max;
+  const oferta = valorOfertadoMensagem ?? min;
   return `=== ROTA CONFIGURADA (portal GMX — obrigatório) ===
 Origem: ${rota.origem}
 Destino: ${rota.destino}
