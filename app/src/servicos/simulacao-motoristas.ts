@@ -1,4 +1,3 @@
-import { config } from '../config.js';
 import { directusConfigurado, directusListar, directusPatch, directusPost } from './directus.js';
 import { registrarDisponibilidade } from './motorista-gmx.js';
 import { normalizarTelefone } from '../util/telefone.js';
@@ -6,7 +5,8 @@ import { normalizarTelefone } from '../util/telefone.js';
 type CidadeBase = { cidade: string; uf: string; lat: number; lng: number };
 type MotoristaSim = { id: number; telefone: string; nome: string; sobrenome: string };
 
-const TAG = 'SIMULACAO_MOTORISTAS_V1';
+export const TAG_SIMULACAO_MOTORISTAS = 'SIMULACAO_MOTORISTAS_V1';
+export const TAG_SIMULACAO_EMBARQUES = 'SIMULACAO_EMBARQUES_V1';
 const CIDADES: CidadeBase[] = [{ cidade: 'Guarulhos', uf: 'SP', lat: -23.4543, lng: -46.5337 }, { cidade: 'Campinas', uf: 'SP', lat: -22.9099, lng: -47.0626 }, { cidade: 'São Paulo', uf: 'SP', lat: -23.5505, lng: -46.6333 }, { cidade: 'Rio de Janeiro', uf: 'RJ', lat: -22.9068, lng: -43.1729 }, { cidade: 'Belo Horizonte', uf: 'MG', lat: -19.9167, lng: -43.9345 }, { cidade: 'Curitiba', uf: 'PR', lat: -25.4284, lng: -49.2733 }, { cidade: 'Porto Alegre', uf: 'RS', lat: -30.0346, lng: -51.2177 }, { cidade: 'Goiânia', uf: 'GO', lat: -16.6869, lng: -49.2648 }, { cidade: 'Brasília', uf: 'DF', lat: -15.7939, lng: -47.8828 }, { cidade: 'Salvador', uf: 'BA', lat: -12.9777, lng: -38.5016 }, { cidade: 'Recife', uf: 'PE', lat: -8.0578, lng: -34.8829 }, { cidade: 'Fortaleza', uf: 'CE', lat: -3.7319, lng: -38.5267 }];
 const OPERACOES = ['ARROZ', 'LATA', 'GRANEL', 'CIMENTO', 'SACARIA', 'SIDER', 'FARINHA', 'AÇÚCAR'];
 const NOMES = ['João', 'Carlos', 'Pedro', 'Marcos', 'Ricardo', 'André', 'Fernando', 'Luiz', 'Paulo', 'Sérgio', 'Roberto', 'Márcia', 'Diego', 'Antônio', 'Felipe', 'Bruno', 'Rafael', 'Gustavo', 'Leandro', 'Vitor'];
@@ -46,7 +46,7 @@ async function listarMotoristasSimulados(): Promise<MotoristaSim[]> {
     sobrenome?: string;
     observacao?: string;
   }>('cadastro_motorista', {
-    'filter[observacao][_contains]': TAG,
+    'filter[observacao][_contains]': TAG_SIMULACAO_MOTORISTAS,
     fields: 'id,telefone,nome,sobrenome,observacao',
     limit: '2000',
     sort: 'id',
@@ -70,9 +70,9 @@ async function criarMotoristaSimulado(opts: {
   const nome = pick(rnd, NOMES);
   const sobrenome = pick(rnd, SOBRENOMES);
   const cidade = pick(rnd, CIDADES);
-  const tel = String(5511990000000 + i);
+  const tel = String(5599900000000 + i);
   const tipo_rota = pickOperacoes(rnd);
-  const observacao = `${TAG} ${opts.seedTag} #${i}`;
+  const observacao = `${TAG_SIMULACAO_MOTORISTAS} ${opts.seedTag} #${i}`;
 
   const criado = await directusPost<{ id: number }>('cadastro_motorista', {
     status: 'active',
@@ -91,7 +91,7 @@ async function criarMotoristaSimulado(opts: {
   const status = rnd() < 0.82 ? 'disponivel' : rnd() < 0.5 ? 'retornando' : 'carregado';
   const disponivel = status === 'disponivel';
   const horas = status === 'disponivel' ? 0 : 4 + Math.floor(rnd() * 48);
-  const previsto = status === 'disponivel' ? null : new Date(Date.now() + horas * 3600_000).toISOString();
+  const previsto = status === 'disponivel' ? null : new Date(estado.simNowMs + horas * 3600_000).toISOString();
   const prevCidade = status === 'disponivel' ? cidade : pick(rnd, CIDADES);
   const localPrev = `${prevCidade.cidade} ${prevCidade.uf}`;
 
@@ -115,20 +115,30 @@ let estado: {
   rodando: boolean;
   seed: number;
   tickMs: number;
+  advanceHoursPorTick: number;
+  simNowMs: number;
   qtd: number;
   tick: number;
   motoristas: MotoristaSim[];
-} = { rodando: false, seed: 42, tickMs: 6000, qtd: 100, tick: 0, motoristas: [] };
+} = { rodando: false, seed: 42, tickMs: 6000, advanceHoursPorTick: 6, simNowMs: Date.now(), qtd: 100, tick: 0, motoristas: [] };
 
 export function statusSimulacaoMotoristas() {
   return {
     rodando: estado.rodando,
     tickMs: estado.tickMs,
+    advanceHoursPorTick: estado.advanceHoursPorTick,
+    simNow: new Date(estado.simNowMs).toISOString(),
     qtdAlvo: estado.qtd,
     tick: estado.tick,
     motoristas: estado.motoristas.length,
-    tag: TAG,
+    tag: TAG_SIMULACAO_MOTORISTAS,
   };
+}
+
+export function definirAgoraSimulado(iso: string) {
+  const d = new Date(iso);
+  if (!Number.isNaN(d.getTime())) estado.simNowMs = d.getTime();
+  return { ok: true, simNow: new Date(estado.simNowMs).toISOString() };
 }
 
 export async function seedMotoristasSimulados(opts?: { qtd?: number; seed?: number }) {
@@ -165,7 +175,7 @@ async function tickSimulacao() {
     indices.add(Math.floor(rnd() * total));
   }
 
-  const agora = Date.now();
+  const agora = estado.simNowMs;
   for (const idx of indices) {
     const m = estado.motoristas[idx] as MotoristaSim | undefined;
     if (!m) continue;
@@ -193,7 +203,7 @@ async function tickSimulacao() {
       latitude: lat,
       longitude: lng,
       data_previsao_disponibilidade: previsto ?? undefined,
-      observacao: `${TAG} tick=${estado.tick}`,
+      observacao: `${TAG_SIMULACAO_MOTORISTAS} tick=${estado.tick}`,
     }).catch(() => undefined);
 
     if (mudaCidade) {
@@ -206,11 +216,20 @@ async function tickSimulacao() {
       await directusPatch('cadastro_motorista', m.id, { status: 'active' }).catch(() => undefined);
     }
   }
+  estado.simNowMs = estado.simNowMs + Math.max(1, estado.advanceHoursPorTick) * 3600_000;
 }
 
-export async function iniciarSimulacaoMotoristas(opts?: { qtd?: number; seed?: number; tickMs?: number }) {
+export async function iniciarSimulacaoMotoristas(opts?: { qtd?: number; seed?: number; tickMs?: number; advanceHoursPorTick?: number; nowIso?: string }) {
   const tickMs = Math.max(1500, Math.min(60_000, opts?.tickMs ?? estado.tickMs));
-  estado = { ...estado, tickMs, seed: opts?.seed ?? estado.seed, qtd: opts?.qtd ?? estado.qtd };
+  const nextNow = opts?.nowIso ? new Date(opts.nowIso) : null;
+  estado = {
+    ...estado,
+    tickMs,
+    seed: opts?.seed ?? estado.seed,
+    qtd: opts?.qtd ?? estado.qtd,
+    advanceHoursPorTick: opts?.advanceHoursPorTick ?? estado.advanceHoursPorTick,
+    ...(nextNow && !Number.isNaN(nextNow.getTime()) ? { simNowMs: nextNow.getTime() } : {}),
+  };
   await seedMotoristasSimulados({ qtd: estado.qtd, seed: estado.seed });
 
   if (timer) clearInterval(timer);
@@ -257,7 +276,7 @@ export async function seedEmbarquesSimulados(opts?: { qtd?: number; seed?: numbe
     const rota = pick(rnd, ativas);
     const min = Number(rota.valor_minimo);
     const max = Number(rota.valor_maximo);
-    const pickup = new Date(Date.now() + (2 + Math.floor(rnd() * 72)) * 3600_000).toISOString();
+    const pickup = new Date(estado.simNowMs + (2 + Math.floor(rnd() * 72)) * 3600_000).toISOString();
     const total = min + Math.floor(rnd() * Math.max(0, max - min + 1));
     await directusPost('embarques', {
       status: 'new',
@@ -272,19 +291,9 @@ export async function seedEmbarquesSimulados(opts?: { qtd?: number; seed?: numbe
       valor_ofertado: min,
       total_value: total,
       produto_predominante: rota.especie_produto ?? rota.operacao ?? null,
-      observacao: `SIMULACAO_EMBARQUES_V1 seed=${seed} #${i + 1}`,
+      observacao: `${TAG_SIMULACAO_EMBARQUES} seed=${seed} #${i + 1}`,
     }).catch(() => undefined);
     criados++;
   }
   return { ok: true, criados };
-}
-
-export async function iniciarSimulacaoMotoristasAuto() {
-  if (!config.simulacaoMotoristasHabilitada) return { ok: true, iniciado: false };
-  await iniciarSimulacaoMotoristas({
-    qtd: config.simulacaoMotoristasQtd,
-    seed: config.simulacaoMotoristasSeed,
-    tickMs: config.simulacaoMotoristasTickMs,
-  });
-  return { ok: true, iniciado: true };
 }

@@ -22,6 +22,28 @@
     el.textContent = texto;
   }
 
+  function setScenarioStatus(texto) {
+    const el = $('simScenarioStatus');
+    if (!el) return;
+    el.textContent = texto || '';
+  }
+
+  function toDatetimeLocal(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function fromDatetimeLocal(v) {
+    const raw = String(v || '').trim();
+    if (!raw) return null;
+    const d = new Date(raw);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toISOString();
+  }
+
   function jornadaAtual() {
     return state.jornadas.find((item) => item.id === $('jornada').value) || null;
   }
@@ -114,6 +136,63 @@
     $('iniciarBtn').addEventListener('click', iniciarJornada);
     $('recarregarJornadasBtn').addEventListener('click', () => carregarJornadas().catch((error) => setBox('journeyStatus', error.message || 'Falha ao recarregar jornadas', 'warn')));
     $('trainingOpenEditorBtn').addEventListener('click', () => ativarPainel('editorPanel'));
+
+    let clicks = 0;
+    const reveal = $('simScenarioReveal');
+    const controls = $('simScenarioControls');
+    if (reveal && controls) {
+      reveal.addEventListener('click', async () => {
+        clicks++;
+        if (clicks < 6) return;
+        controls.hidden = false;
+        reveal.hidden = true;
+        try {
+          const st = await state.json('/api/admin/simulacao/cenario/status');
+          if (st?.cenario?.nowIso && $('simScenarioNow')) $('simScenarioNow').value = toDatetimeLocal(st.cenario.nowIso);
+          if (st?.cenario?.advanceHoursPorTick && $('simScenarioAdvanceHours')) $('simScenarioAdvanceHours').value = String(st.cenario.advanceHoursPorTick);
+          setScenarioStatus(st?.cenario?.ativo ? 'ativo' : 'inativo');
+        } catch {
+          setScenarioStatus('sem acesso');
+        }
+      });
+    }
+
+    const startBtn = $('simScenarioStartBtn');
+    const reviewBtn = $('simScenarioReviewBtn');
+    if (startBtn) startBtn.addEventListener('click', async () => {
+      if (!state.json) return;
+      startBtn.disabled = true;
+      setScenarioStatus('iniciando...');
+      try {
+        const nowIso = fromDatetimeLocal($('simScenarioNow')?.value);
+        const advanceHoursPorTick = Number($('simScenarioAdvanceHours')?.value || 6);
+        await state.json('/api/admin/simulacao/cenario/start', {
+          method: 'POST',
+          body: JSON.stringify({ nowIso: nowIso || undefined, advanceHoursPorTick }),
+        });
+        const st = await state.json('/api/admin/simulacao/cenario/status');
+        setScenarioStatus(st?.cenario?.ativo ? 'ativo' : 'inativo');
+      } catch (error) {
+        setScenarioStatus(error?.message || 'falhou');
+      } finally {
+        startBtn.disabled = false;
+      }
+    });
+
+    if (reviewBtn) reviewBtn.addEventListener('click', async () => {
+      if (!state.json) return;
+      reviewBtn.disabled = true;
+      setScenarioStatus('revisando...');
+      try {
+        const r = await state.json('/api/admin/simulacao/cenario/review', { method: 'POST' });
+        const apag = r?.apagados || {};
+        setScenarioStatus(`limpo: ${apag.motoristas || 0} motoristas, ${apag.embarques || 0} embarques`);
+      } catch (error) {
+        setScenarioStatus(error?.message || 'falhou');
+      } finally {
+        reviewBtn.disabled = false;
+      }
+    });
   }
 
   async function iniciar() {

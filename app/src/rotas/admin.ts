@@ -52,6 +52,20 @@ import {
   aplicarInstrucaoTreinamentoDireto,
   criarPropostaTreinamentoDireto,
 } from '../servicos/treinamento-admin-direto.js';
+import {
+  iniciarSimulacaoMotoristas,
+  pararSimulacaoMotoristas,
+  seedEmbarquesSimulados,
+  seedMotoristasSimulados,
+  statusSimulacaoMotoristas,
+} from '../servicos/simulacao-motoristas.js';
+import {
+  definirAgoraCenario,
+  auditarCenarioSimulado,
+  iniciarCenarioSimulado,
+  reverCenarioSimulado,
+  statusCenarioSimulado,
+} from '../servicos/simulacao-cenario.js';
 
 function exigirPainel(req: Parameters<typeof painelAutenticado>[0], reply: { status: (code: number) => { send: (body: unknown) => unknown } }) {
   if (painelAutenticado(req)) return true;
@@ -425,4 +439,98 @@ export async function rotasAdmin(app: FastifyInstance): Promise<void> {
       };
     },
   );
+
+  app.get('/api/admin/simulacao/motoristas/status', async (req, reply) => {
+    if (!exigirAdmin(req, reply)) return;
+    return { ok: true, status: statusSimulacaoMotoristas() };
+  });
+
+  app.post<{ Body: { qtd?: number; seed?: number } }>('/api/admin/simulacao/motoristas/seed', async (req, reply) => {
+    if (!exigirAdmin(req, reply)) return;
+    try {
+      const r = await seedMotoristasSimulados({ qtd: req.body?.qtd, seed: req.body?.seed });
+      return r;
+    } catch (error) {
+      return reply.status(400).send({ erro: error instanceof Error ? error.message : 'Falha ao seed de motoristas' });
+    }
+  });
+
+  app.post<{ Body: { qtd?: number; seed?: number; tickMs?: number } }>(
+    '/api/admin/simulacao/motoristas/start',
+    async (req, reply) => {
+      if (!exigirAdmin(req, reply)) return;
+      try {
+        const r = await iniciarSimulacaoMotoristas({
+          qtd: req.body?.qtd,
+          seed: req.body?.seed,
+          tickMs: req.body?.tickMs,
+        });
+        return r;
+      } catch (error) {
+        return reply.status(400).send({ erro: error instanceof Error ? error.message : 'Falha ao iniciar simulação' });
+      }
+    },
+  );
+
+  app.post('/api/admin/simulacao/motoristas/stop', async (req, reply) => {
+    if (!exigirAdmin(req, reply)) return;
+    const r = await pararSimulacaoMotoristas();
+    return r;
+  });
+
+  app.post<{ Body: { qtd?: number; seed?: number } }>('/api/admin/simulacao/embarques/seed', async (req, reply) => {
+    if (!exigirAdmin(req, reply)) return;
+    try {
+      const r = await seedEmbarquesSimulados({ qtd: req.body?.qtd, seed: req.body?.seed });
+      return r;
+    } catch (error) {
+      return reply.status(400).send({ erro: error instanceof Error ? error.message : 'Falha ao seed de embarques' });
+    }
+  });
+
+  app.get('/api/admin/simulacao/cenario/status', async (req, reply) => {
+    if (!exigirAdmin(req, reply)) return;
+    return statusCenarioSimulado();
+  });
+
+  app.post<{ Body: { nowIso?: string; advanceHoursPorTick?: number; tickMs?: number; qtdMotoristas?: number; seed?: number; embarquesQtd?: number } }>(
+    '/api/admin/simulacao/cenario/start',
+    async (req, reply) => {
+      if (!exigirAdmin(req, reply)) return;
+      try {
+        return await iniciarCenarioSimulado(req.body ?? {});
+      } catch (error) {
+        return reply.status(400).send({ erro: error instanceof Error ? error.message : 'Falha ao iniciar cenário' });
+      }
+    },
+  );
+
+  app.post('/api/admin/simulacao/cenario/review', async (req, reply) => {
+    if (!exigirAdmin(req, reply)) return;
+    try {
+      return await reverCenarioSimulado();
+    } catch (error) {
+      return reply.status(400).send({ erro: error instanceof Error ? error.message : 'Falha ao revisar cenário' });
+    }
+  });
+
+  app.post<{ Body: { nowIso?: string } }>('/api/admin/simulacao/cenario/tempo', async (req, reply) => {
+    if (!exigirAdmin(req, reply)) return;
+    const nowIso = String(req.body?.nowIso ?? '').trim();
+    if (!nowIso) return reply.status(400).send({ erro: 'nowIso é obrigatório' });
+    try {
+      return await definirAgoraCenario(nowIso);
+    } catch (error) {
+      return reply.status(400).send({ erro: error instanceof Error ? error.message : 'Falha ao ajustar tempo' });
+    }
+  });
+
+  app.get('/api/admin/simulacao/cenario/auditar', async (req, reply) => {
+    if (!exigirAdmin(req, reply)) return;
+    try {
+      return await auditarCenarioSimulado();
+    } catch (error) {
+      return reply.status(400).send({ erro: error instanceof Error ? error.message : 'Falha ao auditar cenário' });
+    }
+  });
 }

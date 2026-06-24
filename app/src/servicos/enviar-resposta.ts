@@ -11,6 +11,7 @@ import { salvarEstadoMonitorTelefone } from './monitor-telefone.js';
 import { aleatorioEntre, obterConfigHumanizacao } from './config-humanizacao.js';
 import { jidEhGrupoOuLista } from '../util/telefone.js';
 import { config } from '../config.js';
+import { simulacaoAtivaParaTelefone } from './simulacao-cenario.js';
 
 export interface ResultadoEnvio {
   enviado: boolean;
@@ -64,7 +65,9 @@ export async function tentarEnviarResposta(
       ? [textoCompleto.trim() || 'Ok']
       : dividirResposta(textoCompleto);
 
-  if (config.envioSimuladoHabilitado) {
+  const simulado =
+    config.envioSimuladoHabilitado ? true : await simulacaoAtivaParaTelefone(telefone);
+  if (simulado) {
     logEvento('envio', 'Envio simulado habilitado — não enviando ao WhatsApp', {
       telefone,
       fragmentos: fragmentos.length,

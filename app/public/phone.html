@@ -549,6 +549,17 @@
         </table>
       </div>
     </section>
+
+    <footer class="muted" style="display:flex;justify-content:flex-end;gap:.6rem;align-items:center;margin:.75rem .25rem 0">
+      <button type="button" id="simScenarioReveal" style="border:none;background:transparent;color:inherit;opacity:.5;cursor:pointer">⋯</button>
+      <div id="simScenarioControls" hidden style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:flex-end">
+        <label style="display:flex;align-items:center;gap:.35rem">Dia simulado <input id="simScenarioNow" type="datetime-local" /></label>
+        <label style="display:flex;align-items:center;gap:.35rem">Avança (h/tick) <input id="simScenarioAdvanceHours" type="number" min="1" step="1" value="6" style="width:72px" /></label>
+        <button type="button" id="simScenarioStartBtn">Testar cenario simulado</button>
+        <button type="button" id="simScenarioReviewBtn">Rever cenario simulado</button>
+        <span id="simScenarioStatus" style="opacity:.8"></span>
+      </div>
+    </footer>
   </div>
 
   <script src="/painel-auth.js"></script>

@@ -128,6 +128,20 @@ export async function directusPatch<T = unknown>(
   return json.data;
 }
 
+/** DELETE em item */
+export async function directusDelete(
+  colecao: string,
+  id: number | string,
+): Promise<void> {
+  if (!directusConfigurado()) throw new Error('Directus não configurado');
+  const res = await fetchDirectus(`/items/${colecao}/${id}`, {
+    method: 'DELETE',
+    headers: headersJson(),
+    signal: AbortSignal.timeout(30000),
+  });
+  if (!res.ok) throw new Error(`Directus DELETE ${colecao}/${id} falhou (${res.status}): ${await res.text()}`);
+}
+
 /** Upload de arquivo → retorna UUID do arquivo no Directus */
 export async function directusUploadArquivo(
   buffer: Buffer,
