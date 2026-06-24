@@ -121,7 +121,14 @@
       ...opts,
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.erro || 'Falha de autenticação');
+    if (!res.ok) {
+      if (res.status === 401 && url !== '/api/painel/login') {
+        state.contexto = null;
+        window.dispatchEvent(new CustomEvent('painel-auth-expired', { detail: { url } }));
+        ensureOverlay();
+      }
+      throw new Error(data.erro || (res.status === 401 ? 'Nao autenticado' : 'Falha de autenticação'));
+    }
     return data;
   }
 

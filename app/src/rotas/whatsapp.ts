@@ -8,6 +8,7 @@ import {
   obterStatusConexaoPorNome,
   listarStatusConexaoWhatsapp,
   obterQrCode,
+  obterQrCodeDeterministicoPorNome,
   obterQrCodePorNome,
   reconectar,
   reconectarPorNome,
@@ -185,18 +186,6 @@ export async function rotasWhatsapp(app: FastifyInstance): Promise<void> {
       podeEnviarAntesQr: status.podeEnviar,
       permiteReconectar: alvo.permiteReconectar,
     });
-    if (status.state === 'stale_open' && !alvo.permiteReconectar) {
-      return reply.status(409).send({
-        erro:
-          'Este numero auxiliar ficou preso em uma sessao residual da Evolution e nao consegue abrir QR sem reset operacional. Como a reconexao do auxiliar e bloqueada neste painel, nao ha QR disponivel aqui agora.',
-        alvo: req.params.alvo,
-        escopo: 'conexao_dupla_ia',
-        state: status.state,
-        permiteReconectar: alvo.permiteReconectar,
-        motivoOperacional:
-          'Use o numero oficial para operacao normal ou faca o reset do auxiliar fora deste painel quando quiser parear esse numero de teste novamente.',
-      });
-    }
     if (!aplicarCooldown('qrcode', escopo, reply)) {
       reportarDebugWhatsapp(req, 'qrcode', 'cooldown', {
         alvo: req.params.alvo,
@@ -215,7 +204,7 @@ export async function rotasWhatsapp(app: FastifyInstance): Promise<void> {
         cooldownAte: new Date((ULTIMA_ACAO.qrcode[escopo] ?? Date.now()) + COOLDOWN_MS.qrcode).toISOString(),
       };
     }
-    const qr = await obterQrCodePorNome(req.params.alvo);
+    const qr = await obterQrCodeDeterministicoPorNome(req.params.alvo);
     reportarDebugWhatsapp(req, 'qrcode', 'permitido', {
       alvo: req.params.alvo,
       hasBase64: Boolean(qr.base64),
@@ -240,19 +229,14 @@ export async function rotasWhatsapp(app: FastifyInstance): Promise<void> {
           cooldownAte: new Date((ULTIMA_ACAO.qrcode[escopo] ?? Date.now()) + COOLDOWN_MS.qrcode).toISOString(),
         };
       }
-      if (statusAtualizado.state === 'stale_open' && !alvo.permiteReconectar) {
-        return reply.status(409).send({
-          erro:
-            'A Evolution nao gerou QR para o numero auxiliar porque a sessao residual ainda esta travada. Neste painel o reset do auxiliar fica bloqueado, entao nao ha como recuperar este QR por aqui.',
-          alvo: req.params.alvo,
-          escopo: 'conexao_dupla_ia',
-          state: statusAtualizado.state,
-          permiteReconectar: alvo.permiteReconectar,
-          motivoOperacional:
-            'Se precisar testar com este numero auxiliar, faca primeiro um reset operacional fora do painel. Aqui dentro, use o numero oficial para reconectar.',
-        });
-      }
-      return reply.status(503).send({ erro: 'QR code não disponível. Tente reconectar.', alvo: req.params.alvo });
+      return reply.status(503).send({
+        erro:
+          'O painel desconectou e tentou recriar a sessao automaticamente, mas a Evolution ainda nao devolveu um QR base64 para este alvo.',
+        alvo: req.params.alvo,
+        escopo: 'conexao_dupla_ia',
+        state: statusAtualizado.state,
+        permiteReconectar: alvo.permiteReconectar,
+      });
     }
     return {
       conectado: false,

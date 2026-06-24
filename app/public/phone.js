@@ -26,8 +26,18 @@
 
   function urlMonitor(phones) {
     const lista = phones.filter(telefoneValido);
-    if (!lista.length) return '/phone';
-    return lista.length === 1 ? `/phone=${lista[0]}` : `/phone?phones=${lista.join(',')}`;
+    const atual = new URL(window.location.href);
+    const destino = new URL(window.location.href);
+    destino.pathname = atual.pathname === '/phone.html' ? '/phone.html' : '/phone';
+    destino.searchParams.delete('phone');
+    destino.searchParams.delete('phones');
+    if (!lista.length) return `${destino.pathname}${destino.search}`;
+    if (lista.length === 1) {
+      destino.searchParams.set('phone', lista[0]);
+      return `${destino.pathname}${destino.search}`;
+    }
+    destino.searchParams.set('phones', lista.join(','));
+    return `${destino.pathname}${destino.search}`;
   }
 
   function atualizarUrl() {

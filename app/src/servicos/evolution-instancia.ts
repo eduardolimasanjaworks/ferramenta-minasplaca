@@ -4,6 +4,7 @@
 import { config } from '../config.js';
 import { resolverStatusEvolution } from './evolution-status.js';
 import { existsSync, readFileSync } from 'node:fs';
+import { obterQrCodeComResetDeterministico } from './evolution-reset.js';
 import {
   listarAlvosWhatsapp,
   obterAlvoWhatsapp,
@@ -295,6 +296,12 @@ export async function obterQrCodePorNome(nome: string): Promise<QrCodeResposta> 
   const alvo = obterAlvoWhatsapp(nome);
   if (!alvo) throw new Error('Alvo WhatsApp não encontrado');
   return obterQrCodePorAlvo(alvo);
+}
+
+export async function obterQrCodeDeterministicoPorNome(nome: string): Promise<QrCodeResposta> {
+  const alvo = obterAlvoWhatsapp(nome);
+  if (!alvo) throw new Error('Alvo WhatsApp não encontrado');
+  return obterQrCodeComResetDeterministico(alvo);
 }
 
 /** Desconecta sessão e gera novo QR */

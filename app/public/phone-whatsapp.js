@@ -89,13 +89,13 @@
       const src = qr.base64.startsWith('data:') ? qr.base64 : `data:image/png;base64,${qr.base64}`;
       return `<img alt="QR ${item.titulo}" src="${src}" />`;
     }
-    return '<div class="qr-placeholder">Clique em "Abrir QR da conexao atual" para carregar o pareamento deste alvo.</div>';
+    return '<div class="qr-placeholder">Clique em "Desconectar e gerar QR agora" para forcar um novo pareamento deste alvo.</div>';
   }
 
   function textoBotao(alvo, acao) {
     const restante = segundosRestantes(alvo, acao);
     if (acao === 'atualizar') return restante > 0 ? `Ja ja eu confiro de novo (${restante}s)` : 'Verificar agora se conectou';
-    if (acao === 'qr') return restante > 0 ? `Seguro mais um instante (${restante}s)` : 'Abrir QR da conexao atual';
+    if (acao === 'qr') return restante > 0 ? `Seguro mais um instante (${restante}s)` : 'Desconectar e gerar QR agora';
     return restante > 0 ? `Calma, vou reiniciar em ${restante}s` : 'Desconectar e gerar novo QR';
   }
 
@@ -137,7 +137,7 @@
           </div>
           <div class="wa-help-box">
             <div><code>Verificar agora se conectou</code> so confere o estado atual deste alvo.</div>
-            <div><code>Abrir QR da conexao atual</code> tenta abrir o pareamento sem derrubar a sessao. Se a Evolution travar o auxiliar, o painel responde com aviso operacional em vez de fingir sucesso.</div>
+            <div><code>Desconectar e gerar QR agora</code> derruba a sessao atual deste alvo e tenta pedir um novo QR de forma deterministica.</div>
             <div><code>Desconectar e gerar novo QR</code> ${item.permiteReconectar ? 'fica liberado neste alvo.' : 'nao fica liberado neste alvo.'}</div>
           </div>
         </div>
