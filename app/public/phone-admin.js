@@ -48,24 +48,9 @@
     return state.jornadas.find((item) => item.id === $('jornada').value) || null;
   }
 
-  function renderInfo(jornada) {
-    $('jornadaInfo').innerHTML = jornada ? `
-      <span class="pill">Cenario ${jornada.cenario}</span>
-      <span class="pill">${jornada.titulo}</span>
-      <span class="pill">${jornada.origemMensagem}</span>` : '';
-  }
-
   function atualizarMensagemPadrao() {
     const jornada = jornadaAtual();
-    renderInfo(jornada);
     if (jornada) $('mensagemInicial').value = jornada.mensagemPadrao || '';
-  }
-
-  function moverJornada(delta) {
-    if (!state.jornadas.length) return;
-    const atual = Math.max(0, state.jornadas.findIndex((item) => item.id === $('jornada').value));
-    $('jornada').value = state.jornadas[(atual + delta + state.jornadas.length) % state.jornadas.length].id;
-    atualizarMensagemPadrao();
   }
 
   function resumoResultado(resultado) {
@@ -120,19 +105,17 @@
 
   function ativarPainel(alvo) {
     document.querySelectorAll('[data-panel]').forEach((item) => item.classList.toggle('active', item.dataset.panel === alvo));
-    ['journeyPanel', 'opsPanel', 'whatsappPanel', 'pausePanel', 'trainingPanel', 'simulatorPanel', 'editorPanel'].forEach((id) => { $(id).hidden = id !== alvo; });
+    ['journeyPanel', 'opsPanel', 'whatsappPanel', 'monitorPanel', 'pausePanel', 'trainingPanel', 'simulatorPanel', 'editorPanel'].forEach((id) => { $(id).hidden = id !== alvo; });
   }
 
   function painelInicial() {
     const painel = new URLSearchParams(window.location.search).get('painel');
-    return ['journeyPanel', 'opsPanel', 'whatsappPanel', 'pausePanel', 'trainingPanel', 'simulatorPanel', 'editorPanel'].includes(`${painel}Panel`) ? `${painel}Panel` : 'journeyPanel';
+    return ['journeyPanel', 'opsPanel', 'whatsappPanel', 'monitorPanel', 'pausePanel', 'trainingPanel', 'simulatorPanel', 'editorPanel'].includes(`${painel}Panel`) ? `${painel}Panel` : 'journeyPanel';
   }
 
   function conectarEventos() {
     document.querySelectorAll('[data-panel]').forEach((btn) => btn.addEventListener('click', () => ativarPainel(btn.dataset.panel)));
     $('jornada').addEventListener('change', atualizarMensagemPadrao);
-    $('journeyPrevBtn').addEventListener('click', () => moverJornada(-1));
-    $('journeyNextBtn').addEventListener('click', () => moverJornada(1));
     $('iniciarBtn').addEventListener('click', iniciarJornada);
     $('recarregarJornadasBtn').addEventListener('click', () => carregarJornadas().catch((error) => setBox('journeyStatus', error.message || 'Falha ao recarregar jornadas', 'warn')));
     $('trainingOpenEditorBtn').addEventListener('click', () => ativarPainel('editorPanel'));

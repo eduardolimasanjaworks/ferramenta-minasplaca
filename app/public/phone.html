@@ -27,48 +27,18 @@
       </div>
       <datalist id="phoneSuggestions"></datalist>
       <button class="primary" type="button" id="addPhoneBtn">Abrir contato do ERP</button>
-      <div class="hint">Os contatos deste topo sao lidos do cadastro de motoristas do ERP.</div>
-    </section>
-
-    <section class="card selection-card">
-      <div class="table-head">
-        <div>
-          <div class="table-title">Contatos selecionados</div>
-          <div class="muted">Clique em um contato sugerido ou digite e adicione. Voce pode acompanhar varios ao mesmo tempo.</div>
-        </div>
-        <button type="button" id="clearPhonesBtn">Limpar selecao</button>
-      </div>
+      <button type="button" id="clearPhonesBtn">Limpar selecao</button>
       <div id="selectedPhones" class="chip-list">
         <span class="empty-inline">Nenhum contato selecionado.</span>
       </div>
-    </section>
-
-    <section class="card overview">
-      <div class="overview-main">
-        <div class="mini-card">
-          <span>Telefone</span>
-          <strong id="sumPhone">-</strong>
-        </div>
-        <div class="mini-card">
-          <span>Estado atual</span>
-          <strong id="sumState">Aguardando consulta</strong>
-        </div>
-        <details class="mini-details details-toggle">
-          <summary>Mais detalhes</summary>
-          <div class="details-grid">
-            <div class="mini-card"><span>Linhas</span><strong id="sumTotal">0</strong></div>
-            <div class="mini-card"><span>Ultima atualizacao</span><strong id="sumUpdated">-</strong></div>
-            <div class="mini-card"><span>Disparo previsto</span><strong id="sumEta">-</strong></div>
-            <div class="mini-card"><span>Delay sorteado</span><strong id="sumDelay">-</strong></div>
-          </div>
-        </details>
-      </div>
+      <div class="hint">Os contatos deste topo sao lidos do cadastro de motoristas do ERP.</div>
     </section>
 
     <div class="panel-switch" role="tablist" aria-label="Acoes do contato">
       <button class="panel-tab active" type="button" data-panel="journeyPanel">Jornada</button>
       <button class="panel-tab" type="button" data-panel="opsPanel">Operacao</button>
       <button class="panel-tab" type="button" data-panel="whatsappPanel">WhatsApp</button>
+      <button class="panel-tab" type="button" data-panel="monitorPanel">Conversas</button>
       <button class="panel-tab" type="button" data-panel="pausePanel">Pausa</button>
       <button class="panel-tab" type="button" data-panel="trainingPanel">Treinamento</button>
       <button class="panel-tab" type="button" data-panel="simulatorPanel">Simulador</button>
@@ -86,13 +56,8 @@
         <div class="field">
           <label for="jornada">Jornada</label>
           <select id="jornada"></select>
-          <div class="actions" style="margin-top:.55rem">
-            <button id="journeyPrevBtn" type="button">Anterior</button>
-            <button id="journeyNextBtn" type="button">Proxima</button>
-          </div>
         </div>
       </div>
-      <div id="jornadaInfo" class="meta-strip"></div>
       <div class="field" style="margin-top:.9rem">
         <label for="mensagemInicial">Mensagem inicial</label>
         <textarea id="mensagemInicial"></textarea>
@@ -105,7 +70,78 @@
         <button id="iniciarBtn" class="primary" type="button">Iniciar jornada</button>
         <button id="recarregarJornadasBtn" type="button">Recarregar jornadas</button>
       </div>
-      <div id="journeyStatus" class="result-box">Aguardando carregamento das jornadas.</div>
+    </section>
+
+    <section id="monitorPanel" class="admin-panel" hidden>
+      <section id="chatMonitorSection" class="card table-card">
+        <div class="table-head">
+          <div>
+            <div class="table-title">Conversas reais</div>
+            <div class="muted">Visualizacao ludica da conversa, do que vai ser enviado e do que foi gravado no banco. Clique numa mensagem da IA para ver o motivo.</div>
+          </div>
+          <div class="panel-switch compact-switch monitor-switch" role="tablist" aria-label="Modo do monitor">
+            <button class="panel-tab active" type="button" data-monitor-view="chat">Chat real</button>
+            <button class="panel-tab" type="button" data-monitor-view="events">Eventos dos contatos</button>
+          </div>
+        </div>
+        <div id="chatCards" class="chat-monitor-grid">
+          <div class="chat-monitor-empty">Informe um ou mais telefones para abrir as conversas reais.</div>
+        </div>
+      </section>
+
+      <section id="eventsMonitorSection" class="card table-card" hidden>
+        <div class="table-head">
+          <div>
+            <div class="table-title">Eventos dos contatos</div>
+            <div class="muted">Atualizacao automatica a cada 2 segundos.</div>
+          </div>
+          <button type="button" id="refreshBtn">Atualizar agora</button>
+        </div>
+        <div class="table-filters">
+          <select id="filterPhone">
+            <option value="">Todos os contatos</option>
+          </select>
+          <select id="filterOrigin">
+            <option value="">Todos</option>
+            <option value="cliente">Cliente</option>
+            <option value="gmx">GMX</option>
+          </select>
+          <select id="filterStatus">
+            <option value="">Todos os status</option>
+            <option value="recebido">Recebido</option>
+            <option value="enviado">Enviado</option>
+            <option value="esperando">Esperando</option>
+            <option value="fila">Fila</option>
+            <option value="erro">Erro</option>
+          </select>
+          <select id="filterType">
+            <option value="">Todos os tipos</option>
+            <option value="mensagem">Mensagem</option>
+            <option value="justificativa_ia">Justificativa IA</option>
+            <option value="debounce">Debounce</option>
+            <option value="fila">Fila</option>
+            <option value="trace">Trace</option>
+          </select>
+          <input id="filterText" type="text" placeholder="Buscar texto na mensagem" />
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Horario</th>
+                <th>Phone</th>
+                <th>Origem</th>
+                <th>Mensagem</th>
+                <th>Tipo</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr><td colspan="6" class="empty">Informe um ou mais telefones para abrir o monitor.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
     </section>
 
     <section id="opsPanel" class="card admin-panel" hidden>
@@ -478,76 +514,6 @@
         <div id="editorOcrStatus" class="result-box">Carregando configuracao OCR.</div>
         </div>
       </details>
-    </section>
-
-    <section id="chatMonitorSection" class="card table-card">
-      <div class="table-head">
-        <div>
-          <div class="table-title">Conversas reais</div>
-          <div class="muted">Visualizacao ludica da conversa, do que vai ser enviado e do que foi gravado no banco. Clique numa mensagem da IA para ver o motivo.</div>
-        </div>
-        <div class="panel-switch compact-switch monitor-switch" role="tablist" aria-label="Modo do monitor">
-          <button class="panel-tab active" type="button" data-monitor-view="chat">Chat real</button>
-          <button class="panel-tab" type="button" data-monitor-view="events">Eventos dos contatos</button>
-        </div>
-      </div>
-      <div id="chatCards" class="chat-monitor-grid">
-        <div class="chat-monitor-empty">Informe um ou mais telefones para abrir as conversas reais.</div>
-      </div>
-    </section>
-
-    <section id="eventsMonitorSection" class="card table-card" hidden>
-      <div class="table-head">
-        <div>
-          <div class="table-title">Eventos dos contatos</div>
-          <div class="muted">Atualizacao automatica a cada 2 segundos.</div>
-        </div>
-        <button type="button" id="refreshBtn">Atualizar agora</button>
-      </div>
-      <div class="table-filters">
-        <select id="filterPhone">
-          <option value="">Todos os contatos</option>
-        </select>
-        <select id="filterOrigin">
-          <option value="">Todos</option>
-          <option value="cliente">Cliente</option>
-          <option value="gmx">GMX</option>
-        </select>
-        <select id="filterStatus">
-          <option value="">Todos os status</option>
-          <option value="recebido">Recebido</option>
-          <option value="enviado">Enviado</option>
-          <option value="esperando">Esperando</option>
-          <option value="fila">Fila</option>
-          <option value="erro">Erro</option>
-        </select>
-        <select id="filterType">
-          <option value="">Todos os tipos</option>
-          <option value="mensagem">Mensagem</option>
-          <option value="justificativa_ia">Justificativa IA</option>
-          <option value="debounce">Debounce</option>
-          <option value="fila">Fila</option>
-          <option value="trace">Trace</option>
-        </select>
-        <input id="filterText" type="text" placeholder="Buscar texto na mensagem" />
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Horario</th>
-              <th>Phone</th>
-              <th>Origem</th>
-              <th>Mensagem</th>
-              <th>Tipo</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <tr><td colspan="6" class="empty">Informe um ou mais telefones para abrir o monitor.</td></tr>
-          </tbody>
-        </table>
-      </div>
     </section>
 
     <footer class="muted" style="display:flex;justify-content:flex-end;gap:.6rem;align-items:center;margin:.75rem .25rem 0">

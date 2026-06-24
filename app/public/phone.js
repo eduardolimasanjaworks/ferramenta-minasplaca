@@ -5,7 +5,7 @@
  */
 (() => {
   const $ = (id) => document.getElementById(id);
-  const els = ['phoneInput', 'addPhoneBtn', 'refreshBtn', 'tableBody', 'sumPhone', 'sumState', 'sumTotal', 'sumUpdated', 'sumEta', 'sumDelay', 'phoneSuggestions', 'selectedPhones', 'clearPhonesBtn', 'filterPhone', 'filterOrigin', 'filterStatus', 'filterType', 'filterText'].reduce((acc, id) => ({ ...acc, [id]: $(id) }), {});
+  const els = ['phoneInput', 'addPhoneBtn', 'refreshBtn', 'tableBody', 'phoneSuggestions', 'selectedPhones', 'clearPhonesBtn', 'filterPhone', 'filterOrigin', 'filterStatus', 'filterType', 'filterText'].reduce((acc, id) => ({ ...acc, [id]: $(id) }), {});
   const state = { activePhone: '', phones: [], lines: [], dataByPhone: new Map(), contactsByPhone: new Map(), pollTimer: null, contexto: null };
 
   const soDigitos = (valor) => String(valor || '').replace(/\D/g, '');
@@ -42,24 +42,6 @@
   function garantirFoco() {
     if (!state.phones.length) state.activePhone = '';
     else if (!state.phones.includes(state.activePhone)) state.activePhone = state.phones[0];
-  }
-
-  function preencherResumo() {
-    const foco = telefoneFoco();
-    const data = state.dataByPhone.get(foco);
-    const comTimer = [...state.dataByPhone.values()].filter((item) => item?.resumoAtual?.previstoParaMs).length;
-    const comDelay = [...state.dataByPhone.values()].filter((item) => item?.resumoAtual?.delaySorteadoSegundos != null).length;
-    const ultimaAtualizacao = [...state.dataByPhone.values()].reduce((maior, item) => Math.max(maior, item?.atualizadoEmMs || 0), 0);
-    els.sumPhone.textContent = foco || (state.phones.length ? `${state.phones.length} contatos` : '-');
-    els.sumState.textContent = data?.estadoAtual || (state.phones.length ? `${state.phones.length} contatos selecionados` : 'Aguardando consulta');
-    els.sumTotal.textContent = String(state.lines.length);
-    els.sumUpdated.textContent = fmtHorario(ultimaAtualizacao);
-    els.sumEta.textContent = data?.resumoAtual?.previstoParaMs
-      ? `${fmtHorario(data.resumoAtual.previstoParaMs)}${data.resumoAtual.restanteSegundos != null ? ` (${data.resumoAtual.restanteSegundos}s)` : ''}`
-      : comTimer ? `${comTimer} contato(s) com cronometro ativo` : (data?.resumoAtual?.observacao || 'Sem cronometro ativo');
-    els.sumDelay.textContent = data?.resumoAtual?.delaySorteadoSegundos != null
-      ? `${data.resumoAtual.delaySorteadoSegundos}s`
-      : comDelay ? `${comDelay} delay(s) ativo(s)` : 'Nao informado';
   }
 
   function renderSelecao() {
@@ -124,7 +106,6 @@
     garantirFoco();
     renderSelecao();
     atualizarFiltroTelefones();
-    preencherResumo();
     renderLinhas();
     atualizarUrl();
     window.dispatchEvent(new CustomEvent('phone-monitor-updated'));
