@@ -117,6 +117,9 @@ export async function iniciarJornadaTeste(
   }
 
   const jornada = await obterJornadaTestePorId(input.jornadaId);
+  if (input.resetarHistorico) {
+    await liberarBloqueioDisparo(telefone, jornada.id);
+  }
   const bloqueado = await adquirirBloqueioDisparo(telefone, jornada.id);
   if (!bloqueado) {
     throw new Error('Ja existe um disparo recente ou em andamento para este telefone nessa jornada');

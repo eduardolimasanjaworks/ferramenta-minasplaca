@@ -78,8 +78,64 @@ type ContextoC7 =
       longitudeAtual?: number;
     };
 
+const ESTADOS_BRASIL = [
+  'acre',
+  'alagoas',
+  'amapa',
+  'amazonas',
+  'bahia',
+  'ceara',
+  'distrito federal',
+  'espirito santo',
+  'goias',
+  'maranhao',
+  'mato grosso',
+  'mato grosso do sul',
+  'minas gerais',
+  'para',
+  'paraiba',
+  'parana',
+  'pernambuco',
+  'piaui',
+  'rio de janeiro',
+  'rio grande do norte',
+  'rio grande do sul',
+  'rondonia',
+  'roraima',
+  'santa catarina',
+  'sao paulo',
+  'sergipe',
+  'tocantins',
+] as const;
+
 function normalizar(s: string): string {
   return s.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function formatarEstado(valor: string): string {
+  return valor
+    .split(' ')
+    .map((parte) => parte.charAt(0).toUpperCase() + parte.slice(1))
+    .join(' ');
+}
+
+function extrairEstadoSemCidade(mensagem: string): string | null {
+  const t = normalizar(mensagem)
+    .replace(/[.,!?]/g, ' ')
+    .replace(/\s+/g, ' ');
+  if (extrairLocalizacaoTexto(mensagem)) return null;
+  return ESTADOS_BRASIL.find((estado) => new RegExp(`\\b${estado}\\b`, 'i').test(t)) ?? null;
+}
+
+function repromptCidadeNoEstado(estado: string, contexto: 'atual' | 'destino' | 'disponibilidade'): string {
+  const nome = formatarEstado(estado);
+  if (contexto === 'atual') {
+    return `Preciso da cidade em ${nome} onde voce esta agora, parceiro`;
+  }
+  if (contexto === 'destino') {
+    return `Preciso da cidade em ${nome} do destino dessa viagem, parceiro`;
+  }
+  return `Preciso da cidade em ${nome} onde voce vai ficar disponivel para carregar, parceiro`;
 }
 
 function ultimaAssistant(historico: Array<{ role: string; content: string }>): string {
@@ -553,6 +609,14 @@ export async function tentarFluxoDisponibilidade(opts: {
   }
 
   if (contexto.tipo === 'indisponivel_local_atual') {
+    const estadoSemCidade = extrairEstadoSemCidade(mensagem);
+    if (estadoSemCidade) {
+      return montarResultado(
+        repromptCidadeNoEstado(estadoSemCidade, 'atual'),
+        undefined,
+        'local_indisponivel_estado_sem_cidade',
+      );
+    }
     const localAtual = await resolverLocalizacaoComGps(mensagem, itens);
     if (!localAtual || localizacaoVaga(mensagem)) {
       return montarResultado(msgs.c7_local_invalida, undefined, 'local_indisponivel_invalida');
@@ -595,6 +659,14 @@ export async function tentarFluxoDisponibilidade(opts: {
   }
 
   if (contexto.tipo === 'indisponivel_local_disponibilidade') {
+    const estadoSemCidade = extrairEstadoSemCidade(mensagem);
+    if (estadoSemCidade) {
+      return montarResultado(
+        repromptCidadeNoEstado(estadoSemCidade, 'disponibilidade'),
+        undefined,
+        'local_disponibilidade_indisponivel_estado_sem_cidade',
+      );
+    }
     const localDisponibilidade = extrairLocalizacaoTexto(mensagem);
     if (!localDisponibilidade || localizacaoVaga(mensagem)) {
       return montarResultado(
@@ -624,6 +696,14 @@ export async function tentarFluxoDisponibilidade(opts: {
   }
 
   if (contexto.tipo === 'carregado_local_atual') {
+    const estadoSemCidade = extrairEstadoSemCidade(mensagem);
+    if (estadoSemCidade) {
+      return montarResultado(
+        repromptCidadeNoEstado(estadoSemCidade, 'atual'),
+        undefined,
+        'local_atual_estado_sem_cidade',
+      );
+    }
     const localAtual = await resolverLocalizacaoComGps(mensagem, itens);
     if (!localAtual || localizacaoVaga(mensagem)) {
       return montarResultado(msgs.c7_local_invalida, undefined, 'local_atual_invalida');
@@ -645,6 +725,14 @@ export async function tentarFluxoDisponibilidade(opts: {
   }
 
   if (contexto.tipo === 'carregado_destino_atual') {
+    const estadoSemCidade = extrairEstadoSemCidade(mensagem);
+    if (estadoSemCidade) {
+      return montarResultado(
+        repromptCidadeNoEstado(estadoSemCidade, 'destino'),
+        undefined,
+        'destino_atual_estado_sem_cidade',
+      );
+    }
     const localDestinoAtual = extrairLocalizacaoTexto(mensagem);
     if (!localDestinoAtual || localizacaoVaga(mensagem)) {
       return montarResultado(
@@ -693,6 +781,14 @@ export async function tentarFluxoDisponibilidade(opts: {
   }
 
   if (contexto.tipo === 'carregado_local_disponibilidade') {
+    const estadoSemCidade = extrairEstadoSemCidade(mensagem);
+    if (estadoSemCidade) {
+      return montarResultado(
+        repromptCidadeNoEstado(estadoSemCidade, 'disponibilidade'),
+        undefined,
+        'local_disponibilidade_estado_sem_cidade',
+      );
+    }
     const localDisponibilidade = extrairLocalizacaoTexto(mensagem);
     if (!localDisponibilidade || localizacaoVaga(mensagem)) {
       return montarResultado(

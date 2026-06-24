@@ -269,6 +269,47 @@ export async function executarTestesUnidade(): Promise<ResultadoTeste[]> {
     ),
   );
 
+  const carregadoDestinoEstadoSemCidade = await tentarFluxoDisponibilidade({
+    telefone: '5511999887766',
+    mensagem: 'vou estar disponivel la em alagoas',
+    historico: [
+      {
+        role: 'assistant',
+        content: 'E qual é a cidade e estado do destino da viagem atual que você está levando agora?',
+      },
+    ],
+  });
+  r.push(
+    assert(
+      'disponibilidade carregado repete cidade quando motorista fala so o estado',
+      carregadoDestinoEstadoSemCidade?.passo === 'destino_atual_estado_sem_cidade' &&
+        carregadoDestinoEstadoSemCidade.visivel.includes('cidade em Alagoas'),
+      JSON.stringify(carregadoDestinoEstadoSemCidade),
+    ),
+  );
+
+  const carregadoDisponibilidadeEstadoSemCidade = await tentarFluxoDisponibilidade({
+    telefone: '5511999887766',
+    mensagem: 'vou estar disponivel la em alagoas',
+    historico: [
+      {
+        role: 'assistant',
+        content: 'E quando liberar, em qual cidade e estado você vai estar disponível para carregar?',
+      },
+      { role: 'user', content: 'to em betim mg' },
+      { role: 'assistant', content: 'E em que data você estará liberado para carregar?' },
+      { role: 'user', content: 'amanha' },
+    ],
+  });
+  r.push(
+    assert(
+      'disponibilidade pede cidade especifica quando motorista informa so o estado de liberacao',
+      carregadoDisponibilidadeEstadoSemCidade?.passo === 'local_disponibilidade_estado_sem_cidade' &&
+        carregadoDisponibilidadeEstadoSemCidade.visivel.includes('cidade em Alagoas'),
+      JSON.stringify(carregadoDisponibilidadeEstadoSemCidade),
+    ),
+  );
+
   r.push(assert('serializarBlocoFerramenta', serializarBlocoFerramenta('teste', { a: 1 }).includes('teste')));
 
   r.push(assert('ehMensagemRecebida v2', ehMensagemRecebida('messages.upsert')));

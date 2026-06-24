@@ -26,3 +26,10 @@
 - `/api/atendimento/contato/5512997918525` respondeu `200` com `precisa_atendimento=true`.
 - O asset servido `phone-global-pause.js` ainda continha a mensagem de restricao antiga antes do patch.
 - `/api/admin/simulador/auditoria` respondeu `200` e confirmou que o simulador atual e um payload de auditoria do backend, nao replay realtime do pipeline.
+
+- `POST /api/admin/jornadas-teste/iniciar` com payload valido respondeu `200` e enviou a jornada real.
+- O `400` mais provavel do iniciar jornada agora e validacao de duplicidade/lock ou payload incompleto, nao indisponibilidade geral do backend.
+
+## Fix Applied
+- Quando `resetarHistorico=true`, o backend agora libera o lock da jornada antes de tentar adquirir um novo lock.
+- Isso permite reiniciar a mesma jornada para o mesmo telefone durante o teste manual sem esperar o TTL de duplicidade.
