@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Monitor por telefone - IA GMX</title>
-  <link rel="stylesheet" href="/phone.css?v=20260624-2" />
-  <link rel="stylesheet" href="/phone-monitor.css?v=20260624-2" />
-  <link rel="stylesheet" href="/phone-simulator.css?v=20260624-2" />
-  <link rel="stylesheet" href="/phone-editor.css?v=20260624-2" />
-  <link rel="stylesheet" href="/phone-whatsapp.css?v=20260624-2" />
-  <link rel="stylesheet" href="/phone-contrast.css?v=20260624-2" />
+  <link rel="stylesheet" href="/phone.css?v=20260624-3" />
+  <link rel="stylesheet" href="/phone-monitor.css?v=20260624-3" />
+  <link rel="stylesheet" href="/phone-simulator.css?v=20260624-3" />
+  <link rel="stylesheet" href="/phone-editor.css?v=20260624-3" />
+  <link rel="stylesheet" href="/phone-whatsapp.css?v=20260624-3" />
+  <link rel="stylesheet" href="/phone-contrast.css?v=20260624-3" />
 </head>
 <body>
   <div class="wrap">
@@ -95,7 +95,13 @@
             <div class="table-title">Eventos dos contatos</div>
             <div class="muted">Atualizacao automatica a cada 2 segundos.</div>
           </div>
-          <button type="button" id="refreshBtn">Atualizar agora</button>
+          <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+            <div class="panel-switch compact-switch monitor-switch" role="tablist" aria-label="Modo do monitor">
+              <button class="panel-tab" type="button" data-monitor-view="chat">Chat real</button>
+              <button class="panel-tab active" type="button" data-monitor-view="events">Eventos dos contatos</button>
+            </div>
+            <button type="button" id="refreshBtn">Atualizar agora</button>
+          </div>
         </div>
         <div class="table-filters">
           <select id="filterPhone">
@@ -531,17 +537,17 @@
     </footer>
   </div>
 
-  <script src="/painel-auth.js?v=20260624-2"></script>
-  <script src="/phone.js?v=20260624-2"></script>
-  <script src="/phone-chat.js?v=20260624-2"></script>
-  <script src="/phone-admin.js?v=20260624-2"></script>
-  <script src="/phone-ops.js?v=20260624-2"></script>
-  <script src="/phone-pause.js?v=20260624-2"></script>
-  <script src="/phone-simulator.js?v=20260624-2"></script>
-  <script src="/phone-training.js?v=20260624-2"></script>
-  <script src="/phone-editor.js?v=20260624-2"></script>
-  <script src="/phone-ocr-editor.js?v=20260624-2"></script>
-  <script src="/phone-editor-core.js?v=20260624-2"></script>
-  <script src="/phone-whatsapp.js?v=20260624-2"></script>
+  <script src="/painel-auth.js?v=20260624-3"></script>
+  <script src="/phone.js?v=20260624-3"></script>
+  <script src="/phone-chat.js?v=20260624-3"></script>
+  <script src="/phone-admin.js?v=20260624-3"></script>
+  <script src="/phone-ops.js?v=20260624-3"></script>
+  <script src="/phone-pause.js?v=20260624-3"></script>
+  <script src="/phone-simulator.js?v=20260624-3"></script>
+  <script src="/phone-training.js?v=20260624-3"></script>
+  <script src="/phone-editor.js?v=20260624-3"></script>
+  <script src="/phone-ocr-editor.js?v=20260624-3"></script>
+  <script src="/phone-editor-core.js?v=20260624-3"></script>
+  <script src="/phone-whatsapp.js?v=20260624-3"></script>
 </body>
 </html>

@@ -41,9 +41,9 @@ function reportarDebugWhatsapp(
   extra?: Record<string, unknown>,
 ) {
   let url = 'http://2.24.201.28:7778/event';
-  let sessionId = 'whatsapp-no-response';
+  let sessionId = 'whatsapp-qr-connection';
   try {
-    const caminho = '.dbg/whatsapp-no-response.env';
+    const caminho = '.dbg/whatsapp-qr-connection.env';
     if (existsSync(caminho)) {
       const env = readFileSync(caminho, 'utf8');
       url = env.match(/DEBUG_SERVER_URL=(.+)/)?.[1]?.trim() || url;

@@ -114,12 +114,12 @@ export async function criarServidor() {
   });
 
   app.get('/phone', async (_req, reply) => {
-    return reply.redirect('/phone.html?v=20260624-1');
+    return reply.redirect('/phone.html?v=20260624-3');
   });
 
   app.get<{ Params: { telefone: string } }>('/phone=:telefone', async (req, reply) => {
     return reply.redirect(
-      `/phone.html?v=20260624-1&phone=${encodeURIComponent(req.params.telefone)}`,
+      `/phone.html?v=20260624-3&phone=${encodeURIComponent(req.params.telefone)}`,
     );
   });
 
