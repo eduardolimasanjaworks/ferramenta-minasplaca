@@ -52,6 +52,14 @@ function comHttps(url: string): string {
   return `https://${limpa.replace(/\/$/, '')}`;
 }
 
+function valorConfigurado(...valores: Array<string | undefined>): string | undefined {
+  for (const valor of valores) {
+    const limpo = String(valor ?? '').trim();
+    if (limpo) return limpo;
+  }
+  return undefined;
+}
+
 export function resolverConfigWhatsappTargets() {
   const legadoOficial = lerArquivoChaveValor(
     resolve(process.cwd(), '../.chatwootgmxtokenevolution.env'),
@@ -61,10 +69,27 @@ export function resolverConfigWhatsappTargets() {
 
   const auxiliar: WhatsappTargetConfig = {
     habilitado: true,
-    url: (process.env.WHATSAPP_AUXILIAR_URL ?? process.env.WHATSAPP_IA_URL ?? process.env.EVOLUTION_URL ?? 'http://evolution-api:8080').replace(/\/$/, ''),
-    apiKey: process.env.WHATSAPP_AUXILIAR_API_KEY ?? process.env.WHATSAPP_IA_API_KEY ?? process.env.EVOLUTION_API_KEY ?? 'iagmx-evolution-key-2026',
-    instancia: process.env.WHATSAPP_AUXILIAR_INSTANCE ?? process.env.WHATSAPP_IA_INSTANCE ?? process.env.EVOLUTION_INSTANCE ?? 'gmx-atendimento-v2',
-    origem: process.env.WHATSAPP_AUXILIAR_ORIGEM ?? process.env.WHATSAPP_IA_ORIGEM ?? 'local_auxiliar',
+    url: (
+      valorConfigurado(
+        process.env.WHATSAPP_AUXILIAR_URL,
+        process.env.WHATSAPP_IA_URL,
+        process.env.EVOLUTION_URL,
+      ) ?? 'http://evolution-api:8080'
+    ).replace(/\/$/, ''),
+    apiKey:
+      valorConfigurado(
+        process.env.WHATSAPP_AUXILIAR_API_KEY,
+        process.env.WHATSAPP_IA_API_KEY,
+        process.env.EVOLUTION_API_KEY,
+      ) ?? 'iagmx-evolution-key-2026',
+    instancia:
+      valorConfigurado(
+        process.env.WHATSAPP_AUXILIAR_INSTANCE,
+        process.env.WHATSAPP_IA_INSTANCE,
+        process.env.EVOLUTION_INSTANCE,
+        legadoOficial['instancia-evo-ia'],
+      ) ?? 'gmx-atendimento-v2',
+    origem: valorConfigurado(process.env.WHATSAPP_AUXILIAR_ORIGEM, process.env.WHATSAPP_IA_ORIGEM) ?? 'local_auxiliar',
     titulo: 'QR auxiliar IA de teste',
     descricao: 'Use este QR apenas no numero auxiliar de testes da IA, separado do numero oficial da GMX.',
     permiteReconectar: bool('WHATSAPP_AUXILIAR_PERMITE_RECONECTAR', false),
@@ -72,21 +97,25 @@ export function resolverConfigWhatsappTargets() {
   };
 
   const oficialUrl = comHttps(
-    process.env.WHATSAPP_OFICIAL_URL
-      ?? process.env.WHATSAPP_CHATWOOT_FUTURO_URL
-      ?? legadoOficial['url-evolution']
-      ?? FALLBACK_OFICIAL_URL,
+    valorConfigurado(
+      process.env.WHATSAPP_OFICIAL_URL,
+      process.env.WHATSAPP_CHATWOOT_FUTURO_URL,
+      legadoOficial['url-evolution'],
+      FALLBACK_OFICIAL_URL,
+    ) ?? FALLBACK_OFICIAL_URL,
   );
-  const oficialApiKey =
-    process.env.WHATSAPP_OFICIAL_API_KEY
-    ?? process.env.WHATSAPP_CHATWOOT_FUTURO_API_KEY
-    ?? legadoOficial['token-da-evolution-do-chatwoot-da-gmx']
-    ?? FALLBACK_OFICIAL_API_KEY;
-  const oficialInstance =
-    process.env.WHATSAPP_OFICIAL_INSTANCE
-    ?? process.env.WHATSAPP_CHATWOOT_FUTURO_INSTANCE
-    ?? legadoOficial['instancia-evo-chatwoot']
-    ?? FALLBACK_OFICIAL_INSTANCE;
+  const oficialApiKey = valorConfigurado(
+    process.env.WHATSAPP_OFICIAL_API_KEY,
+    process.env.WHATSAPP_CHATWOOT_FUTURO_API_KEY,
+    legadoOficial['token-da-evolution-do-chatwoot-da-gmx'],
+    FALLBACK_OFICIAL_API_KEY,
+  ) ?? FALLBACK_OFICIAL_API_KEY;
+  const oficialInstance = valorConfigurado(
+    process.env.WHATSAPP_OFICIAL_INSTANCE,
+    process.env.WHATSAPP_CHATWOOT_FUTURO_INSTANCE,
+    legadoOficial['instancia-evo-chatwoot'],
+    FALLBACK_OFICIAL_INSTANCE,
+  ) ?? FALLBACK_OFICIAL_INSTANCE;
   const oficialHabilitado = bool(
     'WHATSAPP_OFICIAL_HABILITADO',
     Boolean(oficialUrl && oficialApiKey && oficialInstance),
@@ -97,7 +126,7 @@ export function resolverConfigWhatsappTargets() {
     url: oficialUrl,
     apiKey: oficialApiKey,
     instancia: oficialInstance,
-    origem: process.env.WHATSAPP_OFICIAL_ORIGEM ?? 'chatwoot_oficial',
+    origem: valorConfigurado(process.env.WHATSAPP_OFICIAL_ORIGEM) ?? 'chatwoot_oficial',
     titulo: 'QR oficial GMX / Chatwoot',
     descricao: 'Use este QR no numero oficial da GMX ligado ao Chatwoot. Esta e a unica conexao que pode ser reconectada pelo painel.',
     permiteReconectar: bool('WHATSAPP_OFICIAL_PERMITE_RECONECTAR', true),
