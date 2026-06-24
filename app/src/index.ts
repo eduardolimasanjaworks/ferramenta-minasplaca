@@ -17,6 +17,7 @@ import { inicializarContatoProativo } from './servicos/contato-proativo.js';
 import { iniciarWorkerContatoProativo } from './servicos/worker-contato-proativo.js';
 import { inicializarTreinamentoWhatsapp } from './servicos/treinamento-whatsapp.js';
 import { iniciarWorkerAutoavaliacaoConversas } from './servicos/worker-autoavaliacao-conversas.js';
+import { agendarWarmupPosBoot } from './servicos/warmup-pos-boot.js';
 
 async function main(): Promise<void> {
   if (
@@ -48,7 +49,6 @@ async function main(): Promise<void> {
   await inicializarColecaoLinguagem();
   await inicializarColecaoMemoriaContato();
   await garantirApoioIntencaoIndexado();
-  await sincronizarVetores();
   console.log('[init] Qdrant inicializado');
 
   const tokens = await validarTokens();
@@ -67,6 +67,8 @@ async function main(): Promise<void> {
   iniciarWorkerContatoProativo();
   iniciarWorkerAutoavaliacaoConversas();
   await iniciarServidor();
+  console.log('[init] Warm-up pos-boot agendado para sincronizar vetores sem bloquear a API');
+  void agendarWarmupPosBoot(sincronizarVetores, 5000);
 }
 
 async function aguardarDependencias(): Promise<void> {

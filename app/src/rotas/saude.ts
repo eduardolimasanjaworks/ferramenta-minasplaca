@@ -11,6 +11,7 @@ import { verificarDirectus, directusConfigurado, validarDirectusToken } from '..
 import { obterStatusPausa } from '../servicos/pausa.js';
 import { config } from '../config.js';
 import { statusFilaInferencia } from '../servicos/fila-inferencia.js';
+import { obterStatusWarmupPosBoot } from '../servicos/warmup-pos-boot.js';
 
 async function comTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
   try {
@@ -76,6 +77,7 @@ export async function rotasSaude(app: FastifyInstance): Promise<void> {
         directusToken: directusTokenOk,
       },
       pausa,
+      warmup: obterStatusWarmupPosBoot(),
       filaInferencia: statusFilaInferencia(),
       instancia: config.evolutionInstance,
     };
