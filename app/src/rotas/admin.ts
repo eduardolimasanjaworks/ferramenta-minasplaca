@@ -70,6 +70,7 @@ import {
   reverCenarioSimulado,
   statusCenarioSimulado,
 } from '../servicos/simulacao-cenario.js';
+import { obterPainelAuditoriaSimulador } from '../servicos/simulador-auditoria.js';
 
 function exigirPainel(req: Parameters<typeof painelAutenticado>[0], reply: { status: (code: number) => { send: (body: unknown) => unknown } }) {
   if (painelAutenticado(req)) return true;
@@ -527,6 +528,17 @@ export async function rotasAdmin(app: FastifyInstance): Promise<void> {
   app.get('/api/admin/simulacao/cenario/status', async (req, reply) => {
     if (!exigirAdmin(req, reply)) return;
     return statusCenarioSimulado();
+  });
+
+  app.get('/api/admin/simulador/auditoria', async (req, reply) => {
+    if (!(await exigirLeituraBloco(req, reply))) return;
+    try {
+      return await obterPainelAuditoriaSimulador();
+    } catch (error) {
+      return reply.status(400).send({
+        erro: error instanceof Error ? error.message : 'Falha ao montar auditoria do simulador',
+      });
+    }
   });
 
   app.post<{ Body: { nowIso?: string; advanceHoursPorTick?: number; tickMs?: number; qtdMotoristas?: number; seed?: number; embarquesQtd?: number } }>(
