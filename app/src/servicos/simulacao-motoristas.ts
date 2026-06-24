@@ -8,7 +8,7 @@ type MotoristaSim = { id: number; telefone: string; nome: string; sobrenome: str
 export const TAG_SIMULACAO_MOTORISTAS = '__GMX_SIMULACAO_NAO_ENVIAR__MOTORISTAS__V2__';
 export const TAG_SIMULACAO_EMBARQUES = '__GMX_SIMULACAO_NAO_ENVIAR__EMBARQUES__V2__';
 const CIDADES: CidadeBase[] = [{ cidade: 'Guarulhos', uf: 'SP', lat: -23.4543, lng: -46.5337 }, { cidade: 'Campinas', uf: 'SP', lat: -22.9099, lng: -47.0626 }, { cidade: 'São Paulo', uf: 'SP', lat: -23.5505, lng: -46.6333 }, { cidade: 'Rio de Janeiro', uf: 'RJ', lat: -22.9068, lng: -43.1729 }, { cidade: 'Belo Horizonte', uf: 'MG', lat: -19.9167, lng: -43.9345 }, { cidade: 'Curitiba', uf: 'PR', lat: -25.4284, lng: -49.2733 }, { cidade: 'Porto Alegre', uf: 'RS', lat: -30.0346, lng: -51.2177 }, { cidade: 'Goiânia', uf: 'GO', lat: -16.6869, lng: -49.2648 }, { cidade: 'Brasília', uf: 'DF', lat: -15.7939, lng: -47.8828 }, { cidade: 'Salvador', uf: 'BA', lat: -12.9777, lng: -38.5016 }, { cidade: 'Recife', uf: 'PE', lat: -8.0578, lng: -34.8829 }, { cidade: 'Fortaleza', uf: 'CE', lat: -3.7319, lng: -38.5267 }];
-const OPERACOES = ['ARROZ', 'LATA', 'GRANEL', 'CIMENTO', 'SACARIA', 'SIDER', 'FARINHA', 'AÇÚCAR'];
+const OPERACOES_PADRAO = ['ARROZ', 'LATA', 'GRANEL', 'CIMENTO', 'SACARIA', 'SIDER', 'FARINHA', 'ACUCAR'];
 const NOMES = ['João', 'Carlos', 'Pedro', 'Marcos', 'Ricardo', 'André', 'Fernando', 'Luiz', 'Paulo', 'Sérgio', 'Roberto', 'Márcia', 'Diego', 'Antônio', 'Felipe', 'Bruno', 'Rafael', 'Gustavo', 'Leandro', 'Vitor'];
 const SOBRENOMES = ['Silva', 'Souza', 'Oliveira', 'Santos', 'Pereira', 'Costa', 'Rodrigues', 'Almeida', 'Lima', 'Carvalho', 'Gomes', 'Ribeiro', 'Martins', 'Araújo', 'Barbosa'];
 
@@ -27,10 +27,10 @@ function pick<T>(rnd: () => number, arr: T[]): T {
   return arr[Math.floor(rnd() * arr.length)] as T;
 }
 
-function pickOperacoes(rnd: () => number): string {
+function pickOperacoes(rnd: () => number, operacoesDisponiveis: string[]): string {
   const qtd = 1 + Math.floor(rnd() * 3);
   const set = new Set<string>();
-  while (set.size < qtd) set.add(pick(rnd, OPERACOES));
+  while (set.size < Math.min(qtd, operacoesDisponiveis.length)) set.add(pick(rnd, operacoesDisponiveis));
   return Array.from(set).join(' ; ');
 }
 
@@ -61,17 +61,32 @@ async function listarMotoristasSimulados(): Promise<MotoristaSim[]> {
     .filter((m) => Number.isFinite(m.id) && m.telefone.length >= 10);
 }
 
+async function listarOperacoesSimulacao(): Promise<string[]> {
+  const rotas = await directusListar<{ operacao?: string; ativo?: boolean }>('config_rotas', {
+    'filter[ativo][_eq]': 'true',
+    fields: 'operacao,ativo',
+    limit: '2000',
+  }).catch(() => []);
+  const set = new Set<string>();
+  for (const rota of rotas) {
+    const op = String(rota.operacao ?? '').trim().toUpperCase();
+    if (op) set.add(op);
+  }
+  return set.size ? Array.from(set) : OPERACOES_PADRAO;
+}
+
 async function criarMotoristaSimulado(opts: {
   i: number;
   rnd: () => number;
   seedTag: string;
+  operacoesDisponiveis: string[];
 }): Promise<MotoristaSim> {
   const { i, rnd } = opts;
   const nome = pick(rnd, NOMES);
   const sobrenome = pick(rnd, SOBRENOMES);
   const cidade = pick(rnd, CIDADES);
   const tel = String(5500000000000 + i);
-  const tipo_rota = pickOperacoes(rnd);
+  const tipo_rota = pickOperacoes(rnd, opts.operacoesDisponiveis);
   const observacao = `${TAG_SIMULACAO_MOTORISTAS} ${opts.seedTag} #${i}`;
 
   const criado = await directusPost<{ id: number }>('cadastro_motorista', {
@@ -93,13 +108,17 @@ async function criarMotoristaSimulado(opts: {
   const horas = status === 'disponivel' ? 0 : 4 + Math.floor(rnd() * 48);
   const previsto = status === 'disponivel' ? null : new Date(estado.simNowMs + horas * 3600_000).toISOString();
   const prevCidade = status === 'disponivel' ? cidade : pick(rnd, CIDADES);
+  const destinoAtual = status === 'disponivel' ? cidade : pick(rnd, CIDADES);
   const localPrev = `${prevCidade.cidade} ${prevCidade.uf}`;
+  const localDestinoAtual = `${destinoAtual.cidade} ${destinoAtual.uf}`;
 
   await registrarDisponibilidade({
     telefone: tel,
     disponivel,
     status,
     localizacao_atual: `${cidade.cidade} ${cidade.uf}`,
+    local_destino_atual: localDestinoAtual,
+    local_liberacao_prevista: localPrev,
     local_disponibilidade: localPrev,
     latitude: lat,
     longitude: lng,
@@ -146,6 +165,7 @@ export async function seedMotoristasSimulados(opts?: { qtd?: number; seed?: numb
   const qtd = Math.max(1, Math.min(500, opts?.qtd ?? estado.qtd));
   const seed = Number.isFinite(Number(opts?.seed)) ? Number(opts?.seed) : estado.seed;
   const rnd = mulberry32(seed);
+  const operacoesDisponiveis = await listarOperacoesSimulacao();
 
   const existentes = await listarMotoristasSimulados();
   const falta = Math.max(0, qtd - existentes.length);
@@ -154,7 +174,7 @@ export async function seedMotoristasSimulados(opts?: { qtd?: number; seed?: numb
 
   for (let i = 0; i < falta; i++) {
     const idx = existentes.length + i + 1;
-    await criarMotoristaSimulado({ i: idx, rnd, seedTag });
+    await criarMotoristaSimulado({ i: idx, rnd, seedTag, operacoesDisponiveis });
     criados++;
   }
 
@@ -188,8 +208,10 @@ async function tickSimulacao() {
     const horas = disponivel ? 0 : 3 + Math.floor(rnd() * 60);
     const previsto = disponivel ? null : new Date(agora + horas * 3600_000).toISOString();
     const destinoPrev = pick(rnd, CIDADES);
+    const destinoAtual = pick(rnd, CIDADES);
     const localAtual = `${atualCidade.cidade} ${atualCidade.uf}`;
     const localPrev = disponivel ? localAtual : `${destinoPrev.cidade} ${destinoPrev.uf}`;
+    const localDestinoAtual = disponivel ? localAtual : `${destinoAtual.cidade} ${destinoAtual.uf}`;
 
     const lat = jitter(rnd, atualCidade.lat, 0.07);
     const lng = jitter(rnd, atualCidade.lng, 0.07);
@@ -199,6 +221,8 @@ async function tickSimulacao() {
       disponivel,
       status,
       localizacao_atual: localAtual,
+      local_destino_atual: localDestinoAtual,
+      local_liberacao_prevista: localPrev,
       local_disponibilidade: localPrev,
       latitude: lat,
       longitude: lng,

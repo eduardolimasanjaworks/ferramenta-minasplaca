@@ -100,7 +100,7 @@ async function obterUltimaDisponibilidade(motoristaId: number) {
     sort: '-date_created',
     limit: '1',
     fields:
-      'disponivel,localizacao_atual,local_disponibilidade,latitude,longitude,data_previsao_disponibilidade,observacao,date_created',
+      'disponivel,localizacao_atual,local_disponibilidade,local_destino_atual,local_liberacao_prevista,latitude,longitude,data_previsao_disponibilidade,observacao,date_created',
   });
   return lista[0] ?? null;
 }
@@ -409,8 +409,11 @@ async function appendMotorista(
   if (disp) {
     linhas.push(`- disponível: ${disp.disponivel === true ? 'sim' : disp.disponivel === false ? 'não' : '—'}`);
     linhas.push(`- local atual: ${(disp.localizacao_atual as string) || 'não informada'}`);
-    if (disp.local_disponibilidade) {
-      linhas.push(`- local para carregar: ${disp.local_disponibilidade as string}`);
+    if (disp.local_destino_atual) {
+      linhas.push(`- destino da viagem atual: ${disp.local_destino_atual as string}`);
+    }
+    if (disp.local_liberacao_prevista || disp.local_disponibilidade) {
+      linhas.push(`- local onde ficará livre: ${(disp.local_liberacao_prevista as string) || (disp.local_disponibilidade as string)}`);
     }
     if (disp.data_previsao_disponibilidade) {
       linhas.push(`- libera: ${formatarDataBr(disp.data_previsao_disponibilidade as string)}`);

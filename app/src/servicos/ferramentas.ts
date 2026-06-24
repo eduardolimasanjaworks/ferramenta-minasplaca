@@ -341,6 +341,8 @@ async function executarFerramenta(
         status: dados.status as string | undefined,
         localizacao_atual: (dados.localizacao_atual ?? dados.local) as string | undefined,
         local_disponibilidade: dados.local_disponibilidade as string | undefined,
+        local_destino_atual: dados.local_destino_atual as string | undefined,
+        local_liberacao_prevista: dados.local_liberacao_prevista as string | undefined,
         latitude: dados.latitude as number | undefined,
         longitude: dados.longitude as number | undefined,
         data_previsao_disponibilidade: dados.data_previsao_disponibilidade as string | undefined,
@@ -351,6 +353,8 @@ async function executarFerramenta(
         status: dados.status as string | undefined,
         localizacao_atual: (dados.localizacao_atual ?? dados.local) as string | undefined,
         local_disponibilidade: dados.local_disponibilidade as string | undefined,
+        local_destino_atual: dados.local_destino_atual as string | undefined,
+        local_liberacao_prevista: dados.local_liberacao_prevista as string | undefined,
         latitude: dados.latitude as number | undefined,
         longitude: dados.longitude as number | undefined,
         data_previsao_disponibilidade: dados.data_previsao_disponibilidade as string | undefined,
@@ -556,7 +560,7 @@ SEM JSON = dado NÃO salvo no ERP. A revisão remove seu texto mas NÃO pode rem
 {"ferramenta":"grava_ocr","dados":{"tipo":"cnh","midia_id":"ID_SE_HOUVER"}}
 {"ferramenta":"grava_comprovante","dados":{"midia_id":"ID_SE_HOUVER"}}
 {"ferramenta":"registrar_disponibilidade","dados":{"disponivel":true,"status":"disponivel","localizacao_atual":"Cidade UF"}}
-{"ferramenta":"registrar_disponibilidade","dados":{"disponivel":false,"status":"carregado","localizacao_atual":"Cidade UF","data_previsao_disponibilidade":"2026-06-25 08:00:00","local_disponibilidade":"Cidade UF"}}
+{"ferramenta":"registrar_disponibilidade","dados":{"disponivel":false,"status":"carregado","localizacao_atual":"Cidade UF","local_destino_atual":"Cidade UF","local_liberacao_prevista":"Cidade UF","data_previsao_disponibilidade":"2026-06-25 08:00:00"}}
 {"ferramenta":"resposta_oferta_carga","dados":{"aceite":true,"valor_aceito":4500,"valor_ofertado":4500,"origem":"X","destino":"Y"}}
 {"ferramenta":"atualizar_motorista","dados":{"cidade":"Guarulhos","estado":"SP"}}
 {"ferramenta":"salvar_carreta","dados":{"indice":1,"campos":{"placa":"ABC1D23"}}}

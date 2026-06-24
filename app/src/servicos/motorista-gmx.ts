@@ -205,7 +205,7 @@ export async function registrarDisponibilidade(dados: {
   }
 
   console.log(
-    `[erp-disponibilidade] gravado motorista_id=${motorista.id} status=${statusErp} atual=${dados.localizacao_atual ?? '—'} libera_em=${dados.local_disponibilidade ?? '—'}`,
+    `[erp-disponibilidade] gravado motorista_id=${motorista.id} status=${statusErp} atual=${dados.localizacao_atual ?? '—'} destino_atual=${dados.local_destino_atual ?? '—'} libera_em=${dados.local_liberacao_prevista ?? dados.local_disponibilidade ?? '—'}`,
   );
 
   const patchLocal = separarCidadeUf(dados.localizacao_atual);

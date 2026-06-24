@@ -119,7 +119,10 @@ function resumoFerramenta(
       `Disponibilidade validada para gravacao`,
       safe.status ? `status ${String(safe.status)}` : null,
       safe.localizacao_atual ? `local atual ${String(safe.localizacao_atual)}` : null,
-      safe.local_disponibilidade ? `local previsto ${String(safe.local_disponibilidade)}` : null,
+      safe.local_destino_atual ? `destino atual ${String(safe.local_destino_atual)}` : null,
+      (safe.local_liberacao_prevista || safe.local_disponibilidade)
+        ? `local de liberacao ${String(safe.local_liberacao_prevista || safe.local_disponibilidade)}`
+        : null,
       safe.data_previsao_disponibilidade
         ? `libera em ${String(safe.data_previsao_disponibilidade)}`
         : null,
