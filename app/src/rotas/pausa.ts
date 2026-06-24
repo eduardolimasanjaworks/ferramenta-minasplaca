@@ -2,7 +2,6 @@
  * Endpoints para pausar/despausar a IA (global ou por telefone).
  */
 import type { FastifyInstance, FastifyRequest } from 'fastify';
-import { config } from '../config.js';
 import {
   pausarGlobal,
   despausarGlobal,
@@ -10,12 +9,11 @@ import {
   despausarContato,
   obterStatusPausa,
 } from '../servicos/pausa.js';
+import { painelAdmin } from '../servicos/painel-acesso.js';
 import { normalizarTelefone } from '../util/telefone.js';
 
 function verificarAdmin(req: FastifyRequest): boolean {
-  if (!config.adminKey) return true;
-  const chave = req.headers['x-iagmx-key'];
-  return chave === config.adminKey;
+  return painelAdmin(req);
 }
 
 export async function rotasPausa(app: FastifyInstance): Promise<void> {

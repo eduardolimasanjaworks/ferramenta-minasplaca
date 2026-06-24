@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Monitor por telefone - IA GMX</title>
-  <link rel="stylesheet" href="/phone.css?v=20260624-6" />
-  <link rel="stylesheet" href="/phone-monitor.css?v=20260624-6" />
-  <link rel="stylesheet" href="/phone-simulator.css?v=20260624-6" />
-  <link rel="stylesheet" href="/phone-editor.css?v=20260624-6" />
-  <link rel="stylesheet" href="/phone-whatsapp.css?v=20260624-6" />
-  <link rel="stylesheet" href="/phone-contrast.css?v=20260624-6" />
+  <link rel="stylesheet" href="/phone.css?v=20260624-7" />
+  <link rel="stylesheet" href="/phone-monitor.css?v=20260624-7" />
+  <link rel="stylesheet" href="/phone-simulator.css?v=20260624-7" />
+  <link rel="stylesheet" href="/phone-editor.css?v=20260624-7" />
+  <link rel="stylesheet" href="/phone-whatsapp.css?v=20260624-7" />
+  <link rel="stylesheet" href="/phone-contrast.css?v=20260624-7" />
 </head>
 <body>
   <div class="wrap">
@@ -73,15 +73,25 @@
     </section>
 
     <section id="monitorPanel" class="admin-panel" hidden>
+      <div class="monitor-toolbar card">
+        <div>
+          <div class="table-title">Monitor das conversas</div>
+          <div class="muted">Troque entre chat real e eventos sem perder o botao de atualizacao.</div>
+        </div>
+        <div class="monitor-toolbar-actions">
+          <div class="panel-switch compact-switch monitor-switch" role="tablist" aria-label="Modo do monitor">
+            <button class="panel-tab active" type="button" data-monitor-view="chat">Chat real</button>
+            <button class="panel-tab" type="button" data-monitor-view="events">Eventos dos contatos</button>
+          </div>
+          <button type="button" id="refreshBtn">Atualizar agora</button>
+        </div>
+      </div>
+
       <section id="chatMonitorSection" class="card table-card">
         <div class="table-head">
           <div>
             <div class="table-title">Conversas reais</div>
             <div class="muted">Visualizacao ludica da conversa, do que vai ser enviado e do que foi gravado no banco. Clique numa mensagem da IA para ver o motivo.</div>
-          </div>
-          <div class="panel-switch compact-switch monitor-switch" role="tablist" aria-label="Modo do monitor">
-            <button class="panel-tab active" type="button" data-monitor-view="chat">Chat real</button>
-            <button class="panel-tab" type="button" data-monitor-view="events">Eventos dos contatos</button>
           </div>
         </div>
         <div id="chatCards" class="chat-monitor-grid">
@@ -94,13 +104,6 @@
           <div>
             <div class="table-title">Eventos dos contatos</div>
             <div class="muted">Atualizacao automatica a cada 2 segundos.</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
-            <div class="panel-switch compact-switch monitor-switch" role="tablist" aria-label="Modo do monitor">
-              <button class="panel-tab" type="button" data-monitor-view="chat">Chat real</button>
-              <button class="panel-tab active" type="button" data-monitor-view="events">Eventos dos contatos</button>
-            </div>
-            <button type="button" id="refreshBtn">Atualizar agora</button>
           </div>
         </div>
         <div class="table-filters">
@@ -214,8 +217,27 @@
     </section>
 
     <section id="pausePanel" class="card admin-panel" hidden>
-      <h2>Pausar conversa deste contato</h2>
-      <p class="muted">Interrompe as respostas da IA somente para o contato em foco, sem afetar os outros telefones selecionados.</p>
+      <h2>Pausa operacional da IA</h2>
+      <p class="muted">Controle a IA globalmente e, quando precisar, ajuste tambem o contato em foco sem misturar os dois comportamentos.</p>
+      <div class="section-divider">
+        <div class="table-title">Pausa global</div>
+        <p class="muted">Quando a pausa global estiver ativa, a IA fica desligada por padrao para todos os contatos.</p>
+        <div class="grid-2">
+          <div class="field">
+            <label for="globalPauseReason">Motivo global</label>
+            <input id="globalPauseReason" type="text" placeholder="Ex.: operacao manual, manutencao, janela critica" />
+          </div>
+        </div>
+        <div class="actions">
+          <button id="pauseGlobalBtn" type="button">Desligar IA globalmente</button>
+          <button id="resumeGlobalBtn" class="primary" type="button">Liberar IA globalmente</button>
+          <button id="refreshGlobalPauseBtn" type="button">Atualizar estado global</button>
+        </div>
+        <div id="globalPauseStatus" class="result-box">Carregando estado global da IA.</div>
+      </div>
+      <div class="section-divider">
+        <div class="table-title">Pausa por contato</div>
+        <p class="muted">Interrompe as respostas da IA somente para o contato em foco, sem afetar os outros telefones selecionados.</p>
       <div class="grid-2">
         <div class="field">
           <label for="pausePhoneView">Contato em foco</label>
@@ -232,6 +254,7 @@
         <button id="refreshPauseBtn" type="button">Atualizar estado</button>
       </div>
       <div id="pauseStatus" class="result-box">Nenhum contato consultado ainda.</div>
+      </div>
     </section>
 
     <section id="trainingPanel" class="card admin-panel" hidden>
@@ -501,17 +524,18 @@
     </footer>
   </div>
 
-  <script src="/painel-auth.js?v=20260624-6"></script>
-  <script src="/phone.js?v=20260624-6"></script>
-  <script src="/phone-chat.js?v=20260624-6"></script>
-  <script src="/phone-admin.js?v=20260624-6"></script>
-  <script src="/phone-ops.js?v=20260624-6"></script>
-  <script src="/phone-pause.js?v=20260624-6"></script>
-  <script src="/phone-simulator.js?v=20260624-6"></script>
-  <script src="/phone-training.js?v=20260624-6"></script>
-  <script src="/phone-editor.js?v=20260624-6"></script>
-  <script src="/phone-ocr-editor.js?v=20260624-6"></script>
-  <script src="/phone-editor-core.js?v=20260624-6"></script>
-  <script src="/phone-whatsapp.js?v=20260624-6"></script>
+  <script src="/painel-auth.js?v=20260624-7"></script>
+  <script src="/phone.js?v=20260624-7"></script>
+  <script src="/phone-chat.js?v=20260624-7"></script>
+  <script src="/phone-admin.js?v=20260624-7"></script>
+  <script src="/phone-ops.js?v=20260624-7"></script>
+  <script src="/phone-pause.js?v=20260624-7"></script>
+  <script src="/phone-global-pause.js?v=20260624-7"></script>
+  <script src="/phone-simulator.js?v=20260624-7"></script>
+  <script src="/phone-training.js?v=20260624-7"></script>
+  <script src="/phone-editor.js?v=20260624-7"></script>
+  <script src="/phone-ocr-editor.js?v=20260624-7"></script>
+  <script src="/phone-editor-core.js?v=20260624-7"></script>
+  <script src="/phone-whatsapp.js?v=20260624-7"></script>
 </body>
 </html>

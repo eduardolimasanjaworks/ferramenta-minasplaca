@@ -22,6 +22,22 @@
   margin-bottom: 0;
 }
 
+.monitor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.monitor-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .chip-list {
   display: flex;
   flex-wrap: wrap;

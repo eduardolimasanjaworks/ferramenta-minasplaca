@@ -63,6 +63,17 @@ export function obterAlvoWhatsapp(nome: string | undefined | null): AlvoWhatsapp
   return listarAlvosWhatsapp().find((item) => item.nomeLogico === nome) ?? null;
 }
 
+export function obterAlvoWhatsappAtivoIa(): AlvoWhatsapp {
+  const alvos = listarAlvosWhatsapp();
+  const porInstancia = alvos.find((item) => item.instancia === config.whatsappIaInstance);
+  if (porInstancia) return porInstancia;
+
+  const porServidor = alvos.find((item) => item.url === config.whatsappIaUrl);
+  if (porServidor) return porServidor;
+
+  return buildAuxiliar();
+}
+
 export function obterAlvoWhatsappPadrao(): AlvoWhatsapp {
   return obterAlvoWhatsapp('oficial_gmx') ?? buildAuxiliar();
 }

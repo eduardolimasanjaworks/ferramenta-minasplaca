@@ -1,14 +1,13 @@
 /**
  * Operações de instância WhatsApp na Evolution API.
  */
-import { config } from '../config.js';
 import { resolverStatusEvolution } from './evolution-status.js';
 import { existsSync, readFileSync } from 'node:fs';
 import { obterQrCodeComResetDeterministico } from './evolution-reset.js';
 import {
   listarAlvosWhatsapp,
   obterAlvoWhatsapp,
-  obterAlvoWhatsappPadrao,
+  obterAlvoWhatsappAtivoIa,
   type AlvoWhatsapp,
   type AlvoWhatsappNome,
 } from './whatsapp-targets.js';
@@ -238,7 +237,7 @@ async function obterStatusConexaoPorAlvo(alvo: AlvoWhatsapp): Promise<StatusCone
 
 /** Estado da conexão ativa da IA */
 export async function obterStatusConexao(): Promise<StatusConexao> {
-  return obterStatusConexaoPorAlvo(obterAlvoWhatsappPadrao());
+  return obterStatusConexaoPorAlvo(obterAlvoWhatsappAtivoIa());
 }
 
 export async function obterStatusConexaoPorNome(nome: string): Promise<StatusConexao> {
@@ -289,7 +288,7 @@ async function obterQrCodePorAlvo(alvo: AlvoWhatsapp): Promise<QrCodeResposta> {
 
 /** QR da conexão ativa da IA */
 export async function obterQrCode(): Promise<QrCodeResposta> {
-  return obterQrCodePorAlvo(obterAlvoWhatsappPadrao());
+  return obterQrCodePorAlvo(obterAlvoWhatsappAtivoIa());
 }
 
 export async function obterQrCodePorNome(nome: string): Promise<QrCodeResposta> {
@@ -333,7 +332,7 @@ async function reconectarPorAlvo(alvo: AlvoWhatsapp): Promise<QrCodeResposta> {
 
 /** Reconexão da conexão ativa da IA */
 export async function reconectar(): Promise<QrCodeResposta> {
-  return reconectarPorAlvo(obterAlvoWhatsappPadrao());
+  return reconectarPorAlvo(obterAlvoWhatsappAtivoIa());
 }
 
 export async function reconectarPorNome(nome: string): Promise<QrCodeResposta> {
