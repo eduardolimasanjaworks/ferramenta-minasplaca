@@ -83,7 +83,7 @@ export async function tentarEnviarResposta(
     return { enviado: true, pendente: false, fragmentos: fragmentos.length, motivo: 'envio_simulado' };
   }
 
-  const canal = await podeEnviarParaTelefone(telefone);
+  const canal = await podeEnviarParaTelefone(telefone, instance);
   // #region debug-point D:send-channel-check
   if (telefone === '5512982787368') fetch('http://2.24.201.28:7777/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'chat-sync-no-response',runId:'pre-fix',hypothesisId:'D',location:'enviar-resposta.ts:87',msg:'[DEBUG] envio avaliou disponibilidade do canal para o telefone alvo',data:{telefone,instance,canal},ts:Date.now()})}).catch(()=>{});
   // #endregion

@@ -7,6 +7,7 @@ import { obterQrCodeComResetDeterministico } from './evolution-reset.js';
 import {
   listarAlvosWhatsapp,
   obterAlvoWhatsapp,
+  obterAlvoWhatsappPorInstancia,
   obterAlvoWhatsappAtivoIa,
   type AlvoWhatsapp,
   type AlvoWhatsappNome,
@@ -244,6 +245,12 @@ export async function obterStatusConexaoPorNome(nome: string): Promise<StatusCon
   const alvo = obterAlvoWhatsapp(nome);
   if (!alvo) throw new Error('Alvo WhatsApp não encontrado');
   return obterStatusConexaoPorAlvo(alvo);
+}
+
+export async function obterStatusConexaoPorInstancia(instance: string): Promise<StatusConexao> {
+  const alvo = obterAlvoWhatsappPorInstancia(instance);
+  if (alvo) return obterStatusConexaoPorAlvo(alvo);
+  return obterStatusConexao();
 }
 
 export async function listarStatusConexaoWhatsapp(): Promise<StatusConexao[]> {

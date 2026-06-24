@@ -1,12 +1,12 @@
 /**
  * Integração Evolution API: envio de mensagens fragmentadas e download de mídia.
  */
-import { config } from '../config.js';
 import { enviarFragmentosHumanizado } from './envio-humanizado.js';
+import { resolverDestinoEvolution } from './evolution-destino.js';
 
-const headers = () => ({
+const headers = (apiKey: string) => ({
   'Content-Type': 'application/json',
-  apikey: config.evolutionApiKey,
+  apikey: apiKey,
 });
 
 /**
@@ -18,7 +18,8 @@ export async function enviarDigitando(
   numero: string,
   delayMs: number,
 ): Promise<void> {
-  const url = `${config.evolutionUrl}/chat/sendPresence/${instance}`;
+  const destino = resolverDestinoEvolution(instance);
+  const url = `${destino.url}/chat/sendPresence/${destino.instancia}`;
   const corpo = numero.replace(/\D/g, '');
 
   // v2.3+ aceita campos na raiz; versões antigas usam options
@@ -31,7 +32,7 @@ export async function enviarDigitando(
     try {
       const res = await fetch(url, {
         method: 'POST',
-        headers: headers(),
+        headers: headers(destino.apiKey),
         body: JSON.stringify(body),
         signal: AbortSignal.timeout(15000),
       });
@@ -50,10 +51,11 @@ export async function enviarTexto(
   numero: string,
   texto: string,
 ): Promise<void> {
-  const url = `${config.evolutionUrl}/message/sendText/${instance}`;
+  const destino = resolverDestinoEvolution(instance);
+  const url = `${destino.url}/message/sendText/${destino.instancia}`;
   const res = await fetch(url, {
     method: 'POST',
-    headers: headers(),
+    headers: headers(destino.apiKey),
     body: JSON.stringify({ number: numero, text: texto }),
     signal: AbortSignal.timeout(30000),
   });
@@ -80,10 +82,11 @@ export async function baixarMidia(
   messageId: string,
   remoteJid: string,
 ): Promise<{ buffer: Buffer; mimetype: string }> {
-  const url = `${config.evolutionUrl}/chat/getBase64FromMediaMessage/${instance}`;
+  const destino = resolverDestinoEvolution(instance);
+  const url = `${destino.url}/chat/getBase64FromMediaMessage/${destino.instancia}`;
   const res = await fetch(url, {
     method: 'POST',
-    headers: headers(),
+    headers: headers(destino.apiKey),
     body: JSON.stringify({
       message: { key: { id: messageId, remoteJid } },
     }),
@@ -103,7 +106,8 @@ export async function baixarMidia(
 
 export async function verificarEvolution(): Promise<boolean> {
   try {
-    const res = await fetch(`${config.evolutionUrl}/`, { headers: headers() });
+    const destino = resolverDestinoEvolution();
+    const res = await fetch(`${destino.url}/`, { headers: headers(destino.apiKey) });
     return res.ok;
   } catch {
     return false;

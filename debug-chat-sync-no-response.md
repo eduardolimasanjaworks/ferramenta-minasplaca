@@ -24,8 +24,16 @@
 - A causa raiz era dupla:
   - a IA nao respondia porque o contato nao estava liberado individualmente;
   - o inbound do usuario sumia do monitor porque `webhook.ts` descartava a mensagem antes de gravar historico quando `iaPodeResponder()` retornava falso.
+- O fluxo oficial/Chatwoot permanecia fora do pipeline local por dois motivos adicionais:
+  - a instancia externa `gmx-chatwoot` estava com `state=close` na Evolution oficial;
+  - o webhook por instancia da Evolution oficial estava `null`, entao o inbound do numero oficial nao chegava em `/webhook/evolution`.
+- Mesmo quando uma `instance` diferente viesse pelo webhook, o backend ainda usava `config.evolutionUrl` e `config.evolutionApiKey` fixos, prendendo envio, digitacao, midia e checagem de canal ao servidor local.
 
 ## Fix Applied
 - `webhook.ts` agora registra o inbound no historico e no estado do monitor mesmo quando o contato esta pausado.
 - O bloqueio de pausa continua impedindo resposta automatica, mas nao apaga mais a visibilidade da mensagem do usuario.
 - O contato `5512982787368` foi liberado operacionalmente para voltar a responder no modo `default_off`.
+- `evolution.ts`, `canal-envio.ts` e `evolution-instancia.ts` agora resolvem servidor/API key/status pela `instance` real, com teste deterministico cobrindo `gmx-chatwoot` vs fallback local.
+- O `app` foi rebuildado/redeployado com essa correcao.
+- O webhook da instancia oficial `gmx-chatwoot` foi configurado com sucesso para `https://iagmx.sanjaworks.com/webhook/evolution`.
+- O `connect` da instancia oficial foi disparado e a Evolution retornou QR/base64 para novo pareamento do numero oficial.
