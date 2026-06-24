@@ -5,7 +5,7 @@
  */
 (() => {
   const $ = (id) => document.getElementById(id);
-  const state = { json: null, timer: null, bloqueado: false };
+  const state = { json: null, timer: null };
 
   function setStatus(texto, classe = '') {
     const box = $('globalPauseStatus');
@@ -26,22 +26,15 @@
   }
 
   async function carregarEstado() {
-    if (state.bloqueado) return;
     try {
       const data = await state.json('/api/pausa');
       setStatus(formatarStatus(data), data?.modoGlobal === 'default_off' ? 'warn' : 'ok');
     } catch (error) {
-      if (/autentic|autoriz|admin/i.test(String(error?.message || ''))) {
-        state.bloqueado = true;
-        if (state.timer) clearInterval(state.timer);
-        return setStatus('Seu login atual nao pode consultar a pausa global da IA.', 'warn');
-      }
       setStatus(error.message || 'Falha ao consultar o estado global da IA.', 'warn');
     }
   }
 
   async function pausarGlobalmente() {
-    if (state.bloqueado) return;
     const btn = $('pauseGlobalBtn');
     btn.disabled = true;
     setStatus('Desligando a IA globalmente...');
@@ -61,7 +54,6 @@
   }
 
   async function liberarGlobalmente() {
-    if (state.bloqueado) return;
     const btn = $('resumeGlobalBtn');
     btn.disabled = true;
     setStatus('Liberando a IA globalmente...');
