@@ -76,22 +76,28 @@ export function extrairOfertaGmX(
 
 /** Tenta extrair "Cidade UF" da mensagem do motorista. */
 export function extrairLocalizacaoTexto(texto: string): string | null {
-  const limpo = texto.trim();
-  const padroes = [
-    /\b(?:em|de|para|pro|indo\s+pro?)\s+([A-Za-zÀ-ú''\s]{2,40}?)\s+([A-Za-z]{2})\b/i,
-    /\b([A-Za-zÀ-ú''\s]{2,40}?)\s*\/\s*([A-Za-z]{2})\b/i,
-    /\b([A-Za-zÀ-ú''\s]{2,40}?)\s+([A-Za-z]{2})\b/i,
+  const limpo = texto.trim().replace(/\s+/g, ' ');
+  const tentativas = [
+    limpo,
+    limpo.replace(/^(?:em|de|para|pra|pro|indo\s+pra?|saindo\s+pra?|chegando\s+em)\s+/i, ''),
   ];
-  for (const re of padroes) {
-    const m = limpo.match(re);
-    if (m) {
-      const cidade = m[1].replace(/\s+/g, ' ').trim();
-      const uf = m[2].toUpperCase();
-      if (cidade.length >= 3 && !/^(to|em|de|na|no)$/i.test(cidade)) {
-        return `${cidade} ${uf}`;
-      }
+
+  for (const atual of tentativas) {
+    const mBarra = atual.match(/([A-Za-zÀ-ú'\s]{2,60})\s*\/\s*([A-Za-z]{2})\b/i);
+    if (mBarra) {
+      const cidade = mBarra[1].replace(/\s+/g, ' ').trim();
+      const uf = mBarra[2].toUpperCase();
+      if (cidade.length >= 3 && !/^(to|em|de|na|no)$/i.test(cidade)) return `${cidade} ${uf}`;
+    }
+
+    const mUfFinal = atual.match(/([A-Za-zÀ-ú'\s]{2,60})\s+([A-Za-z]{2})\b$/i);
+    if (mUfFinal) {
+      const cidade = mUfFinal[1].replace(/\s+/g, ' ').trim();
+      const uf = mUfFinal[2].toUpperCase();
+      if (cidade.length >= 3 && !/^(to|em|de|na|no)$/i.test(cidade)) return `${cidade} ${uf}`;
     }
   }
+
   return null;
 }
 
