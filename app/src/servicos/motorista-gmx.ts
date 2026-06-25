@@ -59,6 +59,14 @@ function separarCidadeUf(local: string | undefined): { cidade?: string; estado?:
   return { cidade: m[1].trim(), estado: m[2].trim() };
 }
 
+function normalizarDataComparavel(valor: unknown): string {
+  const texto = String(valor ?? '').trim();
+  if (!texto) return '';
+  const iso = texto.match(/^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2}:\d{2})/);
+  if (iso) return `${iso[1]} ${iso[2]}`;
+  return texto;
+}
+
 /** Busca motorista pelo telefone no cadastro GMX */
 export async function buscarMotoristaPorTelefone(telefone: string): Promise<MotoristaGmx | null> {
   if (!directusConfigurado()) return null;
@@ -325,13 +333,27 @@ export async function verificarDisponibilidadeNoErp(
     }
   }
 
-  if (esperado.data_previsao_disponibilidade) {
-    const atual = String(registro.data_previsao_disponibilidade ?? '');
-    if (atual !== esperado.data_previsao_disponibilidade) {
+  if (esperado.local_destino_atual) {
+    const locErp = String(registro.local_destino_atual ?? '').toLowerCase();
+    const locEsp = esperado.local_destino_atual.toLowerCase();
+    const cidadeEsp = locEsp.split(/\s+/)[0];
+    if (cidadeEsp.length > 2 && !locErp.includes(cidadeEsp)) {
       return {
         ok: false,
         registro,
-        motivo: `data_previsao ERP="${atual}" esperado="${esperado.data_previsao_disponibilidade}"`,
+        motivo: `local_destino_atual ERP="${locErp}" não contém "${cidadeEsp}"`,
+      };
+    }
+  }
+
+  if (esperado.data_previsao_disponibilidade) {
+    const atual = normalizarDataComparavel(registro.data_previsao_disponibilidade);
+    const esperadoNorm = normalizarDataComparavel(esperado.data_previsao_disponibilidade);
+    if (atual !== esperadoNorm) {
+      return {
+        ok: false,
+        registro,
+        motivo: `data_previsao ERP="${atual}" esperado="${esperadoNorm}"`,
       };
     }
   }

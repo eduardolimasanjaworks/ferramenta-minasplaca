@@ -392,6 +392,20 @@ function inferirContexto(
 function extrairLocalAtualDoHistorico(
   historico: Array<{ role: string; content: string }>,
 ): string | null {
+  for (let i = historico.length - 1; i >= 0; i--) {
+    const atual = historico[i];
+    const anterior = historico[i - 1];
+    const pergunta = anterior?.content ?? '';
+    if (
+      atual?.role === 'user' &&
+      anterior?.role === 'assistant' &&
+      !perguntouDestinoAtualCarregado(pergunta) &&
+      !perguntouLocalDisponibilidade(pergunta) &&
+      (perguntouLocalAtualCarregado(pergunta) || perguntouLocalizacao(pergunta))
+    ) {
+      return extrairLocalizacaoTexto(atual.content);
+    }
+  }
   for (const h of [...historico].reverse()) {
     if (h.role !== 'user') continue;
     const loc = extrairLocalizacaoTexto(h.content);
