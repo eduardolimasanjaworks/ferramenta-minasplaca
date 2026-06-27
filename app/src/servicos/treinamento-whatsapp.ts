@@ -501,7 +501,11 @@ export async function processarMensagemTreinamentoWhatsapp(opts: {
       await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
       return resposta;
     } catch (error) {
-      const resposta = `Modo treinador ativo sem pausa: nao consegui montar o patch agora por um erro interno, mas voce pode reformular o pedido ou tentar de novo. Detalhe: ${error instanceof Error ? error.message : 'falha desconhecida'}`;
+      const message = error instanceof Error ? error.message : 'falha desconhecida';
+      const detail = (message === 'A proposta veio incompleta para aplicar no treinador' || message === 'Nao consegui estruturar a proposta de patch')
+        ? 'O pedido pareceu vago ou a IA não conseguiu interpretar o alvo. Tente ser mais específico sobre o que trocar e onde.'
+        : message;
+      const resposta = `Modo treinador ativo sem pausa: nao consegui montar o patch agora por um erro interno, mas voce pode reformular o pedido ou tentar de novo. Detalhe: ${detail}`;
       await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
       return resposta;
     }
@@ -546,6 +550,14 @@ export async function processarMensagemTreinamentoWhatsapp(opts: {
   }
 
   if (parecePedidoDeAprendizado(texto)) {
+    const cleaned = texto.replace(/(aprenda|aprender|adicione|inclua|grave|guarde|nova regra|regra:|treino:|a partir de agora|sempre|nunca|quando .* voce|mude seu comportamento|quero que voce)\s*/i, '').trim();
+    const alphanumericCount = cleaned.replace(/[^a-zA-Z0-9À-ÿ]/g, '').length;
+    if (alphanumericCount < 5) {
+      const resposta = 'Para criar uma nova regra, forneça uma instrução mais clara ou detalhada, com palavras reais.';
+      await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
+      return resposta;
+    }
+
     const { instrucao, resumo } = await resumirInstrucaoTreinamento(texto);
     const propostaRes = await pool.query<PropostaAprendizadoWhatsapp>(
       `INSERT INTO whatsapp_aprendizados_pendentes (

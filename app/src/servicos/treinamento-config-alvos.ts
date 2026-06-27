@@ -14,8 +14,19 @@ import {
   salvarConfigOrquestracaoTexto,
 } from './config-orquestracao-texto.js';
 import { obterPromptBruto, salvarPrompt } from './prompt.js';
+import {
+  obterPromptOcr,
+  obterPromptOcrForcado,
+  salvarPromptOcr,
+  salvarPromptOcrForcado,
+} from './config-ocr.js';
 
-export type AlvoPatchTreinamento = 'prompt_sistema' | 'orquestracao_texto' | 'mensagens_fluxo';
+export type AlvoPatchTreinamento =
+  | 'prompt_sistema'
+  | 'orquestracao_texto'
+  | 'mensagens_fluxo'
+  | 'ocr_prompt'
+  | 'ocr_prompt_forcado';
 export type OperacaoPatchTreinamento = 'replace' | 'append' | 'prepend';
 
 export interface PatchTreinamentoAplicavel {
@@ -45,6 +56,20 @@ function aplicarTextoPatch(textoAtual: string, patch: PatchTreinamentoAplicavel)
 
   if (patch.operacao === 'replace') {
     if (trecho && atual.includes(trecho)) return atual.replace(trecho, proposto);
+    if (trecho) {
+      // Fallback: regex flexivel para espacos e quebras de linha que o LLM tenha errado
+      const regexSource = trecho
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+        .join('\\s+');
+      if (regexSource) {
+        const trechoRegex = new RegExp(regexSource);
+        if (trechoRegex.test(atual)) {
+          return atual.replace(trechoRegex, proposto);
+        }
+      }
+    }
     if (!trecho) return proposto;
     throw new Error('trechoAtual nao foi encontrado no alvo real');
   }
@@ -83,6 +108,12 @@ export async function obterAlvoTreinamentoAtual(
 ): Promise<AlvoTreinamentoAtual> {
   if (alvo === 'prompt_sistema') {
     return { alvo, chave: null, textoAtual: await obterPromptBruto() };
+  }
+  if (alvo === 'ocr_prompt') {
+    return { alvo, chave: null, textoAtual: await obterPromptOcr() };
+  }
+  if (alvo === 'ocr_prompt_forcado') {
+    return { alvo, chave: null, textoAtual: await obterPromptOcrForcado() };
   }
 
   if (alvo === 'orquestracao_texto') {
@@ -125,6 +156,14 @@ async function aplicarPatchTreinamentoComTextoAtual(
     await salvarPrompt(depois, origem);
     return { alvo: patch.alvo, chave: null, antes: atual.textoAtual, depois };
   }
+  if (patch.alvo === 'ocr_prompt') {
+    await salvarPromptOcr(depois, origem);
+    return { alvo: patch.alvo, chave: null, antes: atual.textoAtual, depois };
+  }
+  if (patch.alvo === 'ocr_prompt_forcado') {
+    await salvarPromptOcrForcado(depois, origem);
+    return { alvo: patch.alvo, chave: null, antes: atual.textoAtual, depois };
+  }
 
   if (patch.alvo === 'orquestracao_texto') {
     const campo = garantirChaveOrquestracao(patch.chave);
@@ -150,36 +189,3 @@ export async function simularPatchTreinamento(
   return { alvo: patch.alvo, chave: atual.chave, antes: atual.textoAtual, depois };
 }
 
-export async function montarResumoAlvosTreinamento(): Promise<string> {
-  const [prompt, orquestracao, mensagens] = await Promise.all([
-    obterPromptBruto(),
-    obterConfigOrquestracaoTexto(),
-    obterConfigMensagensFluxo(),
-  ]);
-  const itensMensagens = [
-    'oferta_proativa_template',
-    'c7_pergunta_status',
-    'c7_local_invalida',
-    'c8_inicio',
-    'c8_ocr_escalonar',
-    'atualizacao_pedir_foto',
-  ] as const;
-  const resumoMensagens = itensMensagens
-    .map((chave) => `- ${chave}: ${textoValorAtual(mensagens[chave]).slice(0, 220)}`)
-    .join('\n');
-
-  return [
-    '=== ALVOS EDITAVEIS DO TREINADOR ===',
-    '[prompt_sistema]',
-    prompt.slice(0, 5000),
-    '',
-    '[orquestracao_texto.camadaHumana]',
-    orquestracao.camadaHumana,
-    '',
-    '[orquestracao_texto.instrucaoFormatacao]',
-    orquestracao.instrucaoFormatacao,
-    '',
-    '[mensagens_fluxo resumidas]',
-    resumoMensagens,
-  ].join('\n');
-}

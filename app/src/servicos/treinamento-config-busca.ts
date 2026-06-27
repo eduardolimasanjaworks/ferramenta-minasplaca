@@ -4,6 +4,7 @@
  * Mantem a recuperacao deterministica por termos, sem depender de vetor externo.
  */
 import { obterConfigMensagensFluxo } from './config-mensagens-fluxo.js';
+import { obterPromptOcr, obterPromptOcrForcado } from './config-ocr.js';
 import { obterConfigOrquestracaoTexto } from './config-orquestracao-texto.js';
 import { obterPromptBruto } from './prompt.js';
 import type { AlvoPatchTreinamento } from './treinamento-config-alvos.js';
@@ -170,10 +171,12 @@ function pontuarTrecho(
 }
 
 export async function montarCatalogoTrechosTreinamento(): Promise<TrechoCatalogado[]> {
-  const [prompt, orquestracao, mensagens] = await Promise.all([
+  const [prompt, orquestracao, mensagens, ocr, ocrForcado] = await Promise.all([
     obterPromptBruto(),
     obterConfigOrquestracaoTexto(),
     obterConfigMensagensFluxo(),
+    obterPromptOcr(),
+    obterPromptOcrForcado(),
   ]);
   const catalogo: TrechoCatalogado[] = [];
 
@@ -182,6 +185,24 @@ export async function montarCatalogoTrechosTreinamento(): Promise<TrechoCataloga
       alvo: 'prompt_sistema',
       chave: null,
       rotulo: 'Prompt principal',
+      texto: bloco,
+    });
+  }
+
+  for (const bloco of quebrarBlocosTexto(ocr)) {
+    catalogo.push({
+      alvo: 'ocr_prompt',
+      chave: null,
+      rotulo: 'Prompt de Extracao OCR',
+      texto: bloco,
+    });
+  }
+
+  for (const bloco of quebrarBlocosTexto(ocrForcado)) {
+    catalogo.push({
+      alvo: 'ocr_prompt_forcado',
+      chave: null,
+      rotulo: 'Prompt OCR com Tipo Forcado',
       texto: bloco,
     });
   }

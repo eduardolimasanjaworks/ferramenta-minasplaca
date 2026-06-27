@@ -129,7 +129,7 @@ async function sugerirPatchPorTexto(
       {
         role: 'system',
         content:
-          'Voce e um editor tecnico da GMX. Leia os trechos relacionados e proponha um lote objetivo de ajustes. Responda SOMENTE JSON com {"operacoes":[{"alvo":"prompt_sistema|orquestracao_texto|mensagens_fluxo","chave":"... ou null","operacao":"replace|append|prepend","trechoAtual":"...","textoProposto":"..."}],"resumo":"...","justificativa":"...","perguntaConfirmacao":"..."}. Use replace quando o pedido falar em trocar, corrigir ou substituir trecho. Use append para redundancia/reforco. Edite todos os trechos relevantes encontrados, mas no maximo 6 operacoes. Se o alvo for mensagens_fluxo, a chave deve ser um nome real do catalogo. Se o alvo for orquestracao_texto, a chave deve ser camadaHumana ou instrucaoFormatacao.',
+          'Voce e um editor tecnico da GMX. Leia os trechos relacionados e proponha um lote objetivo de ajustes. Responda SOMENTE JSON com {"operacoes":[{"alvo":"prompt_sistema|orquestracao_texto|mensagens_fluxo|ocr_prompt|ocr_prompt_forcado","chave":"... ou null","operacao":"replace|append|prepend","trechoAtual":"...","textoProposto":"..."}],"resumo":"...","justificativa":"...","perguntaConfirmacao":"..."}. Use replace quando o pedido falar em trocar, corrigir ou substituir trecho. Use append para redundancia/reforco. Edite todos os trechos relevantes encontrados, mas no maximo 6 operacoes. Se o alvo for mensagens_fluxo, a chave deve ser um nome real do catalogo. Se o alvo for orquestracao_texto, a chave deve ser camadaHumana ou instrucaoFormatacao.',
       },
       {
         role: 'user',
