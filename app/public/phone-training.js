@@ -5,7 +5,7 @@
  */
 (() => {
   const $ = (id) => document.getElementById(id);
-  const state = { json: null, treinadores: [] };
+  const state = { json: null, treinadores: [], patches: [] };
 
   function setBox(id, texto, classe = '') {
     const el = $(id);
@@ -49,6 +49,24 @@
       </div>`).join('');
   }
 
+  function renderPatches() {
+    const root = $('trainingPatchPendencias');
+    const itens = (state.patches || []).filter((item) => item.status === 'pendente').slice(0, 5);
+    root.innerHTML = !itens.length
+      ? 'Nenhum patch pendente agora.'
+      : itens.map((item) => `
+      <div class="pending-item">
+        <strong>Patch #${item.id} · ${String(item.alvo || '')}${item.chave_alvo ? `.${String(item.chave_alvo)}` : ''}</strong>
+        <div>${String(item.resumo || '').replace(/</g, '&lt;')}</div>
+        <div class="admin-help" style="margin-top:.45rem">${String(item.justificativa || '').replace(/</g, '&lt;')}</div>
+        <pre class="code-block" style="white-space:pre-wrap">${String(item.preview_depois || '').replace(/</g, '&lt;')}</pre>
+        <div class="pending-actions">
+          <button type="button" data-approve-patch="${item.id}">Aprovar patch</button>
+          <button type="button" data-cancel-patch="${item.id}">Cancelar patch</button>
+        </div>
+      </div>`).join('');
+  }
+
   function limparTreinadorForm() {
     $('trainerManagePhone').value = '';
     $('trainerManageName').value = '';
@@ -56,18 +74,22 @@
   }
 
   async function carregarTreinamento() {
-    const [telefones, pendencias, aprendizados] = await Promise.all([
+    const [telefones, pendencias, aprendizados, patches] = await Promise.all([
       state.json('/api/admin/treinamento/telefones'),
       state.json('/api/admin/treinamento/pendencias'),
       state.json('/api/admin/treinamento/aprendizados'),
+      state.json('/api/admin/treinamento/patches'),
     ]);
     state.treinadores = telefones.itens || [];
+    state.patches = patches.itens || [];
     $('statTrainers').textContent = String(state.treinadores.filter((item) => item.ativo).length);
     $('statPending').textContent = String((pendencias.itens || []).filter((item) => item.status === 'pendente').length);
     $('statLearned').textContent = String((aprendizados.itens || []).filter((item) => item.ativo).length);
+    $('statPatches').textContent = String((state.patches || []).filter((item) => item.status === 'pendente').length);
     renderTreinadores();
     renderPendencias((pendencias.itens || []).filter((item) => item.status === 'pendente'));
-    setBox('trainingStatus', 'Telefones autorizados e regras carregados.', 'ok');
+    renderPatches();
+    setBox('trainingStatus', 'Telefones autorizados, regras e patches carregados.', 'ok');
   }
 
   async function salvarTreinador() {
@@ -94,6 +116,24 @@
     setBox('trainingStatus', data.modo === 'aplicado' ? `Regra aplicada agora.\n\n${data.item.resumo || data.item.instrucao}` : `Proposta criada com sucesso.\n\n${data.item.resumo_sugerido || data.item.instrucao_sugerida}`, 'ok');
   }
 
+  async function enviarPatch(aplicarAgora) {
+    const texto = $('trainingPatchInstruction').value.trim();
+    if (texto.length < 10) return setBox('trainingStatus', 'Escreva um pedido mais completo para gerar o patch.', 'warn');
+    const data = await state.json('/api/admin/treinamento/patch-config', {
+      method: 'POST',
+      body: JSON.stringify({ texto, aplicarAgora }),
+    });
+    $('trainingPatchInstruction').value = '';
+    await carregarTreinamento();
+    setBox(
+      'trainingStatus',
+      data.modo === 'aplicado'
+        ? `Patch aplicado no alvo ${data.item.alvo}${data.item.chave_alvo ? `.${data.item.chave_alvo}` : ''}.\n\n${data.item.resumo}`
+        : `Patch proposto com sucesso.\n\n${data.item.resumo}`,
+      'ok',
+    );
+  }
+
   async function aprovarOuCancelar(id, acao) {
     await state.json(`/api/admin/treinamento/pendencias/${id}/${acao}`, { method: 'POST', body: JSON.stringify({ autor: 'dashboard' }) });
     await carregarTreinamento();
@@ -112,9 +152,20 @@
     setBox('trainingStatus', 'Telefone autorizado removido.', 'ok');
   }
 
+  async function aprovarOuCancelarPatch(id, acao) {
+    await state.json(`/api/admin/treinamento/patches/${id}/${acao}`, {
+      method: 'POST',
+      body: JSON.stringify({ autor: 'dashboard' }),
+    });
+    await carregarTreinamento();
+    setBox('trainingStatus', `Patch #${id} ${acao === 'aprovar' ? 'aprovado' : 'cancelado'} com sucesso.`, 'ok');
+  }
+
   function bind() {
     $('trainingProposalBtn').addEventListener('click', () => enviarInstrucao(false).catch((error) => setBox('trainingStatus', error.message || 'Falha ao criar proposta.', 'warn')));
     $('trainingApplyBtn').addEventListener('click', () => enviarInstrucao(true).catch((error) => setBox('trainingStatus', error.message || 'Falha ao aplicar regra.', 'warn')));
+    $('trainingPatchProposalBtn').addEventListener('click', () => enviarPatch(false).catch((error) => setBox('trainingStatus', error.message || 'Falha ao criar patch.', 'warn')));
+    $('trainingPatchApplyBtn').addEventListener('click', () => enviarPatch(true).catch((error) => setBox('trainingStatus', error.message || 'Falha ao aplicar patch.', 'warn')));
     $('trainingTrainerAddBtn').addEventListener('click', () => salvarTreinador().catch((error) => setBox('trainingStatus', error.message || 'Falha ao salvar telefone autorizado.', 'warn')));
     $('trainingTrainerClearBtn').addEventListener('click', limparTreinadorForm);
     $('trainingPendencias').addEventListener('click', (event) => {
@@ -122,6 +173,12 @@
       if (!btn) return;
       if (btn.dataset.approve) aprovarOuCancelar(btn.dataset.approve, 'aprovar').catch((error) => setBox('trainingStatus', error.message || 'Falha ao aprovar proposta.', 'warn'));
       if (btn.dataset.cancel) aprovarOuCancelar(btn.dataset.cancel, 'cancelar').catch((error) => setBox('trainingStatus', error.message || 'Falha ao cancelar proposta.', 'warn'));
+    });
+    $('trainingPatchPendencias').addEventListener('click', (event) => {
+      const btn = event.target.closest('button');
+      if (!btn) return;
+      if (btn.dataset.approvePatch) aprovarOuCancelarPatch(btn.dataset.approvePatch, 'aprovar').catch((error) => setBox('trainingStatus', error.message || 'Falha ao aprovar patch.', 'warn'));
+      if (btn.dataset.cancelPatch) aprovarOuCancelarPatch(btn.dataset.cancelPatch, 'cancelar').catch((error) => setBox('trainingStatus', error.message || 'Falha ao cancelar patch.', 'warn'));
     });
     $('trainingTrainerList').addEventListener('click', (event) => {
       const btn = event.target.closest('button');

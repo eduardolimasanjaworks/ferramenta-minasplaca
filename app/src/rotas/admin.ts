@@ -44,6 +44,12 @@ import {
   listarPendenciasAprendizadoWhatsapp,
   listarTelefonesTreinadores,
 } from '../servicos/treinamento-whatsapp.js';
+import {
+  aprovarPatchConfiguracao,
+  cancelarPatchConfiguracao,
+  criarPropostaPatchConfiguracao,
+  listarPatchesConfiguracaoPendentes,
+} from '../servicos/treinamento-config-patches.js';
 import { resumirHistoricoNominalOfertasPorEmbarque } from '../servicos/historico-ofertas-gmx.js';
 import {
   assumirFilaHumanaOferta,
@@ -351,6 +357,11 @@ export async function rotasAdmin(app: FastifyInstance): Promise<void> {
     return { itens: await listarPendenciasAprendizadoWhatsapp() };
   });
 
+  app.get('/api/admin/treinamento/patches', async (req, reply) => {
+    if (!exigirAdmin(req, reply)) return;
+    return { itens: await listarPatchesConfiguracaoPendentes() };
+  });
+
   app.post<{
     Body: { telefoneAutor?: string; nomeAutor?: string; texto?: string; aplicarAgora?: boolean };
   }>('/api/admin/treinamento/instrucao-direta', async (req, reply) => {
@@ -381,6 +392,36 @@ export async function rotasAdmin(app: FastifyInstance): Promise<void> {
     }
   });
 
+  app.post<{
+    Body: { telefoneAutor?: string; nomeAutor?: string; texto?: string; aplicarAgora?: boolean };
+  }>('/api/admin/treinamento/patch-config', async (req, reply) => {
+    if (!exigirAdmin(req, reply)) return;
+    const texto = String(req.body?.texto ?? '').trim();
+    if (texto.length < 10) {
+      return reply.status(400).send({ erro: 'texto deve ter pelo menos 10 caracteres' });
+    }
+    try {
+      const item = await criarPropostaPatchConfiguracao({
+        texto,
+        telefoneAutor: req.body?.telefoneAutor,
+        nomeAutor: req.body?.nomeAutor,
+        canal: 'dashboard',
+      });
+      if (req.body?.aplicarAgora) {
+        await aprovarPatchConfiguracao(item.id, 'dashboard');
+      }
+      return {
+        ok: true,
+        modo: req.body?.aplicarAgora ? 'aplicado' : 'proposta',
+        item,
+      };
+    } catch (error) {
+      return reply.status(400).send({
+        erro: error instanceof Error ? error.message : 'Falha ao processar patch de configuracao',
+      });
+    }
+  });
+
   app.post<{ Params: { id: string }; Body: { autor?: string } }>(
     '/api/admin/treinamento/pendencias/:id/aprovar',
     async (req, reply) => {
@@ -407,6 +448,36 @@ export async function rotasAdmin(app: FastifyInstance): Promise<void> {
         return { ok: true };
       } catch (error) {
         return reply.status(400).send({ erro: error instanceof Error ? error.message : 'Falha ao cancelar proposta' });
+      }
+    },
+  );
+
+  app.post<{ Params: { id: string }; Body: { autor?: string } }>(
+    '/api/admin/treinamento/patches/:id/aprovar',
+    async (req, reply) => {
+      if (!exigirAdmin(req, reply)) return;
+      const id = Number(req.params.id);
+      if (!Number.isFinite(id)) return reply.status(400).send({ erro: 'id inválido' });
+      try {
+        await aprovarPatchConfiguracao(id, req.body?.autor ?? 'dashboard');
+        return { ok: true };
+      } catch (error) {
+        return reply.status(400).send({ erro: error instanceof Error ? error.message : 'Falha ao aprovar patch' });
+      }
+    },
+  );
+
+  app.post<{ Params: { id: string }; Body: { autor?: string } }>(
+    '/api/admin/treinamento/patches/:id/cancelar',
+    async (req, reply) => {
+      if (!exigirAdmin(req, reply)) return;
+      const id = Number(req.params.id);
+      if (!Number.isFinite(id)) return reply.status(400).send({ erro: 'id inválido' });
+      try {
+        await cancelarPatchConfiguracao(id, req.body?.autor ?? 'dashboard');
+        return { ok: true };
+      } catch (error) {
+        return reply.status(400).send({ erro: error instanceof Error ? error.message : 'Falha ao cancelar patch' });
       }
     },
   );

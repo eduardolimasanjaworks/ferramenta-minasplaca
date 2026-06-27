@@ -308,12 +308,25 @@
           <button id="trainingOpenEditorBtn" type="button">Abrir editor daqui</button>
         </div>
       </div>
+      <div class="section-divider">
+        <div class="table-title">3. Editar configuracao real por patch</div>
+        <div class="field" style="margin-top:.9rem">
+          <label for="trainingPatchInstruction">Pedido de edicao profunda</label>
+          <textarea id="trainingPatchInstruction" placeholder="Ex.: No prompt principal, substitua o trecho que manda escalar por humano por um trecho que primeiro repita cidade + UF. Ou acrescente redundancia na mensagem c7_local_invalida."></textarea>
+        </div>
+        <div class="actions">
+          <button id="trainingPatchProposalBtn" type="button">Gerar proposta de patch</button>
+          <button id="trainingPatchApplyBtn" class="primary" type="button">Gerar e aplicar agora</button>
+        </div>
+        <div id="trainingPatchPendencias" class="result-box">Nenhum patch pendente agora.</div>
+      </div>
       <details class="mini-details">
         <summary>Ver pendencias e contadores</summary>
         <div class="details-grid" id="trainingStats">
           <div class="mini-card"><span>Autorizados</span><strong id="statTrainers">-</strong></div>
           <div class="mini-card"><span>Pendencias</span><strong id="statPending">-</strong></div>
           <div class="mini-card"><span>Regras ativas</span><strong id="statLearned">-</strong></div>
+          <div class="mini-card"><span>Patches</span><strong id="statPatches">-</strong></div>
         </div>
         <div id="trainingPendencias" class="result-box">Nenhuma pendencia de treinamento agora.</div>
       </details>
@@ -546,7 +559,7 @@
   <script src="/phone-pause.js?v=20260624-7"></script>
   <script src="/phone-global-pause.js?v=20260624-7"></script>
   <script src="/phone-simulator.js?v=20260624-7"></script>
-  <script src="/phone-training.js?v=20260624-7"></script>
+  <script src="/phone-training.js?v=20260627-1"></script>
   <script src="/phone-editor.js?v=20260624-7"></script>
   <script src="/phone-ocr-editor.js?v=20260624-7"></script>
   <script src="/phone-editor-core.js?v=20260624-7"></script>

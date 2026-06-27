@@ -4,6 +4,13 @@ import { normalizarTelefone } from '../util/telefone.js';
 import { chatCompletionRaw } from './chat-providers.js';
 import { adicionarAoHistorico, obterHistorico } from './historico.js';
 import { registrarHistoricoConfiguracao } from './historico-configuracao.js';
+import {
+  aprovarPatchConfiguracao,
+  cancelarPatchConfiguracao,
+  criarPropostaPatchConfiguracao,
+  listarPatchesConfiguracaoPendentes,
+  obterUltimoPatchPendentePorTelefone,
+} from './treinamento-config-patches.js';
 
 const pool = new pg.Pool({ connectionString: config.databaseUrl });
 
@@ -388,6 +395,24 @@ function matchCancelamento(texto: string): number | null {
   return match[2] ? Number(match[2]) : -1;
 }
 
+function matchConfirmacaoPatch(texto: string): number | null {
+  const match = texto.match(/^(confirmar|aprovar)(?:\s+patch)?(?:\s*#?\s*(\d+))?$/i);
+  if (!match || !/patch/i.test(texto)) return null;
+  return match[2] ? Number(match[2]) : -1;
+}
+
+function matchCancelamentoPatch(texto: string): number | null {
+  const match = texto.match(/^(cancelar|rejeitar|descartar)(?:\s+patch)?(?:\s*#?\s*(\d+))?$/i);
+  if (!match || !/patch/i.test(texto)) return null;
+  return match[2] ? Number(match[2]) : -1;
+}
+
+function parecePedidoDePatch(texto: string): boolean {
+  return /(substitu|troc|corrig|reescrev|acrescent|adicione|reforc|redundan|bloco|trecho|prompt|mensagem|orquestr|estilo|tom|fluxo|ajuste esse texto|mude esse texto)/i.test(
+    texto,
+  );
+}
+
 export async function processarMensagemTreinamentoWhatsapp(opts: {
   telefone: string;
   remoteJid: string;
@@ -397,6 +422,88 @@ export async function processarMensagemTreinamentoWhatsapp(opts: {
   await inicializarTreinamentoWhatsapp();
   const texto = opts.textoUsuario.trim();
   await adicionarAoHistorico(opts.remoteJid, 'user', texto);
+
+  const pedidoConfirmacaoPatch = matchConfirmacaoPatch(texto);
+  if (pedidoConfirmacaoPatch !== null) {
+    try {
+      const patch =
+        pedidoConfirmacaoPatch > 0
+          ? (await listarPatchesConfiguracaoPendentes()).find((item) => item.id === pedidoConfirmacaoPatch) ?? null
+          : await obterUltimoPatchPendentePorTelefone(opts.telefone);
+      if (!patch || patch.status !== 'pendente') {
+        const resposta = 'Nao encontrei nenhum patch pendente para confirmar agora';
+        await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
+        return resposta;
+      }
+      await aprovarPatchConfiguracao(patch.id, normalizarTelefone(opts.telefone));
+      const resposta = `Patch #${patch.id} confirmado e aplicado no alvo ${patch.alvo}${patch.chave_alvo ? `.${patch.chave_alvo}` : ''}`;
+      await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
+      return resposta;
+    } catch (error) {
+      const resposta = `Nao consegui confirmar o patch agora: ${error instanceof Error ? error.message : 'falha desconhecida'}`;
+      await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
+      return resposta;
+    }
+  }
+
+  const pedidoCancelamentoPatch = matchCancelamentoPatch(texto);
+  if (pedidoCancelamentoPatch !== null) {
+    try {
+      const patch =
+        pedidoCancelamentoPatch > 0
+          ? (await listarPatchesConfiguracaoPendentes()).find((item) => item.id === pedidoCancelamentoPatch) ?? null
+          : await obterUltimoPatchPendentePorTelefone(opts.telefone);
+      if (!patch || patch.status !== 'pendente') {
+        const resposta = 'Nao encontrei nenhum patch pendente para cancelar agora';
+        await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
+        return resposta;
+      }
+      await cancelarPatchConfiguracao(patch.id, normalizarTelefone(opts.telefone));
+      const resposta = `Patch #${patch.id} cancelado, nenhuma mudanca estrutural foi aplicada`;
+      await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
+      return resposta;
+    } catch (error) {
+      const resposta = `Nao consegui cancelar o patch agora: ${error instanceof Error ? error.message : 'falha desconhecida'}`;
+      await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
+      return resposta;
+    }
+  }
+
+  if (/listar.*patch|patch pendente|patches pendentes|o que voce pode editar/i.test(texto)) {
+    const patches = (await listarPatchesConfiguracaoPendentes()).filter((item) => item.status === 'pendente').slice(0, 5);
+    const resposta = patches.length
+      ? `Patches pendentes agora: ${patches.map((item) => `#${item.id} ${item.resumo}`).join(' | ')}`
+      : 'Nao existe patch pendente agora. Eu posso editar prompt_sistema, orquestracao_texto e mensagens_fluxo.';
+    await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
+    return resposta;
+  }
+
+  if (parecePedidoDePatch(texto)) {
+    try {
+      const patch = await criarPropostaPatchConfiguracao({
+        texto,
+        telefoneAutor: opts.telefone,
+        nomeAutor: opts.pushName,
+        canal: 'whatsapp',
+      });
+      const resposta = [
+        `Patch #${patch.id} preparado para ${patch.alvo}${patch.chave_alvo ? `.${patch.chave_alvo}` : ''}.`,
+        `Resumo: ${patch.resumo}`,
+        patch.justificativa ? `Motivo: ${patch.justificativa}` : '',
+        patch.pergunta_confirmacao || `Quer que eu aplique esta troca? Responda "Confirmar patch #${patch.id}" ou "Cancelar patch #${patch.id}"`,
+        `ANTES:\n${patch.preview_antes}`,
+        `DEPOIS:\n${patch.preview_depois}`,
+      ]
+        .filter(Boolean)
+        .join('\n\n');
+      await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
+      return resposta;
+    } catch (error) {
+      const resposta = `Nao consegui montar o patch agora: ${error instanceof Error ? error.message : 'falha desconhecida'}`;
+      await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
+      return resposta;
+    }
+  }
 
   const pedidoConfirmacao = matchConfirmacao(texto);
   if (pedidoConfirmacao !== null) {

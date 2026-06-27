@@ -39,3 +39,10 @@
 - O treino direto pelo painel/IAGMX funcionou pelo menos uma vez hoje e persistiu no banco.
 - O modo treinador via WhatsApp parece nao ter engatado de forma efetiva nas tentativas recentes observadas.
 - O mecanismo atual e restritivo: exige telefone autorizado e mensagens em padroes como `Aprenda:`, `Regra:`, `Confirmar #id`, `Cancelar #id`.
+
+
+## Implementation In Progress
+- Novo modo de `patch de configuracao` em andamento para permitir edicao profunda do prompt e dos textos reais.
+- Backend agora separa proposta de patch e aplicacao real, com confirmacao explicita.
+- O modo treinador no WhatsApp passa a responder com preview `ANTES/DEPOIS` e comandos `Confirmar patch #id` ou `Cancelar patch #id`.
+- O painel `/phone` ganhou bloco grafico para gerar e aprovar patches reais.
