@@ -6,6 +6,7 @@
 (() => {
   const $ = (id) => document.getElementById(id);
   const state = { json: null, treinadores: [], patches: [] };
+  const esc = (valor) => String(valor || '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
   function setBox(id, texto, classe = '') {
     const el = $(id);
@@ -52,14 +53,55 @@
   function renderPatches() {
     const root = $('trainingPatchPendencias');
     const itens = (state.patches || []).filter((item) => item.status === 'pendente').slice(0, 5);
+    const trechos = (item) => (Array.isArray(item.trechos_relacionados_json) ? item.trechos_relacionados_json : []).slice(0, 4);
+    const previews = (item) => (Array.isArray(item.previews_json) ? item.previews_json : []);
     root.innerHTML = !itens.length
       ? 'Nenhum patch pendente agora.'
       : itens.map((item) => `
-      <div class="pending-item">
-        <strong>Patch #${item.id} · ${String(item.alvo || '')}${item.chave_alvo ? `.${String(item.chave_alvo)}` : ''}</strong>
-        <div>${String(item.resumo || '').replace(/</g, '&lt;')}</div>
-        <div class="admin-help" style="margin-top:.45rem">${String(item.justificativa || '').replace(/</g, '&lt;')}</div>
-        <pre class="code-block" style="white-space:pre-wrap">${String(item.preview_depois || '').replace(/</g, '&lt;')}</pre>
+      <div class="pending-item patch-item">
+        <strong>Patch #${item.id} · ${esc(item.alvo || '')}${item.chave_alvo ? `.${esc(item.chave_alvo)}` : ''}</strong>
+        <div>${esc(item.resumo || '')}</div>
+        <div class="admin-help" style="margin-top:.45rem">${esc(item.justificativa || '')}</div>
+        <div class="patch-human-box">${esc(item.resposta_treinador || '')}</div>
+        <div class="patch-found-list">
+          ${trechos(item).length
+            ? trechos(item).map((trecho) => `
+              <div class="patch-found-card">
+                <div class="patch-found-head">${esc(trecho.alvo || '')}${trecho.chave ? `.${esc(trecho.chave)}` : ''}</div>
+                <div>${esc(trecho.texto || '')}</div>
+              </div>`).join('')
+            : `<div class="patch-found-card">Nenhum trecho relacionado salvo neste patch.</div>`}
+        </div>
+        <div class="patch-diff-grid">
+          ${previews(item).length
+            ? previews(item).map((preview) => `
+              <div class="patch-diff-card">
+                <div class="patch-diff-head">${esc(preview.alvo || '')}${preview.chave ? `.${esc(preview.chave)}` : ''}</div>
+                <div class="patch-diff-columns">
+                  <div class="patch-diff-column">
+                    <div class="patch-diff-label">Antes</div>
+                    <pre class="code-block patch-diff-pre">${esc(preview.antes || '')}</pre>
+                  </div>
+                  <div class="patch-diff-column">
+                    <div class="patch-diff-label">Depois</div>
+                    <pre class="code-block patch-diff-pre">${esc(preview.depois || '')}</pre>
+                  </div>
+                </div>
+              </div>`).join('')
+            : `
+              <div class="patch-diff-card">
+                <div class="patch-diff-columns">
+                  <div class="patch-diff-column">
+                    <div class="patch-diff-label">Antes</div>
+                    <pre class="code-block patch-diff-pre">${esc(item.preview_antes || '')}</pre>
+                  </div>
+                  <div class="patch-diff-column">
+                    <div class="patch-diff-label">Depois</div>
+                    <pre class="code-block patch-diff-pre">${esc(item.preview_depois || '')}</pre>
+                  </div>
+                </div>
+              </div>`}
+        </div>
         <div class="pending-actions">
           <button type="button" data-approve-patch="${item.id}">Aprovar patch</button>
           <button type="button" data-cancel-patch="${item.id}">Cancelar patch</button>
@@ -128,8 +170,8 @@
     setBox(
       'trainingStatus',
       data.modo === 'aplicado'
-        ? `Patch aplicado no alvo ${data.item.alvo}${data.item.chave_alvo ? `.${data.item.chave_alvo}` : ''}.\n\n${data.item.resumo}`
-        : `Patch proposto com sucesso.\n\n${data.item.resumo}`,
+        ? `Patch aplicado no alvo ${data.item.alvo}${data.item.chave_alvo ? `.${data.item.chave_alvo}` : ''}.\n\n${data.item.resposta_treinador || data.item.resumo}`
+        : `${data.item.resposta_treinador || `Patch proposto com sucesso.\n\n${data.item.resumo}`}`,
       'ok',
     );
   }

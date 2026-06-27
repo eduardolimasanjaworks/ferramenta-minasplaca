@@ -472,7 +472,7 @@ export async function processarMensagemTreinamentoWhatsapp(opts: {
   if (/listar.*patch|patch pendente|patches pendentes|o que voce pode editar/i.test(texto)) {
     const patches = (await listarPatchesConfiguracaoPendentes()).filter((item) => item.status === 'pendente').slice(0, 5);
     const resposta = patches.length
-      ? `Patches pendentes agora: ${patches.map((item) => `#${item.id} ${item.resumo}`).join(' | ')}`
+      ? `Eu tenho estes patches pendentes agora: ${patches.map((item) => `#${item.id} ${item.resumo}`).join(' | ')}`
       : 'Nao existe patch pendente agora. Eu posso editar prompt_sistema, orquestracao_texto e mensagens_fluxo.';
     await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
     return resposta;
@@ -486,16 +486,18 @@ export async function processarMensagemTreinamentoWhatsapp(opts: {
         nomeAutor: opts.pushName,
         canal: 'whatsapp',
       });
-      const resposta = [
-        `Patch #${patch.id} preparado para ${patch.alvo}${patch.chave_alvo ? `.${patch.chave_alvo}` : ''}.`,
-        `Resumo: ${patch.resumo}`,
-        patch.justificativa ? `Motivo: ${patch.justificativa}` : '',
-        patch.pergunta_confirmacao || `Quer que eu aplique esta troca? Responda "Confirmar patch #${patch.id}" ou "Cancelar patch #${patch.id}"`,
-        `ANTES:\n${patch.preview_antes}`,
-        `DEPOIS:\n${patch.preview_depois}`,
-      ]
-        .filter(Boolean)
-        .join('\n\n');
+      const resposta =
+        patch.resposta_treinador ||
+        [
+          `Patch #${patch.id} preparado para ${patch.alvo}${patch.chave_alvo ? `.${patch.chave_alvo}` : ''}.`,
+          `Resumo: ${patch.resumo}`,
+          patch.justificativa ? `Motivo: ${patch.justificativa}` : '',
+          patch.pergunta_confirmacao || `Quer que eu aplique esta troca? Responda "Confirmar patch #${patch.id}" ou "Cancelar patch #${patch.id}"`,
+          `ANTES:\n${patch.preview_antes}`,
+          `DEPOIS:\n${patch.preview_depois}`,
+        ]
+          .filter(Boolean)
+          .join('\n\n');
       await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
       return resposta;
     } catch (error) {

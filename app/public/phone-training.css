@@ -1,0 +1,89 @@
+/**
+ * Estilos dedicados ao modo treinador no /phone.
+ * Mostra trechos encontrados e comparativo antes/depois lado a lado.
+ * Mantem leitura forte no desktop sem quebrar a visualizacao no celular.
+ */
+.patch-item {
+  display: grid;
+  gap: .8rem;
+}
+
+.patch-human-box {
+  white-space: pre-wrap;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: .8rem;
+  background: var(--surface-soft);
+}
+
+.patch-found-list {
+  display: grid;
+  gap: .7rem;
+}
+
+.patch-found-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: .75rem;
+  background: #fff;
+}
+
+.patch-found-head,
+.patch-diff-head,
+.patch-diff-label {
+  font-size: .83rem;
+  font-weight: 800;
+}
+
+.patch-found-head,
+.patch-diff-head {
+  margin-bottom: .4rem;
+  color: var(--text);
+}
+
+.patch-diff-grid {
+  display: grid;
+  gap: .8rem;
+}
+
+.patch-diff-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: .8rem;
+  background: #fff;
+}
+
+.patch-diff-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .8rem;
+}
+
+.patch-diff-column {
+  display: grid;
+  gap: .45rem;
+}
+
+.patch-diff-label {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.patch-diff-pre {
+  min-height: 140px;
+  max-height: 320px;
+  overflow: auto;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 900px) {
+  .patch-diff-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .patch-diff-pre {
+    min-height: 100px;
+  }
+}

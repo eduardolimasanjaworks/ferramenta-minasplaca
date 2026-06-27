@@ -1,19 +1,36 @@
 /**
  * Gera propostas de patch para configuracoes reais da IA.
- * Permite conversar sobre trocas Y -> Z sem editar no escuro.
- * Mantem confirmacao explicita antes de aplicar qualquer mudanca estrutural.
+ * Encontra trechos relacionados antes de sugerir a mudanca.
+ * Mantem confirmacao explicita para aplicar lote de ajustes com preview real.
  */
 import pg from 'pg';
 import { config } from '../config.js';
 import { chatCompletionRaw } from './chat-providers.js';
 import {
-  aplicarPatchTreinamento,
-  montarResumoAlvosTreinamento,
-  simularPatchTreinamento,
+  buscarTrechosRelacionadosTreinamento,
+  montarContextoBuscaTreinamento,
+  type TrechoTreinamentoRelacionado,
+} from './treinamento-config-busca.js';
+import {
   type AlvoPatchTreinamento,
   type OperacaoPatchTreinamento,
   type PatchTreinamentoAplicavel,
 } from './treinamento-config-alvos.js';
+import {
+  aplicarLotePatchesTreinamento,
+  simularLotePatchesTreinamento,
+  type PreviewPatchTreinamento,
+} from './treinamento-config-lote.js';
+import {
+  montarRespostaHumanaPatch,
+  montarResumoPreviewTexto,
+} from './treinamento-config-resposta.js';
+import {
+  cortar,
+  normalizarOperacoes,
+  parseLista,
+  telefoneSeguro,
+} from './treinamento-config-patch-utils.js';
 
 const pool = new pg.Pool({ connectionString: config.databaseUrl });
 
@@ -35,23 +52,29 @@ export interface PatchConfiguracaoPendente {
   origem_texto: string;
   status: 'pendente' | 'aprovado' | 'cancelado';
   confirmado_por: string | null;
+  operacoes_json: PatchTreinamentoAplicavel[];
+  trechos_relacionados_json: TrechoTreinamentoRelacionado[];
+  previews_json: PreviewPatchTreinamento[];
+  resposta_treinador: string | null;
   criado_em: string;
   atualizado_em: string;
 }
 
-interface PatchConfiguracaoSugerido extends PatchTreinamentoAplicavel {
+interface PatchConfiguracaoSugerido {
+  operacoes: PatchTreinamentoAplicavel[];
   resumo: string;
   justificativa?: string;
   perguntaConfirmacao?: string;
 }
 
-function telefoneSeguro(valor?: string): string {
-  return String(valor || '').replace(/\D/g, '') || 'dashboard';
-}
-
-function cortar(texto: string, limite = 900): string {
-  const sane = String(texto || '').trim();
-  return sane.length <= limite ? sane : `${sane.slice(0, limite)}...`;
+function normalizarPatchPendente(row: PatchConfiguracaoPendente): PatchConfiguracaoPendente {
+  return {
+    ...row,
+    operacoes_json: normalizarOperacoes(row.operacoes_json),
+    trechos_relacionados_json: parseLista<TrechoTreinamentoRelacionado>(row.trechos_relacionados_json),
+    previews_json: parseLista<PreviewPatchTreinamento>(row.previews_json),
+    resposta_treinador: row.resposta_treinador ? String(row.resposta_treinador) : null,
+  };
 }
 
 export async function inicializarTreinamentoConfigPatches(): Promise<void> {
@@ -78,20 +101,39 @@ export async function inicializarTreinamentoConfigPatches(): Promise<void> {
       atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `);
+  await pool.query(`
+    ALTER TABLE whatsapp_config_patches_pendentes
+    ADD COLUMN IF NOT EXISTS operacoes_json JSONB NOT NULL DEFAULT '[]'::jsonb
+  `);
+  await pool.query(`
+    ALTER TABLE whatsapp_config_patches_pendentes
+    ADD COLUMN IF NOT EXISTS trechos_relacionados_json JSONB NOT NULL DEFAULT '[]'::jsonb
+  `);
+  await pool.query(`
+    ALTER TABLE whatsapp_config_patches_pendentes
+    ADD COLUMN IF NOT EXISTS previews_json JSONB NOT NULL DEFAULT '[]'::jsonb
+  `);
+  await pool.query(`
+    ALTER TABLE whatsapp_config_patches_pendentes
+    ADD COLUMN IF NOT EXISTS resposta_treinador TEXT
+  `);
 }
 
-async function sugerirPatchPorTexto(texto: string): Promise<PatchConfiguracaoSugerido> {
-  const contexto = await montarResumoAlvosTreinamento();
+async function sugerirPatchPorTexto(
+  texto: string,
+  trechos: TrechoTreinamentoRelacionado[],
+): Promise<PatchConfiguracaoSugerido> {
+  const contexto = montarContextoBuscaTreinamento(texto, trechos);
   const resposta = await chatCompletionRaw(
     [
       {
         role: 'system',
         content:
-          'Voce e um editor tecnico da GMX. Leia os alvos reais de configuracao e proponha um patch objetivo. Responda SOMENTE JSON com {"alvo":"prompt_sistema|orquestracao_texto|mensagens_fluxo","chave":"... ou null","operacao":"replace|append|prepend","trechoAtual":"...","textoProposto":"...","resumo":"...","justificativa":"...","perguntaConfirmacao":"..."}. Use replace quando o pedido falar em trocar, corrigir ou substituir trecho. Use append para redundancia/reforco. Se o alvo for mensagens_fluxo, a chave deve ser um nome real do catalogo. Se o alvo for orquestracao_texto, a chave deve ser camadaHumana ou instrucaoFormatacao.',
+          'Voce e um editor tecnico da GMX. Leia os trechos relacionados e proponha um lote objetivo de ajustes. Responda SOMENTE JSON com {"operacoes":[{"alvo":"prompt_sistema|orquestracao_texto|mensagens_fluxo","chave":"... ou null","operacao":"replace|append|prepend","trechoAtual":"...","textoProposto":"..."}],"resumo":"...","justificativa":"...","perguntaConfirmacao":"..."}. Use replace quando o pedido falar em trocar, corrigir ou substituir trecho. Use append para redundancia/reforco. Edite todos os trechos relevantes encontrados, mas no maximo 6 operacoes. Se o alvo for mensagens_fluxo, a chave deve ser um nome real do catalogo. Se o alvo for orquestracao_texto, a chave deve ser camadaHumana ou instrucaoFormatacao.',
       },
       {
         role: 'user',
-        content: `${contexto}\n\n=== PEDIDO DO TREINADOR ===\n${texto}`,
+        content: contexto,
       },
     ],
     { temperature: 0.15, max_tokens: 900 },
@@ -100,16 +142,24 @@ async function sugerirPatchPorTexto(texto: string): Promise<PatchConfiguracaoSug
   if (!match) throw new Error('Nao consegui estruturar a proposta de patch');
   const parsed = JSON.parse(match[0]) as Record<string, unknown>;
   const patch: PatchConfiguracaoSugerido = {
-    alvo: String(parsed.alvo || 'prompt_sistema') as AlvoPatchTreinamento,
-    chave: parsed.chave ? String(parsed.chave) : null,
-    operacao: String(parsed.operacao || 'append') as OperacaoPatchTreinamento,
-    trechoAtual: parsed.trechoAtual ? String(parsed.trechoAtual) : null,
-    textoProposto: String(parsed.textoProposto || '').trim(),
+    operacoes: normalizarOperacoes(
+      Array.isArray(parsed.operacoes)
+        ? parsed.operacoes
+        : [
+            {
+              alvo: parsed.alvo,
+              chave: parsed.chave,
+              operacao: parsed.operacao,
+              trechoAtual: parsed.trechoAtual,
+              textoProposto: parsed.textoProposto,
+            },
+          ],
+    ),
     resumo: String(parsed.resumo || '').trim(),
     justificativa: parsed.justificativa ? String(parsed.justificativa) : '',
     perguntaConfirmacao: parsed.perguntaConfirmacao ? String(parsed.perguntaConfirmacao) : '',
   };
-  if (!patch.textoProposto || !patch.resumo) {
+  if (!patch.operacoes.length || !patch.resumo) {
     throw new Error('A proposta veio incompleta para aplicar no treinador');
   }
   return patch;
@@ -122,43 +172,58 @@ export async function criarPropostaPatchConfiguracao(opts: {
   canal?: 'whatsapp' | 'dashboard';
 }): Promise<PatchConfiguracaoPendente> {
   await inicializarTreinamentoConfigPatches();
-  const patch = await sugerirPatchPorTexto(opts.texto);
-  const aplicado = await simularPatchTreinamento(
-    {
-      alvo: patch.alvo,
-      chave: patch.chave,
-      operacao: patch.operacao,
-      trechoAtual: patch.trechoAtual,
-      textoProposto: patch.textoProposto,
-    },
-  ).catch((error) => {
+  const trechos = await buscarTrechosRelacionadosTreinamento(opts.texto);
+  const patch = await sugerirPatchPorTexto(opts.texto, trechos);
+  const previews = await simularLotePatchesTreinamento(patch.operacoes).catch((error) => {
     throw new Error(error instanceof Error ? error.message : 'Falha ao montar preview do patch');
   });
+  const respostaTreinador = montarRespostaHumanaPatch({
+    resumo: patch.resumo,
+    justificativa: patch.justificativa,
+    perguntaConfirmacao: patch.perguntaConfirmacao,
+    trechos,
+    previews,
+  });
+  const primeira = patch.operacoes[0];
   const res = await pool.query<PatchConfiguracaoPendente>(
     `INSERT INTO whatsapp_config_patches_pendentes (
       canal, telefone_autor, nome_autor, alvo, chave_alvo, operacao, trecho_atual,
       texto_proposto, resumo, justificativa, pergunta_confirmacao, preview_antes,
-      preview_depois, origem_texto, status, atualizado_em
-    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,'pendente',NOW())
+      preview_depois, origem_texto, operacoes_json, trechos_relacionados_json,
+      previews_json, resposta_treinador, status, atualizado_em
+    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15::jsonb,$16::jsonb,$17::jsonb,$18,'pendente',NOW())
     RETURNING *`,
     [
       opts.canal || 'whatsapp',
       telefoneSeguro(opts.telefoneAutor),
       opts.nomeAutor?.trim() || null,
-      patch.alvo,
-      patch.chave || null,
-      patch.operacao,
-      patch.trechoAtual || null,
-      patch.textoProposto,
+      primeira.alvo,
+      primeira.chave || null,
+      primeira.operacao,
+      primeira.trechoAtual || null,
+      primeira.textoProposto,
       patch.resumo,
       patch.justificativa || null,
       patch.perguntaConfirmacao || null,
-      cortar(aplicado.antes),
-      cortar(aplicado.depois),
+      cortar(montarResumoPreviewTexto(previews, 'antes')),
+      cortar(montarResumoPreviewTexto(previews, 'depois')),
       opts.texto.trim(),
+      JSON.stringify(patch.operacoes),
+      JSON.stringify(trechos),
+      JSON.stringify(previews),
+      respostaTreinador,
     ],
   );
-  return res.rows[0];
+  const item = normalizarPatchPendente(res.rows[0]);
+  item.resposta_treinador = montarRespostaHumanaPatch({
+    id: item.id,
+    resumo: item.resumo,
+    justificativa: item.justificativa,
+    perguntaConfirmacao: item.pergunta_confirmacao,
+    trechos: item.trechos_relacionados_json,
+    previews: item.previews_json,
+  });
+  return item;
 }
 
 export async function listarPatchesConfiguracaoPendentes(): Promise<PatchConfiguracaoPendente[]> {
@@ -166,7 +231,7 @@ export async function listarPatchesConfiguracaoPendentes(): Promise<PatchConfigu
   const res = await pool.query<PatchConfiguracaoPendente>(
     'SELECT * FROM whatsapp_config_patches_pendentes ORDER BY criado_em DESC, id DESC LIMIT 80',
   );
-  return res.rows;
+  return res.rows.map(normalizarPatchPendente);
 }
 
 export async function obterUltimoPatchPendentePorTelefone(
@@ -179,7 +244,7 @@ export async function obterUltimoPatchPendentePorTelefone(
      ORDER BY criado_em DESC, id DESC LIMIT 1`,
     [telefoneSeguro(telefone)],
   );
-  return res.rows[0] ?? null;
+  return res.rows[0] ? normalizarPatchPendente(res.rows[0]) : null;
 }
 
 export async function obterPatchPendentePorId(id: number): Promise<PatchConfiguracaoPendente | null> {
@@ -188,21 +253,25 @@ export async function obterPatchPendentePorId(id: number): Promise<PatchConfigur
     'SELECT * FROM whatsapp_config_patches_pendentes WHERE id = $1 LIMIT 1',
     [id],
   );
-  return res.rows[0] ?? null;
+  return res.rows[0] ? normalizarPatchPendente(res.rows[0]) : null;
 }
 
 export async function aprovarPatchConfiguracao(id: number, confirmadoPor: string) {
   const patch = await obterPatchPendentePorId(id);
   if (!patch) throw new Error('Patch pendente nao encontrado');
   if (patch.status !== 'pendente') throw new Error('O patch ja foi encerrado');
-  await aplicarPatchTreinamento(
-    {
-      alvo: patch.alvo,
-      chave: patch.chave_alvo,
-      operacao: patch.operacao,
-      trechoAtual: patch.trecho_atual,
-      textoProposto: patch.texto_proposto,
-    },
+  await aplicarLotePatchesTreinamento(
+    patch.operacoes_json.length
+      ? patch.operacoes_json
+      : [
+          {
+            alvo: patch.alvo,
+            chave: patch.chave_alvo,
+            operacao: patch.operacao,
+            trechoAtual: patch.trecho_atual,
+            textoProposto: patch.texto_proposto,
+          },
+        ],
     `treinador_patch:${confirmadoPor}`,
   );
   await pool.query(
