@@ -35,6 +35,18 @@
   font-weight: 800;
 }
 
+.patch-source-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: .12rem .45rem;
+  margin-left: .4rem;
+  background: #e0f2fe;
+  color: #075985;
+  font-size: .72rem;
+  text-transform: uppercase;
+}
+
 .patch-found-head,
 .patch-diff-head {
   margin-bottom: .4rem;

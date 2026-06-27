@@ -299,7 +299,16 @@ async function processarLote(remoteJid: string): Promise<void> {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       await finalizarTrace(traceId, { status: 'erro', erro: msg });
-      throw err;
+      const respostaErroTreino =
+        `Modo treinador ativo sem pausa: houve um erro interno ao processar seu comando, mas eu continuo no modo de edicao. Detalhe: ${msg}`;
+      await tentarEnviarResposta(numero, respostaErroTreino, instance, {
+        remoteJid,
+        mensagensEntrada: mensagens.length,
+        origem,
+        fragmentar: false,
+        agendarAtrasoInicial: false,
+      });
+      return;
     }
   }
 

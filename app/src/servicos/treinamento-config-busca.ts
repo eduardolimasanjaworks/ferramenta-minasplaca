@@ -63,7 +63,7 @@ const STOPWORDS = new Set([
   'voce',
 ]);
 
-interface TrechoCatalogado {
+export interface TrechoCatalogado {
   alvo: AlvoPatchTreinamento;
   chave: string | null;
   rotulo: string;
@@ -78,6 +78,7 @@ export interface TrechoTreinamentoRelacionado {
   score: number;
   termos: string[];
   motivo: string;
+  origemBusca: 'lexical' | 'vetorial' | 'fallback';
 }
 
 function normalizarBusca(texto: string): string {
@@ -164,10 +165,11 @@ function pontuarTrecho(
     motivo: termosEncontrados.length
       ? `coincide com ${termosEncontrados.slice(0, 5).join(', ')}`
       : 'contexto geral proximo do pedido',
+    origemBusca: 'lexical',
   };
 }
 
-async function montarCatalogoTrechos(): Promise<TrechoCatalogado[]> {
+export async function montarCatalogoTrechosTreinamento(): Promise<TrechoCatalogado[]> {
   const [prompt, orquestracao, mensagens] = await Promise.all([
     obterPromptBruto(),
     obterConfigOrquestracaoTexto(),
@@ -236,7 +238,7 @@ export async function buscarTrechosRelacionadosTreinamento(
   pedido: string,
   limite = 8,
 ): Promise<TrechoTreinamentoRelacionado[]> {
-  const catalogo = await montarCatalogoTrechos();
+  const catalogo = await montarCatalogoTrechosTreinamento();
   const resultados = buscarTrechosRelacionadosEmCatalogoParaTeste(pedido, catalogo, limite);
   if (resultados.length) return resultados;
   return catalogo.slice(0, Math.min(limite, 4)).map((item) => ({
@@ -247,6 +249,7 @@ export async function buscarTrechosRelacionadosTreinamento(
     score: 0,
     termos: [],
     motivo: 'fallback de contexto geral editavel',
+    origemBusca: 'fallback',
   }));
 }
 

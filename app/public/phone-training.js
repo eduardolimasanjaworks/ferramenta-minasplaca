@@ -67,8 +67,9 @@
           ${trechos(item).length
             ? trechos(item).map((trecho) => `
               <div class="patch-found-card">
-                <div class="patch-found-head">${esc(trecho.alvo || '')}${trecho.chave ? `.${esc(trecho.chave)}` : ''}</div>
+                <div class="patch-found-head">${esc(trecho.alvo || '')}${trecho.chave ? `.${esc(trecho.chave)}` : ''} <span class="patch-source-chip">${esc(trecho.origemBusca || 'lexical')}</span></div>
                 <div>${esc(trecho.texto || '')}</div>
+                <div class="admin-help">${esc(trecho.motivo || '')}</div>
               </div>`).join('')
             : `<div class="patch-found-card">Nenhum trecho relacionado salvo neste patch.</div>`}
         </div>

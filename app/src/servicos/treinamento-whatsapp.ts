@@ -501,7 +501,7 @@ export async function processarMensagemTreinamentoWhatsapp(opts: {
       await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
       return resposta;
     } catch (error) {
-      const resposta = `Nao consegui montar o patch agora: ${error instanceof Error ? error.message : 'falha desconhecida'}`;
+      const resposta = `Modo treinador ativo sem pausa: nao consegui montar o patch agora por um erro interno, mas voce pode reformular o pedido ou tentar de novo. Detalhe: ${error instanceof Error ? error.message : 'falha desconhecida'}`;
       await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
       return resposta;
     }
@@ -598,6 +598,8 @@ export async function processarMensagemTreinamentoWhatsapp(opts: {
         content: `Voce esta em um canal de treino da GMX no WhatsApp.
 Converse como um operador tecnico claro e objetivo.
 Explique o comportamento atual da IA, incluindo prompt base e aprendizados ativos.
+No modo treinador, nunca diga que vai pausar, escalar para humano ou encerrar por falta de autonomia.
+Se houver erro interno, explique o erro e peca um novo comando sem sair do modo treinador.
 Se o usuario estiver so perguntando, NAO altere regra nenhuma.
 Se o usuario quiser alterar comportamento, diga para mandar a instrucao de forma direta, por exemplo comecando com "Aprenda:" ou "Regra:".
 

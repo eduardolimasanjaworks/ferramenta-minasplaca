@@ -7,7 +7,6 @@ import pg from 'pg';
 import { config } from '../config.js';
 import { chatCompletionRaw } from './chat-providers.js';
 import {
-  buscarTrechosRelacionadosTreinamento,
   montarContextoBuscaTreinamento,
   type TrechoTreinamentoRelacionado,
 } from './treinamento-config-busca.js';
@@ -31,6 +30,7 @@ import {
   parseLista,
   telefoneSeguro,
 } from './treinamento-config-patch-utils.js';
+import { recuperarTrechosTreinamento } from './treinamento-config-recuperacao.js';
 
 const pool = new pg.Pool({ connectionString: config.databaseUrl });
 
@@ -172,7 +172,7 @@ export async function criarPropostaPatchConfiguracao(opts: {
   canal?: 'whatsapp' | 'dashboard';
 }): Promise<PatchConfiguracaoPendente> {
   await inicializarTreinamentoConfigPatches();
-  const trechos = await buscarTrechosRelacionadosTreinamento(opts.texto);
+  const trechos = await recuperarTrechosTreinamento(opts.texto);
   const patch = await sugerirPatchPorTexto(opts.texto, trechos);
   const previews = await simularLotePatchesTreinamento(patch.operacoes).catch((error) => {
     throw new Error(error instanceof Error ? error.message : 'Falha ao montar preview do patch');

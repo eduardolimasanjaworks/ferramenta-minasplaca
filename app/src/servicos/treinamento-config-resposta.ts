@@ -39,6 +39,7 @@ export function montarRespostaHumanaPatch(opts: {
     opts.id
       ? `Eu encontrei estes trechos relacionados e preparei o patch #${opts.id}.`
       : 'Eu encontrei estes trechos relacionados e preparei uma proposta de patch.',
+    'Usei busca vetorial e lexical para localizar o que mais conversa com o seu pedido.',
     'Para chegar no comportamento que voce pediu, eu sugiro estes ajustes:',
     `- ${opts.resumo}`,
   ];
@@ -48,7 +49,7 @@ export function montarRespostaHumanaPatch(opts: {
     linhas.push('', 'Trechos encontrados:');
     for (const trecho of opts.trechos.slice(0, 4)) {
       linhas.push(
-        `- ${nomeAlvo(trecho.alvo, trecho.chave)}: ${resumir(trecho.texto, 180)} (${trecho.motivo})`,
+        `- ${nomeAlvo(trecho.alvo, trecho.chave)}: ${resumir(trecho.texto, 180)} (${trecho.origemBusca}; ${trecho.motivo})`,
       );
     }
   }

@@ -179,6 +179,7 @@ export const config = {
   qdrantColecao: 'prompt_gmx',
   qdrantColecaoLinguagem: 'linguagem_motorista_gmx',
   qdrantColecaoMemoriaContato: 'memoria_contato_gmx',
+  qdrantColecaoTreinamento: 'treinamento_config_gmx',
 
   debounceMs: parseInt(process.env.DEBOUNCE_MS ?? '2200', 10),
   debounceWorkerMs: 300,
