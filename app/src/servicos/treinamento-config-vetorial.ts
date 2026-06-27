@@ -115,7 +115,7 @@ export async function buscarTrechosVetoriaisTreinamento(
           origemBusca: 'vetorial' as const,
         };
       })
-      .filter((item) => item.texto && item.score >= 0.55)
+      .filter((item) => item.texto && item.score >= 0.36)
       .filter((item) => {
         const chaveUnica = `${item.alvo}|${item.chave || ''}|${item.texto}`;
         if (vistos.has(chaveUnica)) return false;
