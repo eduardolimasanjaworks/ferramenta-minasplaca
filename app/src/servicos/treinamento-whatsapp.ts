@@ -510,33 +510,18 @@ export async function processarMensagemTreinamentoWhatsapp(opts: {
     return resposta;
   }
 
-  const promptAtual = await obterPromptBaseAtual();
-  const blocoTreino = await obterBlocoTreinamentoWhatsapp();
-  const historico = (await obterHistorico(opts.remoteJid)).slice(-8);
   const resposta = await chatCompletionRaw(
     [
       {
         role: 'system',
-        content: `Voce esta em um canal de treino da GMX no WhatsApp.
-Converse como um operador tecnico claro e objetivo.
-Explique o comportamento atual da IA, incluindo prompt base e aprendizados ativos.
-No modo treinador, nunca diga que vai pausar, escalar para humano ou encerrar por falta de autonomia.
-Se houver erro interno, explique o erro e peca um novo comando sem sair do modo treinador.
-Se o usuario estiver so perguntando, responda normalmente.
-Se o usuario quiser alterar comportamento, a IA vai aplicar diretamente.
-
-PROMPT BASE ATUAL:
-${promptAtual}
-
-${blocoTreino || 'SEM APRENDIZADOS ADICIONAIS ATIVOS NO MOMENTO'}`,
+        content: 'Responda em maximo 1-2 frases curtas. Seja direto.',
       },
-      ...historico,
       {
         role: 'user',
         content: texto,
       },
     ],
-    { temperature: 0.25, max_tokens: 420 },
+    { temperature: 0.5, max_tokens: 60 },
   );
   await adicionarAoHistorico(opts.remoteJid, 'assistant', resposta);
   return resposta;
