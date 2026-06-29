@@ -1,7 +1,7 @@
 /**
- * Formata a resposta do treinador com trechos encontrados e previews comparativos.
- * Reaproveita a mesma narrativa no WhatsApp e no painel do /phone.
- * Mantem o texto objetivo, mas com cara de conversa humana de operador.
+ * Formata a resposta do treinador para WhatsApp.
+ * Amigavel, curta, com emojis e nomes humanos para os alvos.
+ * Sem termos tecnicos (lexical, vetorial, score, nomes internos).
  */
 import type { TrechoTreinamentoRelacionado } from './treinamento-config-busca.js';
 import type { PreviewPatchTreinamento } from './treinamento-config-lote.js';
@@ -11,8 +11,23 @@ function resumir(texto: string, limite = 420): string {
   return base.length <= limite ? base : `${base.slice(0, limite - 3)}...`;
 }
 
-function nomeAlvo(alvo: string, chave: string | null): string {
-  return chave ? `${alvo}.${chave}` : alvo;
+function nomeAlvoAmigavel(alvo: string, chave: string | null): string {
+  const nomes: Record<string, string> = {
+    prompt_sistema: 'Prompt principal',
+    orquestracao_texto: 'Regras de tom e formatacao',
+    mensagens_fluxo: 'Mensagens do fluxo',
+    ocr_prompt: 'Prompt de OCR',
+    ocr_prompt_forcado: 'Prompt OCR forcado',
+    ocr_documentos_schema: 'Documentos OCR',
+  };
+  const base = nomes[alvo] || alvo;
+  if (alvo === 'orquestracao_texto' && chave) {
+    if (chave === 'camadaHumana') return 'Regras de tom e WhatsApp';
+    if (chave === 'instrucaoFormatacao') return 'Formatacao de mensagens';
+  }
+  if (alvo === 'mensagens_fluxo' && chave) return `Mensagem: ${chave}`;
+  if (alvo === 'ocr_documentos_schema' && chave) return `Documento OCR: ${chave}`;
+  return base;
 }
 
 export function montarResumoPreviewTexto(
@@ -21,10 +36,18 @@ export function montarResumoPreviewTexto(
 ): string {
   return previews
     .map((item) => {
-      const titulo = nomeAlvo(item.alvo, item.chave);
+      const titulo = nomeAlvoAmigavel(item.alvo, item.chave);
       return `[${titulo}]\n${resumir(item[campo], 700)}`;
     })
     .join('\n\n');
+}
+
+function extrairLinhasRelevantes(texto: string, limite = 5): string {
+  const linhas = String(texto || '')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
+  return linhas.slice(0, limite).join('\n');
 }
 
 export function montarRespostaHumanaPatch(opts: {
@@ -35,40 +58,36 @@ export function montarRespostaHumanaPatch(opts: {
   trechos: TrechoTreinamentoRelacionado[];
   previews: PreviewPatchTreinamento[];
 }): string {
-  const linhas = [
-    opts.id
-      ? `Eu encontrei estes trechos relacionados e preparei o patch #${opts.id}.`
-      : 'Eu encontrei estes trechos relacionados e preparei uma proposta de patch.',
-    'Usei busca vetorial e lexical para localizar o que mais conversa com o seu pedido.',
-    'Para chegar no comportamento que voce pediu, eu sugiro estes ajustes:',
-    `- ${opts.resumo}`,
-  ];
+  const linhas: string[] = [];
 
-  if (opts.justificativa) linhas.push(`- ${opts.justificativa}`);
-  if (opts.trechos.length) {
-    linhas.push('', 'Trechos encontrados:');
-    for (const trecho of opts.trechos.slice(0, 4)) {
-      linhas.push(
-        `- ${nomeAlvo(trecho.alvo, trecho.chave)}: ${resumir(trecho.texto, 180)} (${trecho.origemBusca}; ${trecho.motivo})`,
-      );
-    }
+  linhas.push(`*Encontrado!* 🔍 Analisei as instrucoes atuais...`);
+  linhas.push('');
+  linhas.push(`Encontrei os trechos relacionados ao seu pedido. ${opts.resumo}`);
+
+  if (opts.justificativa) {
+    linhas.push(opts.justificativa);
   }
 
   if (opts.previews.length) {
-    linhas.push('', 'Antes e depois sugeridos:');
-    for (const item of opts.previews.slice(0, 4)) {
-      linhas.push(`- ${nomeAlvo(item.alvo, item.chave)}`);
-      linhas.push(`ANTES: ${resumir(item.antes, 220)}`);
-      linhas.push(`DEPOIS: ${resumir(item.depois, 220)}`);
+    for (const item of opts.previews.slice(0, 3)) {
+      const nome = nomeAlvoAmigavel(item.alvo, item.chave);
+      linhas.push('');
+      linhas.push(`*${nome}*`);
+      linhas.push('');
+      linhas.push('*COMO ESTA HOJE:*');
+      linhas.push(extrairLinhasRelevantes(item.antes, 4));
+      linhas.push('');
+      linhas.push('*COMO VAI FICAR:*');
+      linhas.push(extrairLinhasRelevantes(item.depois, 4));
     }
   }
 
+  linhas.push('');
   linhas.push(
-    '',
     opts.perguntaConfirmacao ||
       (opts.id
-        ? `Se fizer sentido, responda "Confirmar patch #${opts.id}". Se nao quiser aplicar, responda "Cancelar patch #${opts.id}".`
-        : 'Se fizer sentido, confirme para eu aplicar a mudanca.'),
+        ? `Posso confirmar e aplicar essa atualizacao? 👍\n\nResponda "Confirmar patch #${opts.id}" ou "Cancelar patch #${opts.id}".`
+        : 'Posso confirmar e aplicar essa atualizacao? 👍'),
   );
 
   return linhas.join('\n');

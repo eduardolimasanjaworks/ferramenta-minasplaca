@@ -17,6 +17,17 @@ import {
   type AlvoPatchTreinamento,
   type PatchTreinamentoAplicavel,
 } from './treinamento-config-alvos.js';
+import {
+  obterPromptOcr,
+  obterPromptOcrForcado,
+  salvarPromptOcr,
+  salvarPromptOcrForcado,
+} from './config-ocr.js';
+import {
+  listarOcrDocumentos,
+  salvarOcrDocumentos,
+  type OcrDocumentoConfig,
+} from './config-ocr-documentos.js';
 
 export interface PreviewPatchTreinamento {
   alvo: AlvoPatchTreinamento;
@@ -39,6 +50,12 @@ async function obterTextoAtual(
   chave: string | null | undefined,
 ): Promise<string> {
   if (alvo === 'prompt_sistema') return obterPromptBruto();
+  if (alvo === 'ocr_prompt') return obterPromptOcr();
+  if (alvo === 'ocr_prompt_forcado') return obterPromptOcrForcado();
+  if (alvo === 'ocr_documentos_schema') {
+    const docs = await listarOcrDocumentos();
+    return JSON.stringify(docs, null, 2);
+  }
   if (alvo === 'orquestracao_texto') {
     const atual = await obterConfigOrquestracaoTexto();
     return textoValorAtual(atual[chave as keyof typeof atual]);
@@ -47,7 +64,7 @@ async function obterTextoAtual(
   return textoValorAtual(atual[chave as keyof typeof atual]);
 }
 
-async function salvarTextoAtualizado(
+export async function salvarTextoAtualizado(
   alvo: AlvoPatchTreinamento,
   chave: string | null,
   texto: string,
@@ -55,6 +72,23 @@ async function salvarTextoAtualizado(
 ): Promise<void> {
   if (alvo === 'prompt_sistema') {
     await salvarPrompt(texto, origem);
+    return;
+  }
+  if (alvo === 'ocr_prompt') {
+    await salvarPromptOcr(texto, origem);
+    return;
+  }
+  if (alvo === 'ocr_prompt_forcado') {
+    await salvarPromptOcrForcado(texto, origem);
+    return;
+  }
+  if (alvo === 'ocr_documentos_schema') {
+    try {
+      const docs = JSON.parse(texto) as OcrDocumentoConfig[];
+      await salvarOcrDocumentos(docs, origem);
+    } catch {
+      throw new Error('Schema OCR invalido: JSON malformado');
+    }
     return;
   }
   if (alvo === 'orquestracao_texto') {

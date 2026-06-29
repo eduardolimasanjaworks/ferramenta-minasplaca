@@ -275,6 +275,15 @@ async function processarLote(remoteJid: string): Promise<void> {
         remoteJid,
         textoUsuario,
         pushName,
+        onReatividade: async (mensagem) => {
+          await tentarEnviarResposta(numero, mensagem, instance, {
+            remoteJid,
+            mensagensEntrada: mensagens.length,
+            origem,
+            fragmentar: false,
+            agendarAtrasoInicial: false,
+          });
+        },
       });
       const envioTreino = await tentarEnviarResposta(numero, respostaTreino, instance, {
         remoteJid,

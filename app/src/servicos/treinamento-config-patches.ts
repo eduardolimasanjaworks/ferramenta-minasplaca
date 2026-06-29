@@ -11,12 +11,14 @@ import {
   type TrechoTreinamentoRelacionado,
 } from './treinamento-config-busca.js';
 import {
+  montarResumoAlvosTreinamento,
   type AlvoPatchTreinamento,
   type OperacaoPatchTreinamento,
   type PatchTreinamentoAplicavel,
 } from './treinamento-config-alvos.js';
 import {
   aplicarLotePatchesTreinamento,
+  salvarTextoAtualizado,
   simularLotePatchesTreinamento,
   type PreviewPatchTreinamento,
 } from './treinamento-config-lote.js';
@@ -50,7 +52,7 @@ export interface PatchConfiguracaoPendente {
   preview_antes: string;
   preview_depois: string;
   origem_texto: string;
-  status: 'pendente' | 'aprovado' | 'cancelado';
+  status: 'pendente' | 'aprovado' | 'cancelado' | 'revertido';
   confirmado_por: string | null;
   operacoes_json: PatchTreinamentoAplicavel[];
   trechos_relacionados_json: TrechoTreinamentoRelacionado[];
@@ -124,12 +126,13 @@ async function sugerirPatchPorTexto(
   trechos: TrechoTreinamentoRelacionado[],
 ): Promise<PatchConfiguracaoSugerido> {
   const contexto = montarContextoBuscaTreinamento(texto, trechos);
+  const catalogoAlvos = await montarResumoAlvosTreinamento();
   const resposta = await chatCompletionRaw(
     [
       {
         role: 'system',
         content:
-          'Voce e um editor tecnico da GMX. Leia os trechos relacionados e proponha um lote objetivo de ajustes. Responda SOMENTE JSON com {"operacoes":[{"alvo":"prompt_sistema|orquestracao_texto|mensagens_fluxo|ocr_prompt|ocr_prompt_forcado|ocr_documentos_schema","chave":"... ou null","operacao":"replace|append|prepend","trechoAtual":"...","textoProposto":"..."}],"resumo":"...","justificativa":"...","perguntaConfirmacao":"..."}. Use replace quando o pedido falar em trocar, corrigir ou substituir trecho. Use append para redundancia/reforco. Edite todos os trechos relevantes encontrados, mas no maximo 6 operacoes. Se o alvo for mensagens_fluxo, a chave deve ser um nome real do catalogo. Se o alvo for orquestracao_texto, a chave deve ser camadaHumana ou instrucaoFormatacao. Se o alvo for ocr_documentos_schema, a chave deve ser o id do documento (cnh, crlv, antt, endereco, foto) e o textoProposto deve ser um JSON valido do schema completo.',
+          'Voce e um editor tecnico da GMX. Leia os trechos relacionados e proponha um lote objetivo de ajustes. Responda SOMENTE JSON com {"operacoes":[{"alvo":"prompt_sistema|orquestracao_texto|mensagens_fluxo|ocr_prompt|ocr_prompt_forcado|ocr_documentos_schema","chave":"... ou null","operacao":"replace|append|prepend","trechoAtual":"...","textoProposto":"..."}],"resumo":"...","justificativa":"...","perguntaConfirmacao":"..."}. Use replace quando o pedido falar em trocar, corrigir ou substituir trecho. Use append para redundancia/reforco. Edite todos os trechos relevantes encontrados, mas no maximo 6 operacoes. Se o alvo for mensagens_fluxo, a chave deve ser um nome real do catalogo. Se o alvo for orquestracao_texto, a chave deve ser camadaHumana ou instrucaoFormatacao. Se o alvo for ocr_documentos_schema, a chave deve ser o id do documento (cnh, crlv, antt, endereco, foto) e o textoProposto deve ser um JSON valido do schema completo.\n\n' + catalogoAlvos,
       },
       {
         role: 'user',
@@ -292,4 +295,51 @@ export async function cancelarPatchConfiguracao(id: number, confirmadoPor: strin
      WHERE id = $1`,
     [id, confirmadoPor],
   );
+}
+
+export async function reverterPatchConfiguracao(id: number, confirmadoPor: string): Promise<void> {
+  const patch = await obterPatchPendentePorId(id);
+  if (!patch) throw new Error('Patch nao encontrado');
+  if (patch.status !== 'aprovado') throw new Error('So e possivel reverter patches aprovados');
+  if (!patch.previews_json.length) throw new Error('Patch sem previews para reverter');
+
+  for (const preview of patch.previews_json) {
+    await salvarTextoAtualizado(
+      preview.alvo,
+      preview.chave,
+      preview.antes,
+      `treinador_revert:${confirmadoPor}`,
+    );
+  }
+
+  await pool.query(
+    `UPDATE whatsapp_config_patches_pendentes
+     SET status = 'revertido', confirmado_por = $2, atualizado_em = NOW()
+     WHERE id = $1`,
+    [id, confirmadoPor],
+  );
+}
+
+export async function reverterUltimoPatchAprovado(
+  confirmadoPor: string,
+  telefoneAutor?: string,
+): Promise<{ id: number; resumo: string } | null> {
+  await inicializarTreinamentoConfigPatches();
+  const condicao = telefoneAutor
+    ? 'WHERE status = $1 AND telefone_autor = $2'
+    : 'WHERE status = $1';
+  const params = telefoneAutor
+    ? ['aprovado', telefoneSeguro(telefoneAutor)]
+    : ['aprovado'];
+  const res = await pool.query<PatchConfiguracaoPendente>(
+    `SELECT * FROM whatsapp_config_patches_pendentes
+     ${condicao}
+     ORDER BY criado_em DESC, id DESC
+     LIMIT 1`,
+    params,
+  );
+  if (!res.rows.length) return null;
+  const patch = normalizarPatchPendente(res.rows[0]);
+  await reverterPatchConfiguracao(patch.id, confirmadoPor);
+  return { id: patch.id, resumo: patch.resumo };
 }

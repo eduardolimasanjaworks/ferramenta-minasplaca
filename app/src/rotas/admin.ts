@@ -49,6 +49,7 @@ import {
   cancelarPatchConfiguracao,
   criarPropostaPatchConfiguracao,
   listarPatchesConfiguracaoPendentes,
+  reverterPatchConfiguracao,
 } from '../servicos/treinamento-config-patches.js';
 import { resumirHistoricoNominalOfertasPorEmbarque } from '../servicos/historico-ofertas-gmx.js';
 import {
@@ -478,6 +479,21 @@ export async function rotasAdmin(app: FastifyInstance): Promise<void> {
         return { ok: true };
       } catch (error) {
         return reply.status(400).send({ erro: error instanceof Error ? error.message : 'Falha ao cancelar patch' });
+      }
+    },
+  );
+
+  app.post<{ Params: { id: string }; Body: { autor?: string } }>(
+    '/api/admin/treinamento/patches/:id/reverter',
+    async (req, reply) => {
+      if (!exigirAdmin(req, reply)) return;
+      const id = Number(req.params.id);
+      if (!Number.isFinite(id)) return reply.status(400).send({ erro: 'id inválido' });
+      try {
+        await reverterPatchConfiguracao(id, req.body?.autor ?? 'dashboard');
+        return { ok: true };
+      } catch (error) {
+        return reply.status(400).send({ erro: error instanceof Error ? error.message : 'Falha ao reverter patch' });
       }
     },
   );
