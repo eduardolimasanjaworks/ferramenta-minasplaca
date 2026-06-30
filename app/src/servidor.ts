@@ -52,6 +52,38 @@ export async function criarServidor() {
   app.get('/whatsapp', async (_req, reply) => reply.redirect('/phone.html?painel=whatsapp'));
   app.get('/phone', async (_req, reply) => reply.redirect('/phone.html'));
 
+  app.get('/api/whatsapp/status', async (_req, reply) => {
+    try {
+      const res = await fetch(`${config.evolutionUrl}/instance/connectionState/${config.evolutionInstance}`, {
+        headers: { apikey: config.evolutionApiKey },
+      });
+      const data = await res.json() as { state?: string; status?: { state?: string }; instance?: { state?: string } };
+      const state = data.instance?.state ?? data.state ?? data.status?.state ?? 'UNKNOWN';
+      return { connected: state.toUpperCase() === 'CONNECTED', state };
+    } catch (err) {
+      return reply.status(502).send({ error: String(err) });
+    }
+  });
+
+  app.get('/api/whatsapp/qr', async (_req, reply) => {
+    try {
+      const state = await fetch(`${config.evolutionUrl}/instance/connectionState/${config.evolutionInstance}`, {
+        headers: { apikey: config.evolutionApiKey },
+      });
+      const stateData = await state.json() as { state?: string };
+      if ((stateData.state ?? '').toUpperCase() === 'CONNECTED') {
+        return { connected: true };
+      }
+      const res = await fetch(`${config.evolutionUrl}/instance/connect/${config.evolutionInstance}`, {
+        headers: { apikey: config.evolutionApiKey },
+      });
+      const data = await res.json() as { code?: string; qrcode?: string; pairingCode?: string | null };
+      return { code: data.code ?? data.qrcode, pairingCode: data.pairingCode };
+    } catch (err) {
+      return reply.status(502).send({ error: String(err) });
+    }
+  });
+
   return app;
 }
 

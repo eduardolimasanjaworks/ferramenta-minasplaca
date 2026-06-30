@@ -5,17 +5,16 @@
 export function dividirResposta(texto: string, maxCaracteres = 1500): string[] {
   if (texto.length <= maxCaracteres) return [texto];
   const partes: string[] = [];
-  let atual = '';
-  const frases = texto.split(/(?<=\.\s)|(?<=\n)/);
-  for (const frase of frases) {
-    if ((atual + frase).length > maxCaracteres) {
-      if (atual) partes.push(atual.trim());
-      atual = frase;
-    } else {
-      atual += frase;
-    }
+  let restante = texto.trim();
+  while (restante.length > maxCaracteres) {
+    let corte = restante.lastIndexOf('\n', maxCaracteres);
+    if (corte <= 0) corte = restante.lastIndexOf('.', maxCaracteres);
+    if (corte <= 0) corte = restante.lastIndexOf(' ', maxCaracteres);
+    if (corte <= 0) corte = maxCaracteres;
+    partes.push(restante.substring(0, corte).trim());
+    restante = restante.substring(corte).trim();
   }
-  if (atual) partes.push(atual.trim());
+  if (restante) partes.push(restante);
   return partes;
 }
 
