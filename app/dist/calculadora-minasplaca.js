@@ -53,16 +53,43 @@ function produtosPadrao() {
         { id: '4', nome: 'Adesivo refletivo', sku: 'ADES-REF', preco_unitario: 15, quantidade_minima: 10, unidade: 'm', observacao: 'Por metro linear' },
     ];
 }
+function normalizar(texto) {
+    return texto
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u030f]/g, '')
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+function paraSingular(texto) {
+    return texto
+        .replace(/placas/g, 'placa')
+        .replace(/etiquetas/g, 'etiqueta')
+        .replace(/adesivos/g, 'adesivo')
+        .replace(/materiais/g, 'material')
+        .replace(/placas de/g, 'placa de');
+}
+function produtoMencionado(texto, produto) {
+    const t = paraSingular(normalizar(texto));
+    const nome = paraSingular(normalizar(produto.nome));
+    const sku = normalizar(produto.sku);
+    if (t.includes(nome))
+        return true;
+    if (t.includes(sku))
+        return true;
+    const partes = nome.split(' ').filter(p => p.length >= 3);
+    if (partes.length >= 2 && partes.every(p => t.includes(p)))
+        return true;
+    return false;
+}
 export async function calcularOrcamento(mensagem) {
     const produtos = await buscarProdutosDirectus();
-    const texto = mensagem.toLowerCase();
     const itens = [];
     const observacoes = [];
     for (const produto of produtos) {
-        const nome = produto.nome.toLowerCase();
-        const sku = produto.sku.toLowerCase();
-        if (texto.includes(nome) || texto.includes(sku)) {
-            const qtdExtraida = extrairQuantidade(texto, produto);
+        if (produtoMencionado(mensagem, produto)) {
+            const qtdExtraida = extrairQuantidade(mensagem, produto);
             const quantidade = Math.max(qtdExtraida, produto.quantidade_minima);
             const subtotal = quantidade * produto.preco_unitario;
             if (qtdExtraida < produto.quantidade_minima) {
@@ -76,8 +103,8 @@ export async function calcularOrcamento(mensagem) {
     return { itens, total: itens.reduce((s, i) => s + i.subtotal, 0), observacoes };
 }
 function extrairQuantidade(texto, produto) {
-    const nome = produto.nome.toLowerCase().replace(/\s+/g, '\\s+');
-    const regex = new RegExp(`(\\d+)\s*(?:un|unidade|und|metros?|m|peças?|pecas?)?\s*(?:de)?\s*${nome}|${nome}\s*(?:de)?\s*(\\d+)\s*(?:un|unidade|und|metros?|m|peças?|pecas?)?`, 'i');
+    const nome = paraSingular(normalizar(produto.nome)).replace(/\s+/g, '\\s+');
+    const regex = new RegExp(`(\\d+)\s*(?:un|unidade|und|metros?|m|peças?|pecas?|placas?|etiquetas?|adesivos?)?\s*(?:de|da|do)?\s*${nome}|${nome}\s*(?:de|da|do)?\s*(\\d+)\s*(?:un|unidade|und|metros?|m|peças?|pecas?|placas?|etiquetas?|adesivos?)?`, 'i');
     const match = texto.match(regex);
     if (match) {
         const num = match[1] ?? match[2];

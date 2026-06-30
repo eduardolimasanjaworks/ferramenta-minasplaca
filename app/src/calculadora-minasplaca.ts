@@ -75,17 +75,47 @@ function produtosPadrao(): Produto[] {
   ];
 }
 
+function limpar(texto: string): string {
+  return texto
+    .toLowerCase()
+    .replace(/[\u0300-\u030f]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function singularizar(texto: string): string {
+  return texto
+    .replace(/\bplacas\b/g, 'placa')
+    .replace(/\betiquetas\b/g, 'etiqueta')
+    .replace(/\badesivos\b/g, 'adesivo')
+    .replace(/\bmateriais\b/g, 'material');
+}
+
+function termosProduto(produto: Produto): string[] {
+  const base = singularizar(limpar(produto.nome));
+  const semDe = base.replace(/\b(de|do|da)\b/g, '').replace(/\s+/g, ' ').trim();
+  const sku = limpar(produto.sku);
+  return [...new Set([base, semDe, sku])].filter(Boolean);
+}
+
+function produtoMencionado(texto: string, produto: Produto): boolean {
+  const t = ' ' + singularizar(limpar(texto)) + ' ';
+  const termos = termosProduto(produto);
+  for (const termo of termos) {
+    if (termo.length >= 3 && t.includes(' ' + termo + ' ')) return true;
+  }
+  return false;
+}
+
 export async function calcularOrcamento(mensagem: string): Promise<Orcamento | null> {
   const produtos = await buscarProdutosDirectus();
-  const texto = mensagem.toLowerCase();
   const itens: ItemOrcamento[] = [];
   const observacoes: string[] = [];
 
   for (const produto of produtos) {
-    const nome = produto.nome.toLowerCase();
-    const sku = produto.sku.toLowerCase();
-    if (texto.includes(nome) || texto.includes(sku)) {
-      const qtdExtraida = extrairQuantidade(texto, produto);
+    if (produtoMencionado(mensagem, produto)) {
+      const qtdExtraida = extrairQuantidade(mensagem, produto);
       const quantidade = Math.max(qtdExtraida, produto.quantidade_minima);
       const subtotal = quantidade * produto.preco_unitario;
       if (qtdExtraida < produto.quantidade_minima) {
@@ -100,14 +130,29 @@ export async function calcularOrcamento(mensagem: string): Promise<Orcamento | n
 }
 
 function extrairQuantidade(texto: string, produto: Produto): number {
-  const nome = produto.nome.toLowerCase().replace(/\s+/g, '\\s+');
-  const regex = new RegExp(`(\\d+)\s*(?:un|unidade|und|metros?|m|peças?|pecas?)?\s*(?:de)?\s*${nome}|${nome}\s*(?:de)?\s*(\\d+)\s*(?:un|unidade|und|metros?|m|peças?|pecas?)?`, 'i');
-  const match = texto.match(regex);
-  if (match) {
-    const num = match[1] ?? match[2];
-    if (num) return parseInt(num, 10);
+  const t = singularizar(limpar(texto));
+  const termos = termosProduto(produto);
+  let melhorQtd = 1;
+  let melhorDist = Infinity;
+
+  for (const termo of termos) {
+    if (termo.length < 3) continue;
+    const regex = new RegExp(`${termo}`, 'gi');
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(t)) !== null) {
+      const trecho = t.substring(Math.max(0, match.index - 30), match.index);
+      const nums = trecho.match(/(\d+)\s*(?:un|unidade|und|metro|metros|m|peca|pecas|placa|placas|etiqueta|etiquetas|adesivo|adesivos)?\b/gi);
+      if (nums && nums.length) {
+        const q = parseInt(nums[nums.length - 1].match(/\d+/)![0], 10);
+        const dist = match.index - (trecho.lastIndexOf(String(q)) + Math.max(0, match.index - 30));
+        if (dist < melhorDist && q > 0 && q < 1000000) {
+          melhorDist = dist;
+          melhorQtd = q;
+        }
+      }
+    }
   }
-  return 1;
+  return melhorQtd;
 }
 
 export function formatarOrcamento(orcamento: Orcamento): string {
