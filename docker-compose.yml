@@ -1,0 +1,174 @@
+networks:
+  gmx_net:
+    external: true
+    name: gmx_net
+  minasplaca_net:
+    external: true
+    name: minasplaca_net
+  n8n_edge:
+    external: true
+    name: n8n_edge
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: minasplaca_postgres
+    networks: [gmx_net, minasplaca_net]
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:5435:5432'
+    environment:
+      POSTGRES_DB: minasplaca
+      POSTGRES_USER: minasplaca
+      POSTGRES_PASSWORD: minasplaca_secret
+    command: postgres -c shared_buffers=512MB -c effective_cache_size=1536MB -c work_mem=16MB -c max_connections=100
+    volumes:
+      - minasplaca_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U minasplaca']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: minasplaca_redis
+    networks: [gmx_net, minasplaca_net]
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:6385:6379'
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - minasplaca_redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  qdrant:
+    image: qdrant/qdrant:v1.12.5
+    container_name: minasplaca_qdrant
+    networks: [gmx_net, minasplaca_net]
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:6340:6333'
+    volumes:
+      - minasplaca_qdrant_data:/qdrant/storage
+
+  directus:
+    image: directus/directus:11.5.1
+    container_name: minasplaca_directus
+    networks: [gmx_net, minasplaca_net]
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:8056:8055'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - minasplaca_directus_uploads:/directus/uploads
+      - minasplaca_directus_extensions:/directus/extensions
+    environment:
+      KEY: minasplaca-directus-key-2026
+      SECRET: minasplaca-directus-secret-2026
+      ADMIN_EMAIL: admin@minasplaca.com
+      ADMIN_PASSWORD: MinasPlaca2026!
+      DB_CLIENT: pg
+      DB_HOST: postgres
+      DB_PORT: '5432'
+      DB_DATABASE: directus_minasplaca
+      DB_USER: minasplaca
+      DB_PASSWORD: minasplaca_secret
+      CACHE_ENABLED: 'false'
+      CORS_ENABLED: 'true'
+      CORS_ORIGIN: '*'
+      CORS_METHODS: 'GET,POST,PATCH,DELETE,OPTIONS'
+      CORS_ALLOWED_HEADERS: 'Content-Type,Authorization'
+      WEBSOCKETS_ENABLED: 'false'
+
+  evolution-api:
+    image: evoapicloud/evolution-api:latest
+    container_name: minasplaca_evolution
+    networks: [gmx_net, minasplaca_net]
+    restart: unless-stopped
+    ports:
+      - '0.0.0.0:8097:8080'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - minasplaca_evolution_instances:/evolution/instances
+    environment:
+      SERVER_TYPE: http
+      SERVER_PORT: 8080
+      SERVER_URL: https://iaminas.sanjaworks.com/evo
+      AUTHENTICATION_API_KEY: minasplaca-evolution-key-2026
+      DATABASE_ENABLED: 'true'
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: postgresql://minasplaca:minasplaca_secret@postgres:5432/evolution?schema=public
+      DATABASE_CONNECTION_CLIENT_NAME: minasplaca_evolution
+      DATABASE_SAVE_DATA_INSTANCE: 'true'
+      DATABASE_SAVE_DATA_NEW_MESSAGE: 'true'
+      DATABASE_SAVE_MESSAGE_UPDATE: 'true'
+      DATABASE_SAVE_DATA_CONTACTS: 'true'
+      DATABASE_SAVE_DATA_CHATS: 'true'
+      CACHE_REDIS_ENABLED: 'true'
+      CACHE_REDIS_URI: redis://redis:6379/1
+      CACHE_REDIS_PREFIX_KEY: minasplaca_evolution
+      CACHE_REDIS_SAVE_INSTANCES: 'false'
+      CACHE_LOCAL_ENABLED: 'false'
+      WEBHOOK_GLOBAL_ENABLED: 'false'
+
+  app:
+    build: ./app
+    container_name: minasplaca_app
+    networks: [gmx_net, minasplaca_net, n8n_edge]
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.minasplaca.rule=Host(`iaminas.sanjaworks.com`)
+      - traefik.http.routers.minasplaca.entrypoints=websecure
+      - traefik.http.routers.minasplaca.tls.certresolver=le
+      - traefik.http.routers.minasplaca.service=minasplaca
+      - traefik.http.services.minasplaca.loadbalancer.server.port=8095
+    ports:
+      - '0.0.0.0:8095:8095'
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+      evolution-api:
+        condition: service_started
+    environment:
+      PORT: '8095'
+      DATABASE_URL: postgresql://minasplaca:minasplaca_secret@postgres:5432/minasplaca
+      REDIS_URL: redis://redis:6379/0
+      QDRANT_URL: http://qdrant:6333
+      DIRECTUS_URL: http://minasplaca_directus:8055
+      EVOLUTION_URL: http://evolution-api:8080
+      EVOLUTION_API_KEY: minasplaca-evolution-key-2026
+      EVOLUTION_INSTANCE: minasplaca-atendimento
+      MODELO_CHAT_OPENROUTER: openai/gpt-4o-mini
+      OPENROUTER_HABILITADO: 'true'
+      IAMINASPLACA_ADMIN_KEY: minasplaca-pausa-2026
+    volumes:
+      - ./.env:/app/.env:ro
+      - ./data:/app/data:ro
+
+volumes:
+  minasplaca_pg_data:
+  minasplaca_redis_data:
+  minasplaca_qdrant_data:
+  minasplaca_evolution_instances:
+  minasplaca_directus_uploads:
+  minasplaca_directus_extensions:
