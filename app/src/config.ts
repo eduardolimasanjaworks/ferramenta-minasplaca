@@ -35,18 +35,13 @@ export const config = {
   // Directus
   directusUrl: process.env.DIRECTUS_URL ?? 'http://minasplaca_directus:8055',
   directusToken: token('directus', 'DIRECTUS_TOKEN', 'VITE_DIRECTUS_TOKEN'),
+  directusAdminEmail: process.env.IAMINASPLACA_ADMIN_EMAIL ?? 'admin@minasplaca.com',
+  directusAdminPassword: process.env.IAMINASPLACA_ADMIN_PASSWORD ?? 'MinasPlaca2026!',
 
   // Admin
   adminKey: process.env.IAMINASPLACA_ADMIN_KEY ?? 'minasplaca-pausa-2026',
   adminEmail: process.env.IAMINASPLACA_ADMIN_EMAIL ?? 'admin@minasplaca.com',
   adminPassword: process.env.IAMINASPLACA_ADMIN_PASSWORD ?? 'MinasPlaca2026!',
-
-  // Prompt
-  promptPadrao: process.env.PROMPT_PADRAO ?? '',
-  promptArquivoInicial: [
-    '/app/prompt-inicial.txt',
-    '/app/prompt-cliente.txt',
-  ],
 
   // Debounce
   debounceMs: Number(process.env.DEBOUNCE_MS ?? '2500'),

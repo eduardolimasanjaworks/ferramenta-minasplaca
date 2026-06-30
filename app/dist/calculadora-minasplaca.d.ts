@@ -1,28 +1,22 @@
-/**
- * Calculadora comercial Minas Placa.
- */
 export interface Produto {
+    id: string;
     nome: string;
     sku: string;
-    precoUnitario: number;
-    quantidadeMinima: number;
+    preco_unitario: number;
+    quantidade_minima: number;
     unidade: string;
     observacao?: string;
 }
 export interface ItemOrcamento {
     produto: Produto;
     quantidade: number;
-    total: number;
+    subtotal: number;
+    observacao?: string;
 }
 export interface Orcamento {
     itens: ItemOrcamento[];
     total: number;
     observacoes: string[];
 }
-export declare function definirProdutos(novos: Produto[]): void;
-export declare function listarProdutos(): Produto[];
-export declare function calcularOrcamento(solicitacao: Array<{
-    nome: string;
-    quantidade: number;
-}>): Orcamento;
-export declare function textoOrcamento(orcamento: Orcamento): string;
+export declare function calcularOrcamento(mensagem: string): Promise<Orcamento | null>;
+export declare function formatarOrcamento(orcamento: Orcamento): string;

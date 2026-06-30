@@ -14,8 +14,12 @@ interface MensagemUpsertData {
 
 interface WebhookEvolution {
   event?: string;
-  data?: MensagemUpsertData;
+  data?: MensagemUpsertData | null;
   instance?: string;
+}
+
+function normalizarEvento(evento?: string): string {
+  return (evento ?? '').toLowerCase().replace(/\./g, '_');
 }
 
 function extrairTexto(message?: Record<string, unknown>): string {
@@ -40,7 +44,7 @@ export async function rotasWebhook(app: FastifyInstance): Promise<void> {
   app.post('/webhook/evolution', async (req, reply) => {
     const payload = req.body as WebhookEvolution;
 
-    if ((payload.event ?? '').toLowerCase() !== 'messages_upsert') {
+    if (normalizarEvento(payload.event) !== 'messages_upsert') {
       return reply.status(200).send({ ok: true, ignorado: payload.event });
     }
 
@@ -73,6 +77,6 @@ export async function rotasWebhook(app: FastifyInstance): Promise<void> {
       recebidoEm: Date.now(),
     });
 
-    return reply.status(200).send({ ok: true });
+    return reply.status(200).send({ ok: true, processado: true });
   });
 }

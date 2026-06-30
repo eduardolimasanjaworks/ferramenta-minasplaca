@@ -1,5 +1,8 @@
 import { adicionarAoDebounce } from './debounce-minasplaca.js';
 import { jidParaTelefone } from './util/telefone.js';
+function normalizarEvento(evento) {
+    return (evento ?? '').toLowerCase().replace(/\./g, '_');
+}
 function extrairTexto(message) {
     if (!message)
         return '';
@@ -25,7 +28,7 @@ function detectarTipo(message) {
 export async function rotasWebhook(app) {
     app.post('/webhook/evolution', async (req, reply) => {
         const payload = req.body;
-        if ((payload.event ?? '').toLowerCase() !== 'messages_upsert') {
+        if (normalizarEvento(payload.event) !== 'messages_upsert') {
             return reply.status(200).send({ ok: true, ignorado: payload.event });
         }
         const dados = payload.data ?? {};
@@ -52,6 +55,6 @@ export async function rotasWebhook(app) {
             instance: payload.instance ?? 'minasplaca-atendimento',
             recebidoEm: Date.now(),
         });
-        return reply.status(200).send({ ok: true });
+        return reply.status(200).send({ ok: true, processado: true });
     });
 }

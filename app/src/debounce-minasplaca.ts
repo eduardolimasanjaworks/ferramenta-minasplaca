@@ -26,6 +26,7 @@ export async function adicionarAoDebounce(item: ItemDebounce): Promise<void> {
   pipeline.expire(chaveLista, TTL);
   pipeline.set(chaveTimer, '1', 'EX', Math.ceil(config.debounceMs / 1000));
   await pipeline.exec();
+  console.log(`[debounce] mensagem adicionada para ${telefone}`);
 }
 
 export async function processarContato(remoteJid: string): Promise<void> {
@@ -38,6 +39,7 @@ export async function processarContato(remoteJid: string): Promise<void> {
 
   try {
     const raw = await redis.lrange(chaveLista, 0, -1);
+    console.log(`[debounce] processando ${telefone}: ${raw.length} mensagens`);
     if (!raw.length) return;
     await redis.del(chaveLista);
 
@@ -51,6 +53,7 @@ export async function processarContato(remoteJid: string): Promise<void> {
     const pushName = itens[0]?.pushName;
     const historico = await obterHistorico(telefone, 20);
 
+    console.log(`[debounce] chamando agente para ${telefone}`);
     const resposta = await gerarRespostaAgente({
       telefone,
       mensagem,
@@ -63,22 +66,27 @@ export async function processarContato(remoteJid: string): Promise<void> {
       { role: 'assistant', content: resposta, timestamp: Date.now() },
     ]);
 
-    await tentarEnviarResposta(telefone, resposta, config.evolutionInstance, {
+    console.log(`[debounce] enviando resposta para ${telefone}: ${resposta.slice(0, 80)}`);
+    const resultado = await tentarEnviarResposta(telefone, resposta, config.evolutionInstance, {
       remoteJid,
       mensagensEntrada: itens.length,
     });
+    console.log(`[debounce] resultado envio:`, resultado);
   } catch (err) {
     const motivo = err instanceof Error ? err.message : String(err);
     logEvento('debounce', 'Erro ao processar contato', { telefone, motivo }, 'error');
+    console.error(`[debounce] erro: ${motivo}`);
   } finally {
     await redis.del(chaveLock);
   }
 }
 
 export function iniciarWorkerDebounce(intervaloMs = 300): void {
+  console.log('[debounce] worker iniciado');
   async function tick() {
     try {
       const chaves = await redis.keys(`${PREFIXO_TIMER}*`);
+      if (chaves.length) console.log(`[debounce] timers encontrados: ${chaves.length}`);
       for (const chave of chaves) {
         const telefone = chave.replace(PREFIXO_TIMER, '');
         await redis.del(chave);
@@ -87,6 +95,7 @@ export function iniciarWorkerDebounce(intervaloMs = 300): void {
     } catch (err) {
       const motivo = err instanceof Error ? err.message : String(err);
       logEvento('debounce', 'Erro no worker', { motivo }, 'error');
+      console.error(`[debounce] worker erro: ${motivo}`);
     }
     setTimeout(tick, intervaloMs);
   }

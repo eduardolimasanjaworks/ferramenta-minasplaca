@@ -3,7 +3,7 @@
  */
 import { config } from './config.js';
 import { buscarContexto } from './rag-minasplaca.js';
-import { calcularOrcamento, textoOrcamento } from './calculadora-minasplaca.js';
+import { calcularOrcamento, formatarOrcamento } from './calculadora-minasplaca.js';
 import { obterPromptBruto } from './prompt-minasplaca.js';
 export async function gerarRespostaAgente(opts) {
     const { mensagem, historico, pushName } = opts;
@@ -16,14 +16,19 @@ export async function gerarRespostaAgente(opts) {
         .slice(-6)
         .map((h) => `${h.role === 'user' ? 'Cliente' : 'Assistente'}: ${h.content}`)
         .join('\n');
-    const system = `${promptBase}\n\n${contextoTexto}Voce e a assistente comercial da Minas Placa. Responda de forma clara, prestativa e objetiva. Se o cliente pedir orcamento, calcule os valores conforme as regras de produtos.`.trim();
+    const orcamento = await calcularOrcamento(mensagem);
+    const system = `${promptBase}\n\n${contextoTexto}Voce e a assistente comercial da Minas Placa. Responda de forma clara, prestativa e objetiva. Quando o cliente pedir orcamento, use os valores calculados abaixo.`.trim();
+    const orcamentoTexto = orcamento ? formatarOrcamento(orcamento) : '';
     const user = pushName ? `${pushName}: ${mensagem}` : mensagem;
+    const userComOrcamento = orcamentoTexto
+        ? `${user}\n\n${orcamentoTexto}`
+        : user;
     const body = {
         model: config.modeloChat,
         messages: [
             { role: 'system', content: system },
             ...(historicoTexto ? [{ role: 'user', content: historicoTexto }] : []),
-            { role: 'user', content: user },
+            { role: 'user', content: userComOrcamento },
         ],
     };
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -42,24 +47,5 @@ export async function gerarRespostaAgente(opts) {
     }
     const json = (await res.json());
     const respostaBruta = json.choices?.[0]?.message?.content?.trim() ?? '';
-    const orcamento = tentarExtrairOrcamento(mensagem);
-    if (orcamento) {
-        return textoOrcamento(orcamento);
-    }
     return respostaBruta || 'Oi! Sou a assistente da Minas Placa. Como posso te ajudar?';
-}
-function tentarExtrairOrcamento(mensagem) {
-    const linhas = mensagem.split(/[\n,;]/);
-    const solicitacao = [];
-    for (const linha of linhas) {
-        const match = linha.match(/(\d+)\s*(?:un|m|metros|pecas|placas)?\s*(?:de|da|do)?\s*([\w\s\u00C0-\u00FF]+)/i);
-        if (match) {
-            const qtd = Number(match[1]);
-            const nome = match[2].trim();
-            solicitacao.push({ nome, quantidade: qtd });
-        }
-    }
-    if (!solicitacao.length)
-        return null;
-    return calcularOrcamento(solicitacao);
 }

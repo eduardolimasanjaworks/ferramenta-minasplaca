@@ -15,10 +15,10 @@ export declare const config: {
     qdrantUrl: string;
     directusUrl: string;
     directusToken: string | undefined;
+    directusAdminEmail: string;
+    directusAdminPassword: string;
     adminKey: string;
     adminEmail: string;
     adminPassword: string;
-    promptPadrao: string;
-    promptArquivoInicial: string[];
     debounceMs: number;
 };
