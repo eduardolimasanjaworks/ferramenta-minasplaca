@@ -104,11 +104,45 @@ Se algum dado ainda estiver faltando, continue a conversa para coletá-lo antes 
         required: ['cepDestino']
       }
     }
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'gerar_preview_patrimonial',
+      description: `Gera e envia um preview/layout das placas patrimoniais para o cliente.
+Chame esta ferramenta SEMPRE que o cliente demonstrar interesse em ver um layout, simulação ou exemplo de como ficaria a placa com a logo dele, E você já tiver o link da imagem/logo do cliente (que aparece no histórico como [Imagem: URL] ou fornecido como link).
+Você pode perguntar se ele quer com furos, código de barras ou QR Code para refinar a simulação.`,
+      parameters: {
+        type: 'object',
+        properties: {
+          link_logo: {
+            type: 'string',
+            description: 'URL da imagem ou logotipo do cliente para estampar na placa.'
+          },
+          furos: {
+            type: 'string',
+            enum: ['sim', 'não'],
+            description: 'Se a simulação deve incluir furos nas laterais da placa. Padrão "não".'
+          },
+          barras: {
+            type: 'string',
+            enum: ['sim', 'não'],
+            description: 'Se a simulação deve incluir código de barras. Padrão "não".'
+          },
+          qrcode: {
+            type: 'string',
+            enum: ['sim', 'não'],
+            description: 'Se a simulação deve incluir QR Code. Padrão "não".'
+          }
+        },
+        required: ['link_logo']
+      }
+    }
   }
 ];
 
 export async function gerarRespostaAgente(opts: OpcoesResposta): Promise<string> {
-  const { mensagem, historico, pushName } = opts;
+  const { telefone, mensagem, historico, pushName } = opts;
 
   const promptBase = await obterPromptBruto();
   const contexto = await buscarContexto(mensagem);
@@ -233,23 +267,39 @@ DIRETRIZES DE FORMATO (WhatsApp):
         // TOOL: verificar_cliente (via API VHSys)
         // -----------------------------------------------
         else if (toolName === 'verificar_cliente') {
-          console.log(`[agente] verificar_cliente CNPJ/CPF: ${args.cnpj_cliente}`);
+          console.log(`[agente] verificar_cliente CNPJ/CPF recebido: ${args.cnpj_cliente}`);
           try {
-            const cnpjFormatado = String(args.cnpj_cliente).replace(/\D/g, '');
+            const digitos = String(args.cnpj_cliente).replace(/\D/g, '');
             
-            if (!cnpjFormatado) {
+            if (!digitos) {
               toolResult = 'CNPJ/CPF inválido. Peça para o cliente enviar o número corretamente.';
             } else {
-              // Busca cliente na API do VHSys
-              const urlCliente = `https://api.vhsys.com/v2/clientes?cnpj_cliente=${cnpjFormatado}`;
+              // Formata para o padrão brasileiro de pontuação
+              let docFormatado = digitos;
+              if (digitos.length === 14) {
+                docFormatado = digitos.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+              } else if (digitos.length === 11) {
+                docFormatado = digitos.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+              }
+
               const headers = {
                 'access-token': 'MKOKBTBHXUNBZaPLADNbIWYHGeKQca',
                 'secret-access-token': 'q0GcQ0kT0Vy0SNpWsytPiOZnhEOgFAa',
                 'User-Agent': 'MinasPlaca-App/1.0'
               };
 
-              const resCliente = await fetch(urlCliente, { headers });
-              const dataCliente = await resCliente.json() as any;
+              console.log(`[agente] buscando no VHSys com documento formatado: ${docFormatado}`);
+              let urlCliente = `https://api.vhsys.com/v2/clientes?cnpj_cliente=${encodeURIComponent(docFormatado)}`;
+              let resCliente = await fetch(urlCliente, { headers });
+              let dataCliente = await resCliente.json() as any;
+
+              // Se não encontrou com pontuação, tenta buscar apenas com os dígitos limpos
+              if (!dataCliente || !Array.isArray(dataCliente.data) || dataCliente.data.length === 0) {
+                console.log(`[agente] não encontrado com pontuação. Tentando apenas dígitos: ${digitos}`);
+                urlCliente = `https://api.vhsys.com/v2/clientes?cnpj_cliente=${digitos}`;
+                resCliente = await fetch(urlCliente, { headers });
+                dataCliente = await resCliente.json() as any;
+              }
 
               if (dataCliente && Array.isArray(dataCliente.data) && dataCliente.data.length > 0) {
                 const clienteEncontrado = dataCliente.data[0];
@@ -282,6 +332,100 @@ DIRETRIZES DE FORMATO (WhatsApp):
           } catch (err) {
             console.error('[agente] Erro ao verificar cliente na API VHSys:', err);
             toolResult = 'Houve uma instabilidade ao consultar o sistema de cadastro. Continue o atendimento normalmente pedindo as informações que precisar.';
+          }
+        }
+
+        // -----------------------------------------------
+        // TOOL: gerar_preview_patrimonial (Simulação layout)
+        // -----------------------------------------------
+        else if (toolName === 'gerar_preview_patrimonial') {
+          console.log(`[agente] gerar_preview_patrimonial chamado:`, args);
+          try {
+            const linkLogo = String(args.link_logo);
+            const furos = args.furos === 'sim' ? 'sim' : 'não';
+            const barras = args.barras === 'sim' ? 'sim' : 'não';
+            const qrcode = args.qrcode === 'sim' ? 'sim' : 'não';
+
+            // Seleção de templateID equivalente às condicionais do n8n
+            let templateId = 'template-1777527773246'; // Padrão sem furos, sem barras, sem qrcode (ou com qrcode)
+            let incluirDelivery = false;
+
+            if (furos === 'sim' && barras === 'sim' && qrcode !== 'sim') {
+              templateId = 'template-1777527533067';
+              incluirDelivery = true;
+            } else if (furos !== 'sim' && barras === 'sim' && qrcode !== 'sim') {
+              templateId = 'template-1777527333570';
+              incluirDelivery = true;
+            } else if (furos === 'sim' && barras !== 'sim' && qrcode === 'sim') {
+              templateId = 'template-1777527656477';
+              incluirDelivery = true;
+            } else if (furos === 'sim' && barras !== 'sim' && qrcode !== 'sim') {
+              templateId = 'template-1777527859311';
+            } else if (furos !== 'sim' && barras !== 'sim' && qrcode === 'sim') {
+              templateId = 'template-1777527773246';
+            } else if (furos !== 'sim' && barras !== 'sim' && qrcode !== 'sim') {
+              templateId = 'template-1777527773246';
+            }
+
+            const payloadBody: any = {
+              templateId,
+              data: {
+                imagem_1: linkLogo
+              }
+            };
+            if (incluirDelivery) {
+              payloadBody.data.delivery = 'link';
+            }
+
+            console.log(`[agente] Requisitando simulação de PDF para o template ${templateId}`);
+            const resPdf = await fetch('https://editor.propostas.sanjaworks.com/api/gerar-pdf', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(payloadBody)
+            });
+
+            if (!resPdf.ok) {
+              throw new Error(`Erro no serviço de PDF: ${resPdf.status} ${resPdf.statusText}`);
+            }
+
+            const dataPdf = await resPdf.json() as any;
+            const linkPdf = dataPdf.link;
+
+            if (linkPdf) {
+              console.log(`[agente] PDF gerado com sucesso: ${linkPdf}`);
+              
+              // Envia o PDF via Evolution API
+              const urlSendMedia = `${config.evolutionUrl}/message/sendMedia/${config.evolutionInstance}`;
+              const resMedia = await fetch(urlSendMedia, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  apikey: config.evolutionApiKey
+                },
+                body: JSON.stringify({
+                  number: telefone,
+                  mediatype: 'document',
+                  media: linkPdf,
+                  fileName: 'simulacao-placa.pdf',
+                  caption: 'Aqui está a simulação do layout da sua placa!'
+                })
+              });
+
+              if (resMedia.ok) {
+                toolResult = `Preview gerado e enviado com sucesso para o WhatsApp do cliente! Link do PDF: ${linkPdf}. Confirme na sua resposta de texto que o preview foi enviado no chat para ele visualizar.`;
+              } else {
+                const txtErr = await resMedia.text();
+                console.error(`[agente] Erro ao enviar media via Evolution:`, txtErr);
+                toolResult = `O layout foi gerado com sucesso (Link: ${linkPdf}), mas ocorreu uma falha ao enviar o arquivo de forma direta. Envie este link de visualização na sua resposta de texto para o cliente: ${linkPdf}`;
+              }
+            } else {
+              toolResult = 'O serviço de PDF não retornou o link do arquivo gerado.';
+            }
+          } catch (err) {
+            console.error('[agente] Erro na ferramenta gerar_preview_patrimonial:', err);
+            toolResult = 'Houve um erro técnico ao gerar a simulação do layout. Continue o atendimento informando que tentará enviar o layout em instantes.';
           }
         }
 

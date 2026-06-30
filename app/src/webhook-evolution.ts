@@ -26,9 +26,18 @@ function extrairTexto(message?: Record<string, unknown>): string {
   if (!message) return '';
   const conversation = (message.conversation as string) ?? '';
   const extended = (message.extendedTextMessage as { text?: string })?.text ?? '';
-  const image = (message.imageMessage as { caption?: string })?.caption ?? '';
-  const video = (message.videoMessage as { caption?: string })?.caption ?? '';
-  return conversation || extended || image || video;
+  
+  const imageMsg = message.imageMessage as { caption?: string; url?: string; mediaUrl?: string } | undefined;
+  const imageCaption = imageMsg?.caption ?? '';
+  const imageUrl = imageMsg?.mediaUrl || imageMsg?.url || '';
+  const imageText = imageUrl ? `[Imagem: ${imageUrl}] ${imageCaption}`.trim() : imageCaption;
+  
+  const videoMsg = message.videoMessage as { caption?: string; url?: string; mediaUrl?: string } | undefined;
+  const videoCaption = videoMsg?.caption ?? '';
+  const videoUrl = videoMsg?.mediaUrl || videoMsg?.url || '';
+  const videoText = videoUrl ? `[Vídeo: ${videoUrl}] ${videoCaption}`.trim() : videoCaption;
+  
+  return conversation || extended || imageText || videoText;
 }
 
 function detectarTipo(message?: Record<string, unknown>): ItemDebounce['tipo'] {

@@ -19,7 +19,11 @@ export function dividirResposta(texto: string, maxCaracteres = 1500): string[] {
 }
 
 export function normalizarRespostaWhatsapp(texto: string): string {
-  return texto.trim().replace(/\s+/g, ' ');
+  return texto
+    .split(/\r?\n/)
+    .map(linha => linha.trim().replace(/[ \t]+/g, ' '))
+    .join('\n')
+    .trim();
 }
 
 export function jidEhGrupoOuLista(jid: string): boolean {
