@@ -89,7 +89,9 @@ function singularizar(texto: string): string {
     .replace(/\bplacas\b/g, 'placa')
     .replace(/\betiquetas\b/g, 'etiqueta')
     .replace(/\badesivos\b/g, 'adesivo')
-    .replace(/\bmateriais\b/g, 'material');
+    .replace(/\bmateriais\b/g, 'material')
+    .replace(/\brefletivos\b/g, 'refletivo')
+    .replace(/\b(\w{3,})s\b/g, '$1');
 }
 
 function termosProduto(produto: Produto): string[] {
