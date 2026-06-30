@@ -161,8 +161,10 @@ services:
       MODELO_CHAT_OPENROUTER: openai/gpt-4o-mini
       OPENROUTER_HABILITADO: 'true'
       IAMINASPLACA_ADMIN_KEY: minasplaca-pausa-2026
+      IAGMX_WEBHOOK_EVOLUTION_URL: http://app:8095/webhook/evolution
     volumes:
       - ./.env:/app/.env:ro
+      - ./prompt-cliente.txt:/app/prompt-cliente.txt:ro
       - ./data:/app/data:ro
 
 volumes:

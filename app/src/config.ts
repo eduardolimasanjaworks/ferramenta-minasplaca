@@ -45,4 +45,7 @@ export const config = {
 
   // Debounce
   debounceMs: Number(process.env.DEBOUNCE_MS ?? '2500'),
+
+  // n8n
+  n8nUrl: process.env.N8N_URL ?? 'http://localhost:5678',
 };

@@ -58,8 +58,9 @@ export async function criarServidor() {
         headers: { apikey: config.evolutionApiKey },
       });
       const data = await res.json() as { state?: string; status?: { state?: string }; instance?: { state?: string } };
-      const state = data.instance?.state ?? data.state ?? data.status?.state ?? 'UNKNOWN';
-      return { connected: state.toUpperCase() === 'CONNECTED', state };
+      const state = String(data.instance?.state ?? data.state ?? data.status?.state ?? 'UNKNOWN').toLowerCase();
+      const connected = state === 'open' || state === 'connected';
+      return { connected, state };
     } catch (err) {
       return reply.status(502).send({ error: String(err) });
     }
@@ -70,16 +71,69 @@ export async function criarServidor() {
       const state = await fetch(`${config.evolutionUrl}/instance/connectionState/${config.evolutionInstance}`, {
         headers: { apikey: config.evolutionApiKey },
       });
-      const stateData = await state.json() as { state?: string };
-      if ((stateData.state ?? '').toUpperCase() === 'CONNECTED') {
+      const stateData = await state.json() as { state?: string; instance?: { state?: string } };
+      const currentState = String(stateData.instance?.state ?? stateData.state ?? '').toLowerCase();
+      if (currentState === 'open' || currentState === 'connected') {
         return { connected: true };
       }
-      const res = await fetch(`${config.evolutionUrl}/instance/connect/${config.evolutionInstance}`, {
+      let res = await fetch(`${config.evolutionUrl}/instance/connect/${config.evolutionInstance}`, {
         headers: { apikey: config.evolutionApiKey },
       });
-      const data = await res.json() as { code?: string; qrcode?: string; pairingCode?: string | null };
-      return { code: data.code ?? data.qrcode, pairingCode: data.pairingCode };
+      let data = await res.json() as { code?: string; qrcode?: string; base64?: string; pairingCode?: string | null; message?: any; error?: any; status?: number };
+      
+      // Se a instância não existir, cria ela automaticamente
+      if (res.status === 404 || (data.message && String(data.message).includes('does not exist')) || data.status === 404) {
+        console.log('[servidor] Instancia nao existe. Criando...');
+        const createRes = await fetch(`${config.evolutionUrl}/instance/create`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: config.evolutionApiKey,
+          },
+          body: JSON.stringify({
+            instanceName: config.evolutionInstance,
+            token: config.evolutionApiKey,
+            qrcode: true,
+            integration: 'WHATSAPP-BAILEYS',
+          }),
+          signal: AbortSignal.timeout(25_000),
+        });
+        if (!createRes.ok) {
+          const corpo = await createRes.text().catch(() => '');
+          throw new Error(`Falha ao criar instancia ${config.evolutionInstance} (${createRes.status}): ${corpo}`);
+        }
+        console.log('[servidor] Instancia criada com sucesso. Obtendo QR...');
+        
+        // Configura o webhook na nova instância
+        const URL_WEBHOOK_PADRAO = process.env.IAGMX_WEBHOOK_EVOLUTION_URL?.trim() || 'http://app:8095/webhook/evolution';
+        await fetch(`${config.evolutionUrl}/webhook/set/${config.evolutionInstance}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: config.evolutionApiKey,
+          },
+          body: JSON.stringify({
+            webhook: {
+              enabled: true,
+              url: URL_WEBHOOK_PADRAO,
+              webhook_by_events: false,
+              webhook_base64: true,
+              events: ['MESSAGES_UPSERT', 'CONNECTION_UPDATE', 'QRCODE_UPDATED'],
+            },
+          }),
+        }).catch(err => console.error('[servidor] Erro ao configurar webhook:', err));
+
+        // Tenta conectar novamente
+        res = await fetch(`${config.evolutionUrl}/instance/connect/${config.evolutionInstance}`, {
+          headers: { apikey: config.evolutionApiKey },
+        });
+        data = await res.json() as any;
+      }
+
+      console.log('[servidor] Resposta connect Evolution:', data);
+      return { code: data.base64 ?? data.code ?? data.qrcode, pairingCode: data.pairingCode, message: data.message ?? data.error };
     } catch (err) {
+      console.error('[servidor] Erro ao obter QR:', err);
       return reply.status(502).send({ error: String(err) });
     }
   });

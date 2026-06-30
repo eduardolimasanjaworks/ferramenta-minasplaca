@@ -10,8 +10,9 @@ export async function obterStatusConexao(instance: string): Promise<{ conectado:
       headers: { apikey: config.evolutionApiKey },
     });
     if (!res.ok) return { conectado: false };
-    const data = await res.json() as { state?: string };
-    return { conectado: (data.state ?? '').toUpperCase() === 'CONNECTED', state: data.state };
+    const data = await res.json() as { state?: string; instance?: { state?: string } };
+    const state = String(data.instance?.state ?? data.state ?? '').toLowerCase();
+    return { conectado: state === 'open' || state === 'connected', state };
   } catch {
     return { conectado: false };
   }

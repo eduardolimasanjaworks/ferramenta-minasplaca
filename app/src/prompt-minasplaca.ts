@@ -39,6 +39,9 @@ ESTILO DE RESPOSTA:
 - Separe ideias em topicos ou paragrafos para facilitar leitura no celular.
 - Nao use emojis a menos que o cliente use.`;
 
+import { readFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+
 export async function inicializarBancoPrompt(): Promise<void> {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS configuracao (
@@ -48,16 +51,34 @@ export async function inicializarBancoPrompt(): Promise<void> {
     )
   `);
 
+  let promptInicial = PROMPT_PADRAO;
+  try {
+    const caminhosPossiveis = [
+      resolve(process.cwd(), '../prompt-cliente.txt'),
+      resolve(process.cwd(), './prompt-cliente.txt'),
+      resolve(process.cwd(), './data/prompt-cliente.txt')
+    ];
+    for (const caminho of caminhosPossiveis) {
+      if (existsSync(caminho)) {
+        promptInicial = readFileSync(caminho, 'utf-8');
+        console.log(`[prompt] Carregando prompt a partir de: ${caminho}`);
+        break;
+      }
+    }
+  } catch (err) {
+    console.error('[prompt] Erro ao ler prompt-cliente.txt:', err);
+  }
+
   const existe = await pool.query('SELECT valor FROM configuracao WHERE chave = $1', ['prompt_sistema']);
   if (existe.rowCount === 0) {
     await pool.query(
       'INSERT INTO configuracao (chave, valor) VALUES ($1, $2)',
-      ['prompt_sistema', PROMPT_PADRAO],
+      ['prompt_sistema', promptInicial],
     );
   } else {
     await pool.query(
       'UPDATE configuracao SET valor = $2, atualizado_em = NOW() WHERE chave = $1',
-      ['prompt_sistema', PROMPT_PADRAO],
+      ['prompt_sistema', promptInicial],
     );
   }
 }
