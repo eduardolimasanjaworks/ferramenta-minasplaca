@@ -51,7 +51,7 @@ export async function processarContato(remoteJid: string): Promise<void> {
     if (!mensagem) return;
 
     const pushName = itens[0]?.pushName;
-    const historico = await obterHistorico(telefone, 20);
+    const historico = await obterHistorico(telefone, 100);
 
     console.log(`[debounce] chamando agente para ${telefone}`);
     const resposta = await gerarRespostaAgente({

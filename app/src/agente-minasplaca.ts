@@ -168,9 +168,9 @@ DIRETRIZES DE FORMATO (WhatsApp):
 3. Tópicos com emojis discretos (📍, 💰, 📦, 👉) para listas.
 4. Tom humano e consultivo como o Rafael.`.trim();
 
-  const user = pushName ? `${pushName}: ${mensagem}` : mensagem;
+  const user = mensagem;
 
-  const mensagensHistorico = historico.slice(-14).map((h) => ({
+  const mensagensHistorico = historico.slice(-98).map((h) => ({
     role: h.role === 'user' ? 'user' : 'assistant',
     content: h.content,
   }));
