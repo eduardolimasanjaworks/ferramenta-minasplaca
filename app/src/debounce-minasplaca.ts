@@ -45,7 +45,7 @@ export async function processarContato(remoteJid: string): Promise<void> {
 
     const itens: ItemDebounce[] = raw.map((s) => JSON.parse(s));
     const textos = itens
-      .filter((i) => i.tipo === 'texto' && i.conteudo)
+      .filter((i) => i.conteudo)
       .map((i) => i.conteudo);
     const mensagem = textos.join('\n\n').trim();
     if (!mensagem) return;

@@ -271,10 +271,10 @@ function obterTamanhoMaisProximo(
 // -----------------------------------------------------------------------------
 
 export async function calcularOrcamento(
-  inputOrParams: string | ParamsCalculo
+  inputOrParams: string | ParamsCalculo | ParamsCalculo[]
 ): Promise<Orcamento | null> {
 
-  let params: ParamsCalculo;
+  let paramsArray: ParamsCalculo[] = [];
 
   // Suporte a chamada por string (legado) ou por objeto estruturado (tool call)
   if (typeof inputOrParams === 'string') {
@@ -301,7 +301,7 @@ export async function calcularOrcamento(
 
     const qtdEncontrada = numeros.find(n => !msg.includes(n + 'x') && !msg.includes('x' + n));
 
-    params = {
+    paramsArray = [{
       material: mat,
       largura: dimMatch ? parseInt(dimMatch[1]) : 30,
       comprimento: dimMatch ? parseInt(dimMatch[2]) : 15,
@@ -309,156 +309,170 @@ export async function calcularOrcamento(
       impressao_uv: msg.includes('uv') || msg.includes('u.v'),
       inox_430: msg.includes('430'),
       espessura_pvc: msg.includes('1mm') ? '1mm' : '2mm',
-    };
+    }];
+  } else if (Array.isArray(inputOrParams)) {
+    paramsArray = inputOrParams;
   } else {
-    params = inputOrParams;
+    paramsArray = [inputOrParams];
   }
 
-  const { material, largura, comprimento, quantidade, impressao_uv, inox_430, espessura_pvc } = params;
-  const areaCm2 = (largura * comprimento) / 100; // área em cm²
-  const chaveNormalizada = normalizarTamanho(largura, comprimento, material);
-
-  let precoUnitario = 0;
-  let larguraFinal = largura;
-  let comprimentoFinal = comprimento;
-  const observacoes: string[] = [];
-  let qtd = quantidade;
-
-  // -------------------------------------------------------------------------
-  if (material === 'poliester') {
-    if (qtd < 51) { qtd = 51; observacoes.push('Quantidade mínima para Poliéster: *51 unidades*.'); }
-    const faixa = encontrarFaixa(qtd, TABELA_POLIESTER)!;
-    if (faixa.precos[chaveNormalizada] !== undefined) {
-      precoUnitario = faixa.precos[chaveNormalizada];
-    } else {
-      const prox = obterTamanhoMaisProximo(largura, comprimento, faixa);
-      precoUnitario = (prox.preco / prox.area) * (largura * comprimento);
-      observacoes.push(`Tamanho especial calculado proporcionalmente a ${prox.tamanho}.`);
-    }
-    if (impressao_uv) { precoUnitario += 0.05; observacoes.push('Adicionado *R$ 0,05/un* por Impressão U.V.'); }
-  }
-
-  // -------------------------------------------------------------------------
-  else if (material === 'void') {
-    if (qtd < 51) { qtd = 51; observacoes.push('Quantidade mínima para VOID: *51 unidades*.'); }
-    const faixa = encontrarFaixa(qtd, TABELA_VOID)!;
-    if (faixa.precos[chaveNormalizada] !== undefined) {
-      precoUnitario = faixa.precos[chaveNormalizada];
-    } else {
-      const prox = obterTamanhoMaisProximo(largura, comprimento, faixa);
-      precoUnitario = (prox.preco / prox.area) * (largura * comprimento);
-      observacoes.push(`Tamanho especial calculado proporcionalmente a ${prox.tamanho}.`);
-    }
-    if (impressao_uv) { precoUnitario += 0.05; observacoes.push('Adicionado *R$ 0,05/un* por Impressão U.V.'); }
-  }
-
-  // -------------------------------------------------------------------------
-  else if (material === 'vinil') {
-    if (qtd < 51) { qtd = 51; observacoes.push('Quantidade mínima para Vinil: *51 unidades*.'); }
-    const faixa = encontrarFaixa(qtd, TABELA_VINIL)!;
-    if (faixa.precos[chaveNormalizada] !== undefined) {
-      precoUnitario = faixa.precos[chaveNormalizada];
-    } else {
-      const prox = obterTamanhoMaisProximo(largura, comprimento, faixa);
-      precoUnitario = (prox.preco / prox.area) * (largura * comprimento);
-      observacoes.push(`Tamanho especial calculado proporcionalmente a ${prox.tamanho}.`);
-    }
-  }
-
-  // -------------------------------------------------------------------------
-  else if (material === 'destrutivel') {
-    if (qtd < 500) { observacoes.push('⚠️ Pedido mínimo para Vinil Destrutível: *500 unidades*.'); }
-    const faixa = encontrarFaixa(qtd, TABELA_DESTRUTIVEL)!;
-    if (faixa.precos[chaveNormalizada] !== undefined) {
-      precoUnitario = faixa.precos[chaveNormalizada];
-    } else {
-      const prox = obterTamanhoMaisProximo(largura, comprimento, faixa);
-      precoUnitario = (prox.preco / prox.area) * (largura * comprimento);
-      observacoes.push(`Tamanho especial calculado proporcionalmente a ${prox.tamanho}.`);
-    }
-  }
-
-  // -------------------------------------------------------------------------
-  else if (material === 'flextag') {
-    if (qtd < 51) { qtd = 51; observacoes.push('Quantidade mínima para Flextag: *51 unidades*.'); }
-    const faixa = encontrarFaixa(qtd, TABELA_FLEXTAG)!;
-    if (faixa.precos[chaveNormalizada] !== undefined) {
-      precoUnitario = faixa.precos[chaveNormalizada];
-    } else {
-      precoUnitario = areaCm2 * 0.08;
-      observacoes.push('Tamanho especial: *Área (cm²) × R$ 0,08*. Corte com quinas vivas.');
-    }
-  }
-
-  // -------------------------------------------------------------------------
-  else if (material === 'aluminio') {
-    if (qtd < 51) { qtd = 51; observacoes.push('Quantidade mínima para Alumínio: *51 unidades*.'); }
-    const faixa = encontrarFaixa(qtd, TABELA_ALUMINIO)!;
-    if (faixa.precos[chaveNormalizada] !== undefined) {
-      precoUnitario = faixa.precos[chaveNormalizada];
-    } else {
-      precoUnitario = areaCm2 * 0.08;
-      observacoes.push('Tamanho especial: *Área (cm²) × R$ 0,08*. Corte com quinas vivas.');
-    }
-  }
-
-  // -------------------------------------------------------------------------
-  else if (material === 'inox') {
-    if (qtd < 51) { qtd = 51; observacoes.push('Quantidade mínima para Aço Inox: *51 unidades*.'); }
-    // Aço Inox aceita apenas 45x15 e 50x20
-    let chaveInox = '45x15';
-    if (largura === 50 && comprimento === 20 || largura === 20 && comprimento === 50) {
-      chaveInox = '50x20';
-      larguraFinal = 50; comprimentoFinal = 20;
-    } else if (largura === 45 && comprimento === 15 || largura === 15 && comprimento === 45) {
-      chaveInox = '45x15';
-      larguraFinal = 45; comprimentoFinal = 15;
-    } else {
-      // Tamanho não disponível — retorna null para a IA informar ao cliente
-      return null;
-    }
-    const faixa = encontrarFaixa(qtd, TABELA_AÇO_INOX)!;
-    precoUnitario = faixa.precos[chaveInox];
-    if (inox_430) { precoUnitario -= 0.08; observacoes.push('Desconto *R$ 0,08/un* aplicado para Inox 430.'); }
-    observacoes.push('Prazo de produção: *10 a 12 dias úteis*.');
-  }
-
-  // -------------------------------------------------------------------------
-  else if (material === 'acm') {
-    if (qtd < 10) { qtd = 10; observacoes.push('Quantidade mínima para ACM: *10 unidades*.'); }
-    precoUnitario = areaCm2 * 0.08;
-    observacoes.push('Calculado: *Área (cm²) × R$ 0,08*.');
-  }
-
-  // -------------------------------------------------------------------------
-  else if (material === 'pvc') {
-    if (qtd < 10) { qtd = 10; observacoes.push('Quantidade mínima para PVC: *10 unidades*.'); }
-    const taxa = (espessura_pvc === '1mm') ? 0.02 : 0.03;
-    precoUnitario = areaCm2 * taxa;
-    observacoes.push(`Calculado PVC ${espessura_pvc ?? '2mm'}: *Área (cm²) × R$ ${taxa.toFixed(2)}*.`);
-  }
-
-  // -------------------------------------------------------------------------
-  else if (material === 'ribbon_resina') { precoUnitario = 39.00; }
-  else if (material === 'ribbon_cera')   { precoUnitario = 19.00; }
-  else if (material === 'cola')          { precoUnitario = 30.00; observacoes.push('Cola junta de motor 3M. Rende ~200 placas.'); }
-
-  if (precoUnitario <= 0) return null;
-
-  const subtotal = qtd * precoUnitario;
-  const nomeMaterial = material.charAt(0).toUpperCase() + material.slice(1).replace(/_/g, ' ');
-
-  const item: ItemOrcamento = {
-    material: nomeMaterial,
-    largura: larguraFinal,
-    comprimento: comprimentoFinal,
-    quantidade: qtd,
-    precoUnitario,
-    subtotal,
-    observacoes,
+  const orcamentoFinal: Orcamento = {
+    itens: [],
+    total: 0,
+    observacoes: []
   };
 
-  return { itens: [item], total: subtotal, observacoes };
+  for (const params of paramsArray) {
+    const { material, largura, comprimento, quantidade, impressao_uv, inox_430, espessura_pvc } = params;
+    const areaCm2 = (largura * comprimento) / 100; // área em cm²
+    const chaveNormalizada = normalizarTamanho(largura, comprimento, material);
+
+    let precoUnitario = 0;
+    let larguraFinal = largura;
+    let comprimentoFinal = comprimento;
+    const obsItem: string[] = [];
+    let qtd = quantidade;
+
+    // -------------------------------------------------------------------------
+    if (material === 'poliester') {
+      if (qtd < 51) { qtd = 51; obsItem.push('Quantidade mínima para Poliéster: *51 unidades*.'); }
+      const faixa = encontrarFaixa(qtd, TABELA_POLIESTER)!;
+      if (faixa.precos[chaveNormalizada] !== undefined) {
+        precoUnitario = faixa.precos[chaveNormalizada];
+      } else {
+        const prox = obterTamanhoMaisProximo(largura, comprimento, faixa);
+        precoUnitario = (prox.preco / prox.area) * (largura * comprimento);
+        obsItem.push(`Tamanho especial calculado proporcionalmente a ${prox.tamanho}.`);
+      }
+      if (impressao_uv) { precoUnitario += 0.05; obsItem.push('Adicionado *R$ 0,05/un* por Impressão U.V.'); }
+    }
+
+    // -------------------------------------------------------------------------
+    else if (material === 'void') {
+      if (qtd < 51) { qtd = 51; obsItem.push('Quantidade mínima para VOID: *51 unidades*.'); }
+      const faixa = encontrarFaixa(qtd, TABELA_VOID)!;
+      if (faixa.precos[chaveNormalizada] !== undefined) {
+        precoUnitario = faixa.precos[chaveNormalizada];
+      } else {
+        const prox = obterTamanhoMaisProximo(largura, comprimento, faixa);
+        precoUnitario = (prox.preco / prox.area) * (largura * comprimento);
+        obsItem.push(`Tamanho especial calculado proporcionalmente a ${prox.tamanho}.`);
+      }
+      if (impressao_uv) { precoUnitario += 0.05; obsItem.push('Adicionado *R$ 0,05/un* por Impressão U.V.'); }
+    }
+
+    // -------------------------------------------------------------------------
+    else if (material === 'vinil') {
+      if (qtd < 51) { qtd = 51; obsItem.push('Quantidade mínima para Vinil: *51 unidades*.'); }
+      const faixa = encontrarFaixa(qtd, TABELA_VINIL)!;
+      if (faixa.precos[chaveNormalizada] !== undefined) {
+        precoUnitario = faixa.precos[chaveNormalizada];
+      } else {
+        const prox = obterTamanhoMaisProximo(largura, comprimento, faixa);
+        precoUnitario = (prox.preco / prox.area) * (largura * comprimento);
+        obsItem.push(`Tamanho especial calculado proporcionalmente a ${prox.tamanho}.`);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    else if (material === 'destrutivel') {
+      if (qtd < 500) { obsItem.push('⚠️ Pedido mínimo para Vinil Destrutível: *500 unidades*.'); }
+      const faixa = encontrarFaixa(qtd, TABELA_DESTRUTIVEL)!;
+      if (faixa.precos[chaveNormalizada] !== undefined) {
+        precoUnitario = faixa.precos[chaveNormalizada];
+      } else {
+        const prox = obterTamanhoMaisProximo(largura, comprimento, faixa);
+        precoUnitario = (prox.preco / prox.area) * (largura * comprimento);
+        obsItem.push(`Tamanho especial calculado proporcionalmente a ${prox.tamanho}.`);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    else if (material === 'flextag') {
+      if (qtd < 51) { qtd = 51; obsItem.push('Quantidade mínima para Flextag: *51 unidades*.'); }
+      const faixa = encontrarFaixa(qtd, TABELA_FLEXTAG)!;
+      if (faixa.precos[chaveNormalizada] !== undefined) {
+        precoUnitario = faixa.precos[chaveNormalizada];
+      } else {
+        precoUnitario = areaCm2 * 0.08;
+        obsItem.push('Tamanho especial: *Área (cm²) × R$ 0,08*. Corte com quinas vivas.');
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    else if (material === 'aluminio') {
+      if (qtd < 51) { qtd = 51; obsItem.push('Quantidade mínima para Alumínio: *51 unidades*.'); }
+      const faixa = encontrarFaixa(qtd, TABELA_ALUMINIO)!;
+      if (faixa.precos[chaveNormalizada] !== undefined) {
+        precoUnitario = faixa.precos[chaveNormalizada];
+      } else {
+        precoUnitario = areaCm2 * 0.08;
+        obsItem.push('Tamanho especial: *Área (cm²) × R$ 0,08*. Corte com quinas vivas.');
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    else if (material === 'inox') {
+      if (qtd < 51) { qtd = 51; obsItem.push('Quantidade mínima para Aço Inox: *51 unidades*.'); }
+      // Aço Inox aceita apenas 45x15 e 50x20
+      let chaveInox = '45x15';
+      if (largura === 50 && comprimento === 20 || largura === 20 && comprimento === 50) {
+        chaveInox = '50x20';
+        larguraFinal = 50; comprimentoFinal = 20;
+      } else if (largura === 45 && comprimento === 15 || largura === 15 && comprimento === 45) {
+        chaveInox = '45x15';
+        larguraFinal = 45; comprimentoFinal = 15;
+      } else {
+        continue; // Ignora item se tamanho for inválido
+      }
+      const faixa = encontrarFaixa(qtd, TABELA_AÇO_INOX)!;
+      precoUnitario = faixa.precos[chaveInox];
+      if (inox_430) { precoUnitario -= 0.08; obsItem.push('Desconto *R$ 0,08/un* aplicado para Inox 430.'); }
+      obsItem.push('Prazo de produção: *10 a 12 dias úteis*.');
+    }
+
+    // -------------------------------------------------------------------------
+    else if (material === 'acm') {
+      if (qtd < 10) { qtd = 10; obsItem.push('Quantidade mínima para ACM: *10 unidades*.'); }
+      precoUnitario = areaCm2 * 0.08;
+      obsItem.push('Calculado: *Área (cm²) × R$ 0,08*.');
+    }
+
+    // -------------------------------------------------------------------------
+    else if (material === 'pvc') {
+      if (qtd < 10) { qtd = 10; obsItem.push('Quantidade mínima para PVC: *10 unidades*.'); }
+      const taxa = (espessura_pvc === '1mm') ? 0.02 : 0.03;
+      precoUnitario = areaCm2 * taxa;
+      obsItem.push(`Calculado PVC ${espessura_pvc ?? '2mm'}: *Área (cm²) × R$ ${taxa.toFixed(2)}*.`);
+    }
+
+    // -------------------------------------------------------------------------
+    else if (material === 'ribbon_resina') { precoUnitario = 39.00; }
+    else if (material === 'ribbon_cera')   { precoUnitario = 19.00; }
+    else if (material === 'cola')          { precoUnitario = 30.00; obsItem.push('Cola junta de motor 3M. Rende ~200 placas.'); }
+
+    if (precoUnitario <= 0) continue;
+
+    const subtotal = qtd * precoUnitario;
+    const nomeMaterial = material.charAt(0).toUpperCase() + material.slice(1).replace(/_/g, ' ');
+
+    orcamentoFinal.itens.push({
+      material: nomeMaterial,
+      largura: larguraFinal,
+      comprimento: comprimentoFinal,
+      quantidade: qtd,
+      precoUnitario,
+      subtotal,
+      observacoes: obsItem,
+    });
+    
+    orcamentoFinal.total += subtotal;
+    orcamentoFinal.observacoes.push(...obsItem);
+  }
+
+  if (orcamentoFinal.itens.length === 0) return null;
+
+  return orcamentoFinal;
 }
 
 // -----------------------------------------------------------------------------
@@ -466,18 +480,23 @@ export async function calcularOrcamento(
 // -----------------------------------------------------------------------------
 
 export function formatarOrcamento(orcamento: Orcamento): string {
-  const item = orcamento.itens[0];
-  const tamanhoTexto = item.largura > 0 ? `Medida: *${item.largura}x${item.comprimento} mm* | ` : '';
-  const obsTexto = item.observacoes.length
-    ? '\n' + item.observacoes.map(o => `ℹ️ ${o}`).join('\n')
+  let output = `🛒 *SUA COTAÇÃO ATUAL:*\n━━━━━━━━━━━━━━━━━━━━\n`;
+  
+  for (const item of orcamento.itens) {
+    const tamanhoTexto = item.largura > 0 ? `Medida: *${item.largura}x${item.comprimento} mm* | ` : '';
+    output += `Produto: *${item.material}*\n`;
+    output += `${tamanhoTexto}Qtd: *${item.quantidade}* un.\n`;
+    output += `Preço Unitário: *R$ ${item.precoUnitario.toFixed(2)}*\n`;
+    output += `Subtotal Item: *R$ ${item.subtotal.toFixed(2)}*\n`;
+    output += `━━━━━━━━━━━━━━━━━━━━\n`;
+  }
+  
+  // Deduplica observações se houver repetidas
+  const obsUnicas = [...new Set(orcamento.observacoes)];
+  const obsTexto = obsUnicas.length
+    ? '\n' + obsUnicas.map(o => `ℹ️ ${o}`).join('\n')
     : '';
 
-  return `🛒 *SUA COTAÇÃO ATUAL:*
-━━━━━━━━━━━━━━━━━━━━
-Produto: *${item.material}*
-${tamanhoTexto}Qtd: *${item.quantidade}* un.
-Preço Unitário: *R$ ${item.precoUnitario.toFixed(2)}*
-Total Item: *R$ ${item.subtotal.toFixed(2)}*
-━━━━━━━━━━━━━━━━━━━━
-*VALOR PARCIAL: R$ ${orcamento.total.toFixed(2)}*${obsTexto}`;
+  output += `*VALOR TOTAL DA COTAÇÃO: R$ ${orcamento.total.toFixed(2)}*${obsTexto}`;
+  return output;
 }

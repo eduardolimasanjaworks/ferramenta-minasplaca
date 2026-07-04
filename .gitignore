@@ -1,0 +1,24 @@
+# Dependências
+node_modules/
+**/node_modules/
+
+# Configurações Locais
+.env
+
+# Builds e Distribuição
+dist/
+**/dist/
+
+# Logs e Arquivos Temporários
+*.log
+logs.txt
+logs_utf8.txt
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+
+# Pastas de IDEs
+.vscode/
+.idea/
+.DS_Store
