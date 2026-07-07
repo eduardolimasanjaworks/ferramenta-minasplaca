@@ -7,7 +7,9 @@ import { inicializarBancoPrompt } from './prompt-minasplaca.js';
 import { inicializarBancoHistorico } from './historico-minasplaca.js';
 import { garantirColecaoConhecimento } from './rag-minasplaca.js';
 import { iniciarWorkerDebounce } from './debounce-minasplaca.js';
+import { iniciarWorkerFollowup } from './followup-minasplaca.js';
 import { obterRedis } from './lib/redis.js';
+import { inicializarBancoEstado } from './estado-minasplaca.js';
 
 async function aguardarDependencias(): Promise<void> {
   const redis = obterRedis();
@@ -37,10 +39,12 @@ async function main(): Promise<void> {
 
   await inicializarBancoPrompt();
   await inicializarBancoHistorico();
+  await inicializarBancoEstado();
   await garantirColecaoConhecimento();
   console.log('[init] Banco e vetores prontos');
 
   iniciarWorkerDebounce();
+  iniciarWorkerFollowup();
   await iniciarServidor();
 }
 

@@ -3,12 +3,16 @@
  * calcular_orcamento com parâmetros estruturados. O código faz o cálculo,
  * nunca a IA.
  */
+import pg from 'pg';
 import { config } from './config.js';
 import { buscarContexto } from './rag-minasplaca.js';
 import { calcularOrcamento, formatarOrcamento, type ParamsCalculo } from './calculadora-minasplaca.js';
 import { obterPromptBruto } from './prompt-minasplaca.js';
 import type { RegistroHistorico } from './lib/tipos.js';
 import { calcularPrecoPrazo } from 'correios-brasil';
+import { obterEstadoCliente, salvarEstadoCliente } from './estado-minasplaca.js';
+
+const dbPool = new pg.Pool({ connectionString: config.databaseUrl });
 
 interface OpcoesResposta {
   telefone: string;
@@ -169,6 +173,42 @@ Use o URL da imagem do histórico como o parâmetro link_logo.`,
         required: ['link_logo']
       }
     }
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'atualizar_dados_cliente',
+      description: 'Salva ou atualiza os dados estruturados do cliente e o carrinho no banco de dados. Chame esta ferramenta SEMPRE que o cliente informar ou confirmar algum desses dados (ex: nome, CPF/CNPJ, CEP, itens de compra, opções de layout, ou se o layout foi aprovado). Use-a somente para dados confirmados pelo cliente.',
+      parameters: {
+        type: 'object',
+        properties: {
+          nome: { type: 'string', description: 'Nome do cliente' },
+          documento: { type: 'string', description: 'CPF ou CNPJ do cliente (somente números)' },
+          cep: { type: 'string', description: 'CEP de entrega do cliente (somente números)' },
+          itens: {
+            type: 'array',
+            description: 'Lista de produtos cotados ou adicionados ao carrinho.',
+            items: {
+              type: 'object',
+              properties: {
+                material: { type: 'string', description: 'Material do produto' },
+                largura: { type: 'number', description: 'Largura em mm' },
+                comprimento: { type: 'number', description: 'Comprimento em mm' },
+                quantidade: { type: 'number', description: 'Quantidade de peças' },
+                espessura_pvc: { type: 'string', description: 'Espessura se for PVC ("1mm" ou "2mm")' }
+              },
+              required: ['material', 'largura', 'comprimento', 'quantidade']
+            }
+          },
+          furos: { type: 'string', enum: ['sim', 'não'], description: 'Se deseja furos na placa' },
+          barras: { type: 'string', enum: ['sim', 'não'], description: 'Se deseja código de barras' },
+          qrcode: { type: 'string', enum: ['sim', 'não'], description: 'Se deseja QR Code' },
+          link_logo: { type: 'string', description: 'URL ou link do logotipo enviado' },
+          layout_aprovado: { type: 'boolean', description: 'Se o layout/preview do PDF foi aprovado pelo cliente' },
+          observacoes: { type: 'string', description: 'Notas ou observações adicionais sobre o atendimento' }
+        }
+      }
+    }
   }
 ];
 
@@ -176,6 +216,30 @@ export async function gerarRespostaAgente(opts: OpcoesResposta): Promise<string>
   const { telefone, mensagem, historico, pushName } = opts;
 
   const promptBase = await obterPromptBruto();
+  const estado = await obterEstadoCliente(telefone);
+  let estadoTexto = '';
+  if (estado && Object.keys(estado).length > 0) {
+    const dataHora = estado.atualizado_em ? new Date(estado.atualizado_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : 'não definida';
+    estadoTexto = `📌 FICHA CADASTRAL E ESTADO ATUAL DO CLIENTE (Última atualização: ${dataHora}):\n`;
+    if (estado.nome) estadoTexto += `- Nome do Cliente: ${estado.nome}\n`;
+    if (estado.documento) estadoTexto += `- CPF/CNPJ: ${estado.documento}\n`;
+    if (estado.cep) estadoTexto += `- CEP de entrega: ${estado.cep}\n`;
+    if (estado.itens && Array.isArray(estado.itens) && estado.itens.length > 0) {
+      estadoTexto += `- Carrinho de Compras / Itens Cotados:\n`;
+      estado.itens.forEach((it: any, index: number) => {
+        const espessura = it.espessura_pvc ? ` (Espessura: ${it.espessura_pvc})` : '';
+        estadoTexto += `  • Item ${index + 1}: ${it.quantidade} un. de ${it.material} no tamanho ${it.largura}x${it.comprimento} mm${espessura}\n`;
+      });
+    }
+    if (estado.furos) estadoTexto += `- Furos no Layout: ${estado.furos}\n`;
+    if (estado.barras) estadoTexto += `- Código de Barras: ${estado.barras}\n`;
+    if (estado.qrcode) estadoTexto += `- QR Code: ${estado.qrcode}\n`;
+    if (estado.link_logo) estadoTexto += `- Link do Logotipo: ${estado.link_logo}\n`;
+    if (estado.layout_aprovado !== undefined) estadoTexto += `- Layout Aprovado pelo Cliente: ${estado.layout_aprovado ? 'SIM' : 'NÃO'}\n`;
+    if (estado.observacoes) estadoTexto += `- Observações: ${estado.observacoes}\n`;
+    estadoTexto += `=========================================\n\n`;
+  }
+
   const contexto = await buscarContexto(mensagem);
   const contextoTexto = contexto.length
     ? `Contexto relevante:\n${contexto.map((c) => `- ${c}`).join('\n')}\n\n`
@@ -183,16 +247,75 @@ export async function gerarRespostaAgente(opts: OpcoesResposta): Promise<string>
 
   // ALERTA DE FLUXO CRÍTICO (APLICAÇÃO PATRIMONIAL DETECTADA)
   const historicoTextoCompleto = (historico.map(h => h.content).join(' ') + ' ' + mensagem).toLowerCase();
-  const ePatrimonial = historicoTextoCompleto.includes('patrimon') || 
-                       historicoTextoCompleto.includes('tombamento') || 
-                       historicoTextoCompleto.includes('bens') || 
-                       historicoTextoCompleto.includes('máquina') || 
-                       historicoTextoCompleto.includes('ativo') || 
-                       historicoTextoCompleto.includes('equipamento');
-                       
-  const temLayoutNoHistorico = historicoTextoCompleto.includes('simulacao-placa.pdf') || 
-                               historicoTextoCompleto.includes('gerar_preview_patrimonial') || 
-                               historicoTextoCompleto.includes('layout da sua placa');
+  
+  let ePatrimonial = historicoTextoCompleto.includes('patrimon') || 
+                     historicoTextoCompleto.includes('tombamento') || 
+                     historicoTextoCompleto.includes('bens') || 
+                     historicoTextoCompleto.includes('máquina') || 
+                     historicoTextoCompleto.includes('ativo') || 
+                     historicoTextoCompleto.includes('equipamento');
+                     
+  let temLayoutNoHistorico = historicoTextoCompleto.includes('simulacao-placa.pdf') || 
+                             historicoTextoCompleto.includes('gerar_preview_patrimonial') || 
+                             historicoTextoCompleto.includes('layout da sua placa');
+
+  // Faz uma busca profunda no banco de dados para evitar perdas devido ao limite de fatiamento do histórico (slice),
+  // limitando a busca à sessão ativa (mensagens das últimas 24 horas e após a última transferência de atendimento).
+  try {
+    // 1. Localiza a última transferência nas últimas 24 horas
+    const resUltimaTransf = await dbPool.query(
+      `SELECT COALESCE(MAX(timestamp), '1970-01-01 00:00:00+00'::timestamptz) AS ultima_transferencia 
+       FROM historico_conversa 
+       WHERE telefone = $1 
+         AND timestamp >= NOW() - INTERVAL '24 hours'
+         AND (content ILIKE '%Transferindo%' OR content ILIKE '%TRANSFERIR%')`,
+      [telefone]
+    );
+    const ultimaTransferencia = resUltimaTransf.rows[0]?.ultima_transferencia || '1970-01-01 00:00:00+00';
+
+    // 2. Verifica se houve menção a patrimonial na sessão ativa
+    const resPatrimonial = await dbPool.query(
+      `SELECT EXISTS (
+        SELECT 1 FROM historico_conversa 
+        WHERE telefone = $1 
+          AND timestamp >= NOW() - INTERVAL '24 hours'
+          AND timestamp > $2
+          AND (
+            content ILIKE '%patrimon%' 
+            OR content ILIKE '%tombamento%' 
+            OR content ILIKE '%bens%' 
+            OR content ILIKE '%máquina%' 
+            OR content ILIKE '%ativo%' 
+            OR content ILIKE '%equipamento%'
+          )
+      ) AS e_patrimonial`,
+      [telefone, ultimaTransferencia]
+    );
+    if (resPatrimonial.rows[0]?.e_patrimonial === true) {
+      ePatrimonial = true;
+    }
+
+    // 3. Verifica se o layout foi gerado na sessão ativa
+    const resLayout = await dbPool.query(
+      `SELECT EXISTS (
+        SELECT 1 FROM historico_conversa 
+        WHERE telefone = $1 
+          AND timestamp >= NOW() - INTERVAL '24 hours'
+          AND timestamp > $2
+          AND (
+            content ILIKE '%simulacao-placa.pdf%' 
+            OR content ILIKE '%gerar_preview_patrimonial%' 
+            OR content ILIKE '%layout da sua placa%'
+          )
+      ) AS tem_layout`,
+      [telefone, ultimaTransferencia]
+    );
+    if (resLayout.rows[0]?.tem_layout === true) {
+      temLayoutNoHistorico = true;
+    }
+  } catch (err) {
+    console.error('[agente] Erro ao consultar histórico da sessão ativa no banco:', err);
+  }
 
   let warningPrompt = '';
   if (ePatrimonial && !temLayoutNoHistorico) {
@@ -208,13 +331,19 @@ export async function gerarRespostaAgente(opts: OpcoesResposta): Promise<string>
 =========================================\n\n`;
   }
 
-  const system = `${warningPrompt}${promptBase}\n\n${contextoTexto}
+  const system = `${warningPrompt}${estadoTexto}${promptBase}\n\n${contextoTexto}
 REGRA ABSOLUTA SOBRE CÁLCULO DE PREÇOS (PRIORIDADE MÁXIMA):
 - É COMPLETAMENTE PROIBIDO calcular, estimar ou inventar qualquer preço.
 - Você NÃO possui permissão para fazer matemática com valores das tabelas.
 - SEMPRE que tiver material + tamanho + quantidade confirmados, chame a ferramenta calcular_orcamento.
 - A ferramenta retornará o carrinho formatado pronto para enviar ao cliente.
 - Se o cliente pedir um produto mas ainda faltar algum dos 3 dados, continue a conversa para coletá-lo — um dado por vez.
+
+REGRA DE GERENCIAMENTO DE ESTADO (PRIORIDADE MÁXIMA):
+- Você possui acesso à ferramenta 'atualizar_dados_cliente'.
+- Sempre que o cliente fornecer ou confirmar novos dados (como nome, CPF/CNPJ, CEP, itens de compra, opções de layout ou aprovação do layout), chame IMEDIATAMENTE a ferramenta 'atualizar_dados_cliente' para manter a ficha cadastral do cliente atualizada no banco.
+- NÃO tente adivinhar ou inventar dados; grave apenas dados confirmados e reais.
+- O histórico de mensagens está resumido em apenas 15 mensagens mais recentes. Para se localizar sobre o que o cliente deseja e onde a conversa parou, use a 'FICHA CADASTRAL E ESTADO ATUAL DO CLIENTE' fornecida acima.
 
 REGRA DE FRETE (PRIORIDADE MÁXIMA):
 - Sempre que o cliente pedir o frete, pergunte o CEP (se ele ainda não tiver passado).
@@ -236,7 +365,7 @@ DIRETRIZES DE FORMATO (WhatsApp):
 
   const user = mensagem;
 
-  const mensagensHistorico = historico.slice(-98).map((h) => ({
+  const mensagensHistorico = historico.slice(-15).map((h) => ({
     role: h.role === 'user' ? 'user' : 'assistant',
     content: h.content,
   }));
@@ -389,7 +518,7 @@ DIRETRIZES DE FORMATO (WhatsApp):
                 const idCliente = clienteEncontrado.id_cliente;
                 const razaoSocial = clienteEncontrado.razao_cliente || clienteEncontrado.nome_destinatario_cliente || '';
                 
-                toolResult = `Cadastro localizado no sistema (ID: ${idCliente}, Razão Social/Nome: ${razaoSocial}). Informe ao cliente que localizou o cadastro sob o nome/razão social "${razaoSocial}". `;
+                toolResult = `Cadastro localizado (ID: ${idCliente}, Razão Social/Nome: ${razaoSocial}). `;
                 
                 // Tenta buscar o último pedido (orçamento)
                 try {
@@ -401,15 +530,15 @@ DIRETRIZES DE FORMATO (WhatsApp):
                     const ultimoPedido = dataPedido.data[0];
                     const valor = ultimoPedido.valor_total_nota || ultimoPedido.valor_total_produtos;
                     const data = ultimoPedido.data_pedido;
-                    toolResult += `O último pedido foi de R$ ${valor} em ${data}. Informe o valor e pergunte se quer repetir o pedido ou cotar novos itens.`;
+                    toolResult += `Último pedido localizado: R$ ${valor} em ${data}.`;
                   } else {
-                    toolResult = `Cadastro localizado (ID: ${idCliente}, Razão Social/Nome: ${razaoSocial}), mas sem pedidos anteriores. Confirme o cadastro da "${razaoSocial}" e siga OBRIGATORIAMENTE para a Transição da Etapa 2 (perguntar aplicação caso a palavra não tenha sido dita).`;
+                    toolResult += `Sem histórico de pedidos anteriores cadastrados.`;
                   }
                 } catch (e) {
-                  toolResult = `Cadastro localizado (ID: ${idCliente}, Razão Social/Nome: ${razaoSocial}), mas sem histórico. Confirme o cadastro da "${razaoSocial}" e avance para a Transição da Etapa 2.`;
+                  toolResult += `Não foi possível consultar os pedidos anteriores.`;
                 }
               } else {
-                toolResult = 'Cliente não encontrado. Confirme que é primeira compra e avance OBRIGATORIAMENTE para a Transição da Etapa 2.';
+                toolResult = 'Cliente não encontrado no sistema.';
               }
             }
           } catch (err) {
@@ -469,10 +598,13 @@ DIRETRIZES DE FORMATO (WhatsApp):
               incluirDelivery = true;
             } else if (furos === 'sim' && barras !== 'sim' && qrcode !== 'sim') {
               templateId = 'template-1777527859311';
+              incluirDelivery = false;
             } else if (furos !== 'sim' && barras !== 'sim' && qrcode === 'sim') {
               templateId = 'template-1777527773246';
+              incluirDelivery = true;
             } else if (furos !== 'sim' && barras !== 'sim' && qrcode !== 'sim') {
               templateId = 'template-1777527773246';
+              incluirDelivery = false;
             }
 
             const payloadBody: any = {
@@ -721,6 +853,26 @@ DIRETRIZES DE FORMATO (WhatsApp):
           } catch (err) {
             console.error('[agente] Erro geral ao processar calcular_frete:', err);
             toolResult = 'Houve um erro ao processar o frete. O frete será calculado no fechamento.';
+          }
+        }
+
+        // -----------------------------------------------
+        // TOOL: atualizar_dados_cliente
+        // -----------------------------------------------
+        else if (toolName === 'atualizar_dados_cliente') {
+          console.log(`[agente] atualizar_dados_cliente chamado para ${telefone}:`, args);
+          try {
+            const estadoAtual = await obterEstadoCliente(telefone);
+            const novoEstado = {
+              ...estadoAtual,
+              ...args
+            };
+            delete novoEstado.atualizado_em;
+            await salvarEstadoCliente(telefone, novoEstado);
+            toolResult = 'Dados do cliente atualizados com sucesso no banco de dados.';
+          } catch (err) {
+            console.error('[agente] Erro ao atualizar dados do cliente:', err);
+            toolResult = 'Erro ao atualizar dados do cliente no banco de dados.';
           }
         }
 

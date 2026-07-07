@@ -21,6 +21,7 @@ export const config = {
   openrouterToken: token('openrouter', 'OPENROUTER_TOKEN'),
   openrouterHabilitado: (process.env.OPENROUTER_HABILITADO ?? 'true') === 'true',
   modeloChat: process.env.MODELO_CHAT_OPENROUTER ?? 'openai/gpt-4o-mini',
+  openaiApiKey: token('openai', 'OPENAI_API_KEY'),
 
   // WhatsApp / Evolution
   evolutionUrl: process.env.EVOLUTION_URL ?? 'http://evolution-api:8080',
@@ -45,6 +46,9 @@ export const config = {
 
   // Debounce
   debounceMs: Number(process.env.DEBOUNCE_MS ?? '2500'),
+
+  // Follow-up (padrão 30 minutos)
+  followupMs: Number(process.env.FOLLOWUP_MS ?? '1800000'),
 
   // n8n
   n8nUrl: process.env.N8N_URL ?? 'http://localhost:5678',

@@ -172,6 +172,94 @@ function detectarTipo(rawMessage?: Record<string, unknown>): ItemDebounce['tipo'
   return 'texto';
 }
 
+async function transcreverAudio(dados: any, instance: string): Promise<string | null> {
+  if (!config.openaiApiKey) {
+    console.warn('[webhook] OPENAI_API_KEY nao configurada no .env. Ignorando transcricao de audio.');
+    return null;
+  }
+
+  const messageId = dados.key?.id;
+  if (!messageId) return null;
+
+  try {
+    const url = `${config.evolutionUrl}/chat/getBase64FromMediaMessage/${instance}`;
+    console.log(`[webhook] Baixando audio do Evolution API para transcrição. ID: ${messageId}`);
+    
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: config.evolutionApiKey,
+      },
+      body: JSON.stringify({
+        message: {
+          key: dados.key,
+          message: dados.message
+        }
+      }),
+    });
+
+    if (!res.ok) {
+      console.error(`[webhook] Erro ao buscar base64 do audio (${res.status}):`, await res.text());
+      return null;
+    }
+
+    const json = await res.json() as { base64?: string; mimeType?: string };
+    let base64Data = json.base64;
+    if (!base64Data) {
+      console.error(`[webhook] Nao foi retornado base64 do endpoint de audio`);
+      return null;
+    }
+
+    if (base64Data.includes(';base64,')) {
+      base64Data = base64Data.split(';base64,')[1];
+    }
+
+    let mimeType = 'audio/ogg';
+    let ext = 'ogg';
+    if (json.mimeType) {
+      mimeType = json.mimeType;
+      const parts = json.mimeType.split('/');
+      if (parts.length === 2) {
+        ext = parts[1].split(';')[0];
+      }
+    }
+
+    const buffer = Buffer.from(base64Data, 'base64');
+    const blob = new Blob([buffer], { type: mimeType });
+
+    const formData = new FormData();
+    formData.append('file', blob, `${messageId}.${ext}`);
+    formData.append('model', 'whisper-1');
+
+    console.log(`[webhook] Enviando audio para o OpenAI Whisper...`);
+    const whisperRes = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${config.openaiApiKey}`,
+      },
+      body: formData,
+    });
+
+    if (!whisperRes.ok) {
+      console.error(`[webhook] Erro na API do Whisper (${whisperRes.status}):`, await whisperRes.text());
+      return null;
+    }
+
+    const whisperJson = await whisperRes.json() as { text?: string };
+    const textoTranscrito = whisperJson.text?.trim();
+    if (textoTranscrito) {
+      console.log(`[webhook] Audio transcrito com sucesso: "${textoTranscrito}"`);
+      return textoTranscrito;
+    }
+
+    return null;
+  } catch (err) {
+    console.error(`[webhook] Erro ao transcrever audio:`, err);
+    return null;
+  }
+}
+
 export async function rotasWebhook(app: FastifyInstance): Promise<void> {
   app.post('/webhook/evolution', async (req, reply) => {
     const payload = req.body as WebhookEvolution;
@@ -207,6 +295,13 @@ export async function rotasWebhook(app: FastifyInstance): Promise<void> {
     }
 
     let texto = extrairTexto(message, urlSobrescrita);
+
+    if (tipo === 'audio') {
+      const transcrito = await transcreverAudio(dados, payload.instance ?? 'minasplaca-atendimento');
+      if (transcrito) {
+        texto = `[Áudio]: ${transcrito}`;
+      }
+    }
 
     if (!texto) {
       if (tipo === 'texto') {
