@@ -77,7 +77,7 @@ services:
       ADMIN_EMAIL: admin@minasplaca.com
       ADMIN_PASSWORD: MinasPlaca2026!
       DB_CLIENT: pg
-      DB_HOST: postgres
+      DB_HOST: minasplaca_postgres
       DB_PORT: '5432'
       DB_DATABASE: directus_minasplaca
       DB_USER: minasplaca
@@ -110,7 +110,7 @@ services:
       AUTHENTICATION_API_KEY: minasplaca-evolution-key-2026
       DATABASE_ENABLED: 'true'
       DATABASE_PROVIDER: postgresql
-      DATABASE_CONNECTION_URI: postgresql://minasplaca:minasplaca_secret@postgres:5432/evolution?schema=public
+      DATABASE_CONNECTION_URI: postgresql://minasplaca:minasplaca_secret@minasplaca_postgres:5432/evolution?schema=public
       DATABASE_CONNECTION_CLIENT_NAME: minasplaca_evolution
       DATABASE_SAVE_DATA_INSTANCE: 'true'
       DATABASE_SAVE_DATA_NEW_MESSAGE: 'true'
@@ -118,7 +118,7 @@ services:
       DATABASE_SAVE_DATA_CONTACTS: 'true'
       DATABASE_SAVE_DATA_CHATS: 'true'
       CACHE_REDIS_ENABLED: 'true'
-      CACHE_REDIS_URI: redis://redis:6379/1
+      CACHE_REDIS_URI: redis://minasplaca_redis:6379/1
       CACHE_REDIS_PREFIX_KEY: minasplaca_evolution
       CACHE_REDIS_SAVE_INSTANCES: 'false'
       CACHE_LOCAL_ENABLED: 'false'
@@ -151,21 +151,29 @@ services:
         condition: service_started
     environment:
       PORT: '8095'
-      DATABASE_URL: postgresql://minasplaca:minasplaca_secret@postgres:5432/minasplaca
-      REDIS_URL: redis://redis:6379/0
-      QDRANT_URL: http://qdrant:6333
+      DATABASE_URL: postgresql://minasplaca:minasplaca_secret@minasplaca_postgres:5432/minasplaca
+      REDIS_URL: redis://minasplaca_redis:6379/0
+      QDRANT_URL: http://minasplaca_qdrant:6333
       DIRECTUS_URL: http://minasplaca_directus:8055
-      EVOLUTION_URL: http://evolution-api:8080
-      EVOLUTION_API_KEY: minasplaca-evolution-key-2026
-      EVOLUTION_INSTANCE: minasplaca-atendimento
+      EVOLUTION_URL: https://evolution.117.sanjaworks.com
+      EVOLUTION_API_KEY: 4813f30ee3d04216a0f7fc9c901a3646
+      EVOLUTION_INSTANCE: minas-placa-chatwoot
+      WHATSAPP_PROVIDER: uazapi
+      UAZAPI_BASE_URL: https://sanjaworks.uazapi.com
+      UAZAPI_ADMIN_TOKEN: ''
+      UAZAPI_TOKEN: ${UAZAPI_TOKEN:-}
+      UAZAPI_INSTANCE_NAME: minas
+      UAZAPI_WEBHOOK_URL: https://iaminas.sanjaworks.com/webhook/uazapi
+      LICENCA_IA_DATABASE_URL: postgresql://master:master_secret_2026@master_postgres:5432/master_ti
       MODELO_CHAT_OPENROUTER: openai/gpt-4o-mini
       OPENROUTER_HABILITADO: 'true'
       IAMINASPLACA_ADMIN_KEY: minasplaca-pausa-2026
-      IAGMX_WEBHOOK_EVOLUTION_URL: http://app:8095/webhook/evolution
+      IAGMX_WEBHOOK_EVOLUTION_URL: https://iaminas.sanjaworks.com/webhook/evolution
     volumes:
       - ./.env:/app/.env:ro
       - ./prompt-cliente.txt:/app/prompt-cliente.txt:ro
       - ./data:/app/data:ro
+      - ./data/crm-arquivos:/app/data/crm-arquivos
 
 volumes:
   minasplaca_pg_data:

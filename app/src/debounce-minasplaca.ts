@@ -5,11 +5,13 @@ import { obterRedis } from './lib/redis.js';
 import { jidParaTelefone } from './util/telefone.js';
 import { logEvento } from './util/log-eventos.js';
 import { gerarRespostaAgente } from './agente-minasplaca.js';
-import { tentarEnviarResposta } from './lib/evolution.js';
+import { tentarEnviarRespostaAtiva, nomeInstanciaAtiva } from './lib/canal-whatsapp.js';
 import { obterHistorico, adicionarAoHistorico } from './historico-minasplaca.js';
 import { config } from './config.js';
 import type { ItemDebounce } from './lib/tipos.js';
 import { agendarFollowup, cancelarFollowup } from './followup-minasplaca.js';
+import { iaEstaPausada } from './pausa-minasplaca.js';
+import { linhaTemLicencaIa } from './licenca-ia.js';
 
 const redis = obterRedis();
 const PREFIXO_LISTA = 'debounce:lista:';
@@ -19,6 +21,18 @@ const TTL = 2 * 60 * 60;
 
 export async function adicionarAoDebounce(item: ItemDebounce): Promise<void> {
   const telefone = item.telefone;
+  const instance = item.instance || nomeInstanciaAtiva();
+
+  if (!(await linhaTemLicencaIa(instance))) {
+    console.log(`[debounce] sem licenca IA na linha ${instance} — nao enfileira`);
+    return;
+  }
+
+  if (await iaEstaPausada(telefone)) {
+    console.log(`[debounce] IA pausada para ${telefone} — mensagem nao enfileirada`);
+    return;
+  }
+
   const chaveLista = `${PREFIXO_LISTA}${telefone}`;
   const chaveTimer = `${PREFIXO_TIMER}${telefone}`;
 
@@ -59,6 +73,17 @@ export async function processarContato(remoteJid: string): Promise<void> {
     const mensagem = textos.join('\n\n').trim();
     if (!mensagem) return;
 
+    if (await iaEstaPausada(telefone)) {
+      console.log(`[debounce] IA pausada para ${telefone} — processamento cancelado`);
+      return;
+    }
+
+    const instanciaEnvio = itens[0]?.instance || nomeInstanciaAtiva();
+    if (!(await linhaTemLicencaIa(instanciaEnvio))) {
+      console.log(`[debounce] sem licenca IA na linha ${instanciaEnvio} — processamento cancelado`);
+      return;
+    }
+
     const pushName = itens[0]?.pushName;
     const historico = await obterHistorico(telefone, 100);
 
@@ -76,10 +101,7 @@ export async function processarContato(remoteJid: string): Promise<void> {
     ]);
 
     console.log(`[debounce] enviando resposta para ${telefone}: ${resposta.slice(0, 80)}`);
-    const resultado = await tentarEnviarResposta(telefone, resposta, config.evolutionInstance, {
-      remoteJid,
-      mensagensEntrada: itens.length,
-    });
+    const resultado = await tentarEnviarRespostaAtiva(telefone, resposta);
     console.log(`[debounce] resultado envio:`, resultado);
 
     if (resultado.enviado) {

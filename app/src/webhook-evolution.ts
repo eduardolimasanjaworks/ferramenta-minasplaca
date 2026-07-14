@@ -4,11 +4,14 @@
 import type { FastifyInstance } from 'fastify';
 import { config } from './config.js';
 import { adicionarAoDebounce } from './debounce-minasplaca.js';
+import { iaEstaPausada } from './pausa-minasplaca.js';
+import { linhaTemLicencaIa } from './licenca-ia.js';
 import { jidParaTelefone } from './util/telefone.js';
 import type { ItemDebounce } from './lib/tipos.js';
+import { marcarMensagemNova } from './lib/msg-dedupe.js';
 
 interface MensagemUpsertData {
-  key?: { remoteJid?: string; fromMe?: boolean };
+  key?: { remoteJid?: string; fromMe?: boolean; id?: string };
   message?: Record<string, unknown>;
   pushName?: string;
 }
@@ -278,7 +281,19 @@ export async function rotasWebhook(app: FastifyInstance): Promise<void> {
       return reply.status(200).send({ ok: true, ignorado: 'sem_remoteJid' });
     }
 
+    const messageId = (dados.key as { id?: string } | undefined)?.id;
+    if (!(await marcarMensagemNova(messageId))) {
+      return reply.status(200).send({ ok: true, ignorado: 'duplicada', messageId });
+    }
+
     const telefone = jidParaTelefone(remoteJid);
+    const instance = payload.instance ?? config.evolutionInstance;
+
+    if (!(await linhaTemLicencaIa(instance))) {
+      console.log(`[webhook] sem licenca IA na linha ${instance} — ignorado`);
+      return reply.status(200).send({ ok: true, ignorado: 'sem_licenca_ia', instance });
+    }
+
     const message = dados.message ?? {};
     
     // Log do payload completo para debug de estrutura do Evolution API
@@ -288,7 +303,7 @@ export async function rotasWebhook(app: FastifyInstance): Promise<void> {
     
     let urlSobrescrita: string | undefined;
     if (tipo === 'imagem' || tipo === 'documento') {
-      const publicUrl = await baixarEEnviarParaDirectus(dados, payload.instance ?? 'minasplaca-atendimento');
+      const publicUrl = await baixarEEnviarParaDirectus(dados, instance);
       if (publicUrl) {
         urlSobrescrita = publicUrl;
       }
@@ -297,10 +312,15 @@ export async function rotasWebhook(app: FastifyInstance): Promise<void> {
     let texto = extrairTexto(message, urlSobrescrita);
 
     if (tipo === 'audio') {
-      const transcrito = await transcreverAudio(dados, payload.instance ?? 'minasplaca-atendimento');
+      const transcrito = await transcreverAudio(dados, instance);
       if (transcrito) {
         texto = `[Áudio]: ${transcrito}`;
       }
+    }
+
+    if (await iaEstaPausada(telefone)) {
+      console.log(`[webhook] IA pausada para ${telefone} — mensagem ignorada`);
+      return reply.status(200).send({ ok: true, ignorado: 'ia_pausada', telefone });
     }
 
     if (!texto) {
@@ -323,7 +343,7 @@ export async function rotasWebhook(app: FastifyInstance): Promise<void> {
       conteudo: texto,
       tipo,
       pushName: dados.pushName,
-      instance: payload.instance ?? 'minasplaca-atendimento',
+      instance,
       recebidoEm: Date.now(),
     });
 

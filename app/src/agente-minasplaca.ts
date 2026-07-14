@@ -11,6 +11,10 @@ import { obterPromptBruto } from './prompt-minasplaca.js';
 import type { RegistroHistorico } from './lib/tipos.js';
 import { calcularPrecoPrazo } from 'correios-brasil';
 import { obterEstadoCliente, salvarEstadoCliente } from './estado-minasplaca.js';
+import { notificarIntervencaoHumana } from './notificacao-minasplaca.js';
+import { definirPausa } from './pausa-minasplaca.js';
+import { cancelarFollowup } from './followup-minasplaca.js';
+import { enviarMidiaAtiva } from './lib/canal-whatsapp.js';
 
 const dbPool = new pg.Pool({ connectionString: config.databaseUrl });
 
@@ -209,6 +213,30 @@ Use o URL da imagem do histórico como o parâmetro link_logo.`,
         }
       }
     }
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'transferir_humano',
+      description: `Aciona a transferência para um atendente humano e dispara uma NOTIFICAÇÃO para a equipe.
+Chame esta ferramenta SOMENTE quando o atendimento realmente precisar de um humano, por exemplo:
+- O cliente pede explicitamente para falar com um atendente/humano/vendedor.
+- O cliente está claramente insatisfeito, irritado ou reclamando de um problema.
+- Há uma reclamação, cobrança, problema com pedido/entrega ou negociação que foge da sua função de cotação.
+- O pedido é claramente fora do seu escopo e você não consegue resolver.
+NÃO use para dúvidas normais de cotação, preço, frete ou layout — essas você mesmo resolve com as outras ferramentas.
+Após chamar, informe o cliente de forma acolhedora que um atendente humano dará continuidade em breve.`,
+      parameters: {
+        type: 'object',
+        properties: {
+          motivo: {
+            type: 'string',
+            description: 'Motivo resumido da transferência (ex: "cliente pediu atendente", "reclamação sobre entrega", "negociação de preço").'
+          }
+        },
+        required: ['motivo']
+      }
+    }
   }
 ];
 
@@ -338,6 +366,11 @@ REGRA ABSOLUTA SOBRE CÁLCULO DE PREÇOS (PRIORIDADE MÁXIMA):
 - SEMPRE que tiver material + tamanho + quantidade confirmados, chame a ferramenta calcular_orcamento.
 - A ferramenta retornará o carrinho formatado pronto para enviar ao cliente.
 - Se o cliente pedir um produto mas ainda faltar algum dos 3 dados, continue a conversa para coletá-lo — um dado por vez.
+
+REGRA DE MENSAGENS PROATIVAS (PRIORIDADE ALTA):
+- O histórico pode incluir mensagens automáticas que o sistema enviou antes do cliente responder (lembrete de boleto, rastreio, cobrança, pós-venda).
+- Se o cliente responder "obrigado", "ok", "bom dia" ou similar logo após uma mensagem proativa, interprete no contexto do que foi enviado — NÃO trate como conversa nova/genérica.
+- Exemplo: após lembrete de boleto, "obrigado" = confirmação educada; responda de forma breve e contextual (ex: disponível para dúvidas sobre o pagamento).
 
 REGRA DE GERENCIAMENTO DE ESTADO (PRIORIDADE MÁXIMA):
 - Você possui acesso à ferramenta 'atualizar_dados_cliente'.
@@ -486,55 +519,24 @@ DIRETRIZES DE FORMATO (WhatsApp):
             if (!digitos) {
               toolResult = 'CNPJ/CPF inválido. Peça para o cliente enviar o número corretamente.';
             } else {
-              // Formata para o padrão brasileiro de pontuação
-              let docFormatado = digitos;
-              if (digitos.length === 14) {
-                docFormatado = digitos.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
-              } else if (digitos.length === 11) {
-                docFormatado = digitos.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
-              }
+              const { buscarClientePorDocumento, obterUltimoPedidoCliente } = await import('./vhsys-client.js');
+              console.log(`[agente] buscando no VHSys documento: ${digitos}`);
+              const clienteEncontrado = await buscarClientePorDocumento(digitos);
 
-              const headers = {
-                'access-token': 'MKOKBTBHXUNBZaPLADNbIWYHGeKQca',
-                'secret-access-token': 'q0GcQ0kT0Vy0SNpWsytPiOZnhEOgFAa',
-                'User-Agent': 'MinasPlaca-App/1.0'
-              };
-
-              console.log(`[agente] buscando no VHSys com documento formatado: ${docFormatado}`);
-              let urlCliente = `https://api.vhsys.com/v2/clientes?cnpj_cliente=${encodeURIComponent(docFormatado)}`;
-              let resCliente = await fetch(urlCliente, { headers });
-              let dataCliente = await resCliente.json() as any;
-
-              // Se não encontrou com pontuação, tenta buscar apenas com os dígitos limpos
-              if (!dataCliente || !Array.isArray(dataCliente.data) || dataCliente.data.length === 0) {
-                console.log(`[agente] não encontrado com pontuação. Tentando apenas dígitos: ${digitos}`);
-                urlCliente = `https://api.vhsys.com/v2/clientes?cnpj_cliente=${digitos}`;
-                resCliente = await fetch(urlCliente, { headers });
-                dataCliente = await resCliente.json() as any;
-              }
-
-              if (dataCliente && Array.isArray(dataCliente.data) && dataCliente.data.length > 0) {
-                const clienteEncontrado = dataCliente.data[0];
+              if (clienteEncontrado) {
                 const idCliente = clienteEncontrado.id_cliente;
                 const razaoSocial = clienteEncontrado.razao_cliente || clienteEncontrado.nome_destinatario_cliente || '';
                 
                 toolResult = `Cadastro localizado (ID: ${idCliente}, Razão Social/Nome: ${razaoSocial}). `;
                 
-                // Tenta buscar o último pedido (orçamento)
                 try {
-                  const urlPedido = `https://api.vhsys.com/v2/pedidos?id_cliente=${idCliente}&limit=1&sort=id_pedido&order=desc`;
-                  const resPedido = await fetch(urlPedido, { headers });
-                  const dataPedido = await resPedido.json() as any;
-                  
-                  if (dataPedido && Array.isArray(dataPedido.data) && dataPedido.data.length > 0) {
-                    const ultimoPedido = dataPedido.data[0];
-                    const valor = ultimoPedido.valor_total_nota || ultimoPedido.valor_total_produtos;
-                    const data = ultimoPedido.data_pedido;
-                    toolResult += `Último pedido localizado: R$ ${valor} em ${data}.`;
+                  const ultimoPedido = await obterUltimoPedidoCliente(idCliente!);
+                  if (ultimoPedido?.valor) {
+                    toolResult += `Último pedido localizado: R$ ${ultimoPedido.valor} em ${ultimoPedido.data}.`;
                   } else {
                     toolResult += `Sem histórico de pedidos anteriores cadastrados.`;
                   }
-                } catch (e) {
+                } catch {
                   toolResult += `Não foi possível consultar os pedidos anteriores.`;
                 }
               } else {
@@ -636,32 +638,18 @@ DIRETRIZES DE FORMATO (WhatsApp):
             if (linkPdf) {
               console.log(`[agente] PDF gerado com sucesso: ${linkPdf}`);
               
-              // Envia o PDF via Evolution API
-              const urlSendMedia = `${config.evolutionUrl}/message/sendMedia/${config.evolutionInstance}`;
-              const resMedia = await fetch(urlSendMedia, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  apikey: config.evolutionApiKey
-                },
-                body: JSON.stringify({
-                  number: telefone,
-                  mediatype: 'document',
-                  media: linkPdf,
+              // Envia o PDF pelo canal ativo (UazAPI ou Evolution)
+              try {
+                await enviarMidiaAtiva({
+                  telefone,
+                  type: 'document',
+                  url: linkPdf,
                   fileName: 'simulacao-placa.pdf',
                   caption: 'Aqui está a simulação do layout da sua placa!',
-                  options: {
-                    delay: 1200,
-                    presence: 'composing'
-                  }
-                })
-              });
-
-              if (resMedia.ok) {
+                });
                 toolResult = `Preview gerado e enviado com sucesso para o WhatsApp do cliente! Link do PDF: ${linkPdf}. Confirme na sua resposta de texto que o preview foi enviado no chat para ele visualizar.`;
-              } else {
-                const txtErr = await resMedia.text();
-                console.error(`[agente] Erro ao enviar media via Evolution:`, txtErr);
+              } catch (errMedia) {
+                console.error(`[agente] Erro ao enviar media:`, errMedia);
                 toolResult = `O layout foi gerado com sucesso (Link: ${linkPdf}), mas ocorreu uma falha ao enviar o arquivo de forma direta. Envie este link de visualização na sua resposta de texto para o cliente: ${linkPdf}`;
               }
             } else {
@@ -873,6 +861,45 @@ DIRETRIZES DE FORMATO (WhatsApp):
           } catch (err) {
             console.error('[agente] Erro ao atualizar dados do cliente:', err);
             toolResult = 'Erro ao atualizar dados do cliente no banco de dados.';
+          }
+        }
+
+        // -----------------------------------------------
+        // TOOL: transferir_humano (notifica equipe + pausa a IA)
+        // -----------------------------------------------
+        else if (toolName === 'transferir_humano') {
+          const motivo = String(args.motivo || 'Solicitação de atendimento humano').trim();
+          console.log(`[agente] transferir_humano acionado para ${telefone}: ${motivo}`);
+          try {
+            const estadoCli = await obterEstadoCliente(telefone).catch(() => null);
+            const nome = (estadoCli && (estadoCli as any).nome) || pushName || '';
+            const resultado = await notificarIntervencaoHumana({
+              telefoneCliente: telefone,
+              nomeCliente: nome,
+              motivo,
+            });
+
+            // Pausa a IA para este contato — o humano assume a partir de agora.
+            try {
+              await definirPausa(telefone, true, {
+                motivo: `Transferência solicitada pela IA: ${motivo}`,
+                origem: 'ia:transferir_humano',
+              });
+              await cancelarFollowup(telefone).catch(() => {});
+            } catch (errPausa) {
+              console.error('[agente] Erro ao pausar contato após transferência:', errPausa);
+            }
+
+            if (resultado.enviado) {
+              toolResult = 'Notificação enviada ao atendente humano com sucesso. Responda ao cliente de forma acolhedora e breve, informando que um atendente humano dará continuidade em instantes. NÃO peça novamente dados já coletados.';
+            } else if (resultado.motivo === 'ja_notificado_recentemente') {
+              toolResult = 'A equipe já foi notificada recentemente sobre este atendimento. Informe ao cliente, de forma tranquila, que um atendente humano dará continuidade em breve.';
+            } else {
+              toolResult = `Não foi possível enviar a notificação (motivo técnico: ${resultado.motivo}). Ainda assim, informe ao cliente que ele será atendido por um humano em breve.`;
+            }
+          } catch (err) {
+            console.error('[agente] Erro na ferramenta transferir_humano:', err);
+            toolResult = 'Houve um erro ao acionar a transferência. Informe ao cliente que um atendente humano dará continuidade em breve.';
           }
         }
 

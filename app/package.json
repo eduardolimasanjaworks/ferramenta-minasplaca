@@ -10,7 +10,8 @@
     "test": "node ../scripts/teste-completo.mjs",
     "test:rapido": "node ../scripts/teste-completo.mjs --sem-llm",
     "test:capacidades": "npm run build && node ../scripts/teste-capacidades.mjs",
-    "test:simulacao": "npm run build && node ../scripts/teste-simulacao-motoristas.mjs"
+    "test:simulacao": "npm run build && node ../scripts/teste-simulacao-motoristas.mjs",
+    "test:crm": "node ../scripts/teste-crm.mjs"
   },
   "dependencies": {
     "@fastify/static": "^8.0.2",

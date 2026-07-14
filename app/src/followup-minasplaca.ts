@@ -6,9 +6,11 @@ import pg from 'pg';
 import { obterRedis } from './lib/redis.js';
 import { config } from './config.js';
 import { gerarRespostaAgente } from './agente-minasplaca.js';
-import { tentarEnviarResposta } from './lib/evolution.js';
+import { tentarEnviarRespostaAtiva } from './lib/canal-whatsapp.js';
 import { obterHistorico, adicionarAoHistorico } from './historico-minasplaca.js';
 import { logEvento } from './util/log-eventos.js';
+import { iaEstaPausada } from './pausa-minasplaca.js';
+import { obterConfigFollowup } from './followup-config.js';
 
 const redis = obterRedis();
 const pool = new pg.Pool({ connectionString: config.databaseUrl });
@@ -20,15 +22,24 @@ const PREFIXO_SENT = 'followup:sent:';
  * Agenda um novo follow-up para o cliente e limpa o flag de follow-up enviado.
  */
 export async function agendarFollowup(telefone: string): Promise<void> {
+  const cfg = await obterConfigFollowup();
+  if (!cfg.ativo) {
+    // Follow-up desligado no painel — garante que nao ha timer pendente.
+    await cancelarFollowup(telefone).catch(() => {});
+    console.log(`[followup] desativado no painel — nao agendado para ${telefone}`);
+    return;
+  }
+
   const chaveTimer = `${PREFIXO_TIMER}${telefone}`;
   const chaveSent = `${PREFIXO_SENT}${telefone}`;
-  const executaEm = Date.now() + config.followupMs;
+  const atrasoMs = cfg.minutos * 60000;
+  const executaEm = Date.now() + atrasoMs;
 
   const pipeline = redis.pipeline();
   pipeline.set(chaveTimer, String(executaEm));
   pipeline.del(chaveSent);
   await pipeline.exec();
-  console.log(`[followup] agendado para ${telefone} em timestamp ${executaEm} (daqui a ${Math.round(config.followupMs / 60000)} min)`);
+  console.log(`[followup] agendado para ${telefone} em timestamp ${executaEm} (daqui a ${cfg.minutos} min)`);
 }
 
 /**
@@ -50,6 +61,17 @@ export async function cancelarFollowup(telefone: string): Promise<void> {
  */
 export async function processarFollowup(telefone: string): Promise<void> {
   const chaveSent = `${PREFIXO_SENT}${telefone}`;
+
+  const cfg = await obterConfigFollowup();
+  if (!cfg.ativo) {
+    console.log(`[followup] desativado no painel. Ignorando follow-up para ${telefone}.`);
+    return;
+  }
+
+  if (await iaEstaPausada(telefone)) {
+    console.log(`[followup] IA pausada para ${telefone}. Ignorando follow-up.`);
+    return;
+  }
 
   // 1. Verifica se já enviamos follow-up nessa janela de silêncio
   const jaEnviado = await redis.get(chaveSent);
@@ -86,10 +108,11 @@ export async function processarFollowup(telefone: string): Promise<void> {
     return;
   }
 
-  // b) O tempo decorrido desde a última mensagem deve ser de pelo menos followupMs (com pequena tolerância de 5s)
+  // b) O tempo decorrido desde a última mensagem deve ser de pelo menos o configurado (com pequena tolerância de 5s)
+  const atrasoMs = cfg.minutos * 60000;
   const tempoDecorrido = agora - tsMensagem;
-  if (tempoDecorrido < config.followupMs - 5000) {
-    console.log(`[followup] inatividade recente para ${telefone} (${tempoDecorrido}ms < ${config.followupMs}ms). Ignorando.`);
+  if (tempoDecorrido < atrasoMs - 5000) {
+    console.log(`[followup] inatividade recente para ${telefone} (${tempoDecorrido}ms < ${atrasoMs}ms). Ignorando.`);
     return;
   }
 
@@ -109,7 +132,7 @@ export async function processarFollowup(telefone: string): Promise<void> {
     // Recupera o histórico das últimas 100 mensagens para a IA formular a resposta contextualizada
     const historico = await obterHistorico(telefone, 100);
 
-    const mensagemInstrucao = '[SISTEMA: O cliente está em silêncio há 30 minutos. Com base no histórico da conversa, envie uma mensagem de acompanhamento (follow-up) muito curta, amigável e consultiva em nome de Rafael para reatar o contato e dar continuidade na compra/cotação de onde pararam. Não repita preços desnecessariamente, seja breve (máximo de 2 parágrafos pequenos) e termine com uma pergunta simples e receptiva.]';
+    const mensagemInstrucao = `[SISTEMA: O cliente está em silêncio há ${cfg.minutos} minutos. Siga estritamente as regras de follow-up definidas pelo administrador abaixo. Se, ao avaliar o contexto, o follow-up NÃO fizer sentido, responda apenas com o texto EXATO "SEM_FOLLOWUP" e nada mais.\n\nREGRAS DE FOLLOW-UP:\n${cfg.instrucoes}]`;
 
     const resposta = await gerarRespostaAgente({
       telefone,
@@ -123,17 +146,19 @@ export async function processarFollowup(telefone: string): Promise<void> {
       return;
     }
 
+    // A IA pode decidir que o follow-up não faz sentido conforme as regras.
+    if (/^\s*sem_followup\s*$/i.test(resposta) || /\bSEM_FOLLOWUP\b/.test(resposta)) {
+      console.log(`[followup] IA avaliou que não cabe follow-up para ${telefone} (regras do painel).`);
+      return;
+    }
+
     // Salva a resposta no histórico de conversa
     await adicionarAoHistorico(telefone, [
       { role: 'assistant', content: resposta, timestamp: Date.now() },
     ]);
 
     console.log(`[followup] enviando resposta de follow-up para ${telefone}: ${resposta.slice(0, 80)}`);
-    const remoteJid = `${telefone}@s.whatsapp.net`;
-    const resultado = await tentarEnviarResposta(telefone, resposta, config.evolutionInstance, {
-      remoteJid,
-      fragmentar: true,
-    });
+    const resultado = await tentarEnviarRespostaAtiva(telefone, resposta, { fragmentar: true });
     console.log(`[followup] resultado envio para ${telefone}:`, resultado);
 
     logEvento('followup', 'Follow-up enviado com sucesso', { telefone, resposta }, 'info');

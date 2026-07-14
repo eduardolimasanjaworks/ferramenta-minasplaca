@@ -6,6 +6,7 @@ import { obterRedis } from './lib/redis.js';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import pg from 'pg';
 import { config } from './config.js';
+import { uazPing } from './lib/uazapi.js';
 
 const redis = obterRedis();
 
@@ -64,23 +65,26 @@ async function verificarEvolution(): Promise<boolean> {
 
 export async function rotasSaude(app: FastifyInstance): Promise<void> {
   app.get('/health', async () => {
-    const [redisOk, postgresOk, qdrantOk, openrouterOk, evolutionOk] = await Promise.all([
+    const [redisOk, postgresOk, qdrantOk, openrouterOk, evolutionOk, uazapiOk] = await Promise.all([
       verificarRedis(),
       verificarPostgres(),
       verificarQdrant(),
       verificarOpenRouter(),
       verificarEvolution(),
+      uazPing(),
     ]);
 
     return {
       status: redisOk && postgresOk ? 'ok' : 'degradado',
       build: config.buildId,
+      whatsappProvider: config.whatsappProvider,
       servicos: {
         redis: redisOk,
         postgres: postgresOk,
         qdrant: qdrantOk,
         openrouter: openrouterOk,
         evolution: evolutionOk,
+        uazapi: uazapiOk,
       },
     };
   });

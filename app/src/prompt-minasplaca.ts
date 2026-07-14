@@ -76,11 +76,6 @@ export async function inicializarBancoPrompt(): Promise<void> {
       'INSERT INTO configuracao (chave, valor) VALUES ($1, $2)',
       ['prompt_sistema', promptInicial],
     );
-  } else {
-    await pool.query(
-      'UPDATE configuracao SET valor = $2, atualizado_em = NOW() WHERE chave = $1',
-      ['prompt_sistema', promptInicial],
-    );
   }
 }
 
