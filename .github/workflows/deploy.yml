@@ -1,0 +1,53 @@
+# Deploy automático SanjaWorks — push em main sobe o container do cliente.
+# Secrets: DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY
+# Pasta no servidor: /root/{slug}-rag/ferramenta-{slug}
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'docker-compose.yml'
+      - 'prompt-cliente.txt'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.repository }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Deploy no servidor
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          command_timeout: 40m
+          script: |
+            set -euo pipefail
+            REPO="${{ github.event.repository.name }}"
+            SLUG="${REPO#ferramenta-}"
+            DIR="/root/${SLUG}-rag/ferramenta-${SLUG}"
+            if [ ! -d "$DIR" ]; then
+              echo "ERRO: pasta nao encontrada: $DIR"
+              exit 1
+            fi
+            cd "$DIR"
+            if [ ! -d .git ]; then
+              echo "ERRO: sem .git em $DIR — configure o remote antes"
+              exit 1
+            fi
+            git remote get-url origin >/dev/null
+            git fetch origin main
+            git checkout -B main origin/main
+            git reset --hard origin/main
+            docker compose up -d --build app
+            docker compose ps app
+            echo "Deploy OK: $SLUG"
