@@ -3,10 +3,9 @@
  * Clones dos 4 workflows n8n (boleto, rastreio, cobrança, pós-venda).
  */
 import { config } from './config.js';
-import { obterRedis } from './lib/redis.js';
 import { obterStatusConexaoAtivo, enviarTextoAtivo } from './lib/canal-whatsapp.js';
+import { uazNumeroNoWhatsapp } from './lib/uazapi.js';
 import { adicionarAoHistorico } from './historico-minasplaca.js';
-import { iaEstaPausada } from './pausa-minasplaca.js';
 import { canonizarTelefoneBr, telefoneEhContatoValido } from './util/telefone.js';
 import {
   obterConfigProativos,
@@ -22,6 +21,14 @@ import {
   listarEntregasPosVenda,
   registrarLogDisparo,
 } from './proativos-store.js';
+import {
+  jaEnviadoNoDia,
+  marcarEnviadoNoDia,
+  registrarJobAtivoNoDia,
+  jobEstaReligando,
+  obterCorteRastreio,
+  definirCorteRastreio,
+} from './proativos-guarda.js';
 import {
   filtrarContasBoletoAVencer,
   filtrarContasCobrancaVencidos,
@@ -41,9 +48,8 @@ import {
 } from './vhsys-client.js';
 import { consultarRastreio } from './rastreio-client.js';
 
-const redis = obterRedis();
-const PREFIXO_SENT = 'proativo:sent:';
-const RATE_LIMIT_MS = 1500;
+/** Delay alto entre mensagens reais — evita rajada no WhatsApp. */
+const RATE_LIMIT_MS = 25_000;
 
 let workerRodando = false;
 let ultimoEnvioMs = 0;
@@ -69,17 +75,6 @@ function jobDeveRodar(abordagem: AbordagemProativa, slot: { hora: string; diaSem
   return false;
 }
 
-async function jaEnviado(slug: string, slot: string, idAlvo: string): Promise<boolean> {
-  const chave = `${PREFIXO_SENT}${slug}:${slot}:${idAlvo}`;
-  const v = await redis.get(chave);
-  return v === '1';
-}
-
-async function marcarEnviado(slug: string, slot: string, idAlvo: string): Promise<void> {
-  const chave = `${PREFIXO_SENT}${slug}:${slot}:${idAlvo}`;
-  await redis.set(chave, '1', 'EX', 60 * 60 * 26);
-}
-
 async function aguardarRateLimit(): Promise<void> {
   const agora = Date.now();
   const espera = RATE_LIMIT_MS - (agora - ultimoEnvioMs);
@@ -92,7 +87,7 @@ interface ContextoEnvio {
   telefone: string;
   idAlvo: string;
   mensagem: string;
-  slot: string;
+  dia: string;
   forcar?: boolean;
   telefoneTeste?: string;
 }
@@ -100,9 +95,11 @@ interface ContextoEnvio {
 async function enviarProativo(ctx: ContextoEnvio): Promise<void> {
   const modoTeste = Boolean(ctx.telefoneTeste);
   const telefoneDestino = modoTeste ? ctx.telefoneTeste! : ctx.telefone;
-  const slot = ctx.slot;
+  const dia = ctx.dia;
 
-  if (!ctx.forcar && !modoTeste && (await jaEnviado(ctx.slug, slot, ctx.idAlvo))) {
+  // Dedupe por DIA (não por horário): mesmo com várias regras/horários no
+  // mesmo dia, cada alvo recebe no máximo 1 mensagem por job por dia.
+  if (!ctx.forcar && !modoTeste && (await jaEnviadoNoDia(ctx.slug, dia, ctx.idAlvo))) {
     await registrarLogDisparo({
       job_slug: ctx.slug,
       telefone: telefoneDestino,
@@ -119,20 +116,26 @@ async function enviarProativo(ctx: ContextoEnvio): Promise<void> {
       telefone: telefoneDestino,
       id_alvo: ctx.idAlvo,
       status: 'erro',
-      erro: 'telefone invalido',
+      erro: 'telefone invalido / cliente sem telefone no VhSys',
     });
     return;
   }
 
-  if (!ctx.forcar && !modoTeste && (await iaEstaPausada(telefoneDestino))) {
-    await registrarLogDisparo({
-      job_slug: ctx.slug,
-      telefone: telefoneDestino,
-      id_alvo: ctx.idAlvo,
-      status: 'pulado',
-      payload_resumo: 'ia pausada',
-    });
-    return;
+  // Disparo proativo NÃO respeita pausa da IA do chat: cobrança/boleto/
+  // rastreio são envios comerciais deliberados, independentes do atendimento.
+
+  if (!modoTeste && config.whatsappProvider === 'uazapi') {
+    const noWa = await uazNumeroNoWhatsapp(telefoneDestino);
+    if (!noWa) {
+      await registrarLogDisparo({
+        job_slug: ctx.slug,
+        telefone: telefoneDestino,
+        id_alvo: ctx.idAlvo,
+        status: 'erro',
+        erro: 'numero nao esta no WhatsApp',
+      });
+      return;
+    }
   }
 
   if (config.proativosDryRun) {
@@ -144,7 +147,7 @@ async function enviarProativo(ctx: ContextoEnvio): Promise<void> {
       status: 'dry_run',
       payload_resumo: ctx.mensagem.slice(0, 200),
     });
-    if (!modoTeste) await marcarEnviado(ctx.slug, slot, ctx.idAlvo);
+    if (!modoTeste) await marcarEnviadoNoDia(ctx.slug, dia, ctx.idAlvo);
     return;
   }
 
@@ -168,7 +171,7 @@ async function enviarProativo(ctx: ContextoEnvio): Promise<void> {
       content: `[Disparo proativo — ${ctx.slug}]\n${ctx.mensagem}`,
       timestamp: Date.now(),
     }]);
-    if (!modoTeste) await marcarEnviado(ctx.slug, slot, ctx.idAlvo);
+    if (!modoTeste) await marcarEnviadoNoDia(ctx.slug, dia, ctx.idAlvo);
     await registrarLogDisparo({
       job_slug: ctx.slug,
       telefone: telefoneDestino,
@@ -188,7 +191,7 @@ async function enviarProativo(ctx: ContextoEnvio): Promise<void> {
   }
 }
 
-async function executarBoletoAVencer(abordagem: AbordagemProativa, slot: string, opts?: { forcar?: boolean; telefoneTeste?: string }): Promise<void> {
+async function executarBoletoAVencer(abordagem: AbordagemProativa, dia: string, opts?: { forcar?: boolean; telefoneTeste?: string }): Promise<void> {
   const dias = abordagem.parametros?.dias_antes ?? [0, 3];
   const contas = await listarContasReceberAbertas();
   const filtradas = filtrarContasBoletoAVencer(contas, dias);
@@ -212,14 +215,14 @@ async function executarBoletoAVencer(abordagem: AbordagemProativa, slot: string,
       telefone,
       idAlvo: String(conta.id_conta),
       mensagem,
-      slot,
+      dia,
       forcar: opts?.forcar,
       telefoneTeste: opts?.telefoneTeste,
     });
   }
 }
 
-async function executarCobrancaVencidos(abordagem: AbordagemProativa, slot: string, opts?: { forcar?: boolean; telefoneTeste?: string }): Promise<void> {
+async function executarCobrancaVencidos(abordagem: AbordagemProativa, dia: string, opts?: { forcar?: boolean; telefoneTeste?: string }): Promise<void> {
   const dias = abordagem.parametros?.dias_atraso ?? [1, 3, 5, 7];
   const contas = await listarContasReceberAbertas();
   const filtradas = filtrarContasCobrancaVencidos(contas, dias);
@@ -241,7 +244,7 @@ async function executarCobrancaVencidos(abordagem: AbordagemProativa, slot: stri
       telefone,
       idAlvo: String(conta.id_conta),
       mensagem,
-      slot,
+      dia,
       forcar: opts?.forcar,
       telefoneTeste: opts?.telefoneTeste,
     });
@@ -268,8 +271,28 @@ function montarMensagemRastreio(
   });
 }
 
-async function executarEnviaRastreamento(abordagem: AbordagemProativa, slot: string, opts?: { forcar?: boolean; telefoneTeste?: string }): Promise<void> {
-  const pedidos = filtrarPedidosRastreio(await listarPedidosAtendidos(150));
+function idPedNumerico(pedido: { id_ped?: number; id_pedido?: number | string }): number {
+  const n = Number(pedido.id_ped ?? pedido.id_pedido ?? 0);
+  return Number.isFinite(n) ? n : 0;
+}
+
+/**
+ * Ao religar o job após 1+ dia parado, marca o maior id_ped atual como corte:
+ * pedidos antigos (anteriores à religada) nunca recebem disparo de rastreio,
+ * evitando a rajada de mensagens acumuladas.
+ */
+async function aplicarCorteReligadaRastreio(): Promise<void> {
+  const pedidos = await listarPedidosAtendidos(150);
+  const maior = pedidos.reduce((max, p) => Math.max(max, idPedNumerico(p)), 0);
+  await definirCorteRastreio(maior);
+  console.log(`[proativos] religada: corte do rastreio definido em id_ped ${maior}; só pedidos novos serão avisados`);
+}
+
+async function executarEnviaRastreamento(abordagem: AbordagemProativa, dia: string, opts?: { forcar?: boolean; telefoneTeste?: string }): Promise<void> {
+  const corte = opts?.telefoneTeste ? 0 : await obterCorteRastreio();
+  const pedidos = filtrarPedidosRastreio(await listarPedidosAtendidos(150)).filter(
+    (p) => idPedNumerico(p) > corte,
+  );
 
   for (const pedido of pedidos) {
     const cliente = await obterCliente(pedido.id_cliente ?? '');
@@ -304,7 +327,7 @@ async function executarEnviaRastreamento(abordagem: AbordagemProativa, slot: str
       telefone,
       idAlvo: String(pedido.id_pedido),
       mensagem,
-      slot,
+      dia,
       forcar: opts?.forcar,
       telefoneTeste: opts?.telefoneTeste,
     });
@@ -332,7 +355,7 @@ async function executarEnviaRastreamento(abordagem: AbordagemProativa, slot: str
   }
 }
 
-async function executarPesquisaPosVenda(abordagem: AbordagemProativa, slot: string, opts?: { forcar?: boolean; telefoneTeste?: string }): Promise<void> {
+async function executarPesquisaPosVenda(abordagem: AbordagemProativa, dia: string, opts?: { forcar?: boolean; telefoneTeste?: string }): Promise<void> {
   const dias = abordagem.parametros?.dias_pos_entrega ?? 2;
   const entregas = await listarEntregasPosVenda();
   const filtradas = filtrarEntregasPosVenda(
@@ -352,19 +375,38 @@ async function executarPesquisaPosVenda(abordagem: AbordagemProativa, slot: stri
       telefone,
       idAlvo: entrega.id_pedido,
       mensagem,
-      slot,
+      dia,
       forcar: opts?.forcar,
       telefoneTeste: opts?.telefoneTeste,
     });
   }
 }
 
-const EXECUTORES: Record<JobSlug, (a: AbordagemProativa, slot: string, o?: { forcar?: boolean; telefoneTeste?: string }) => Promise<void>> = {
+const EXECUTORES: Record<JobSlug, (a: AbordagemProativa, dia: string, o?: { forcar?: boolean; telefoneTeste?: string }) => Promise<void>> = {
   'boleto-a-vencer': executarBoletoAVencer,
   'envia-rastreamento': executarEnviaRastreamento,
   'cobranca-vencidos': executarCobrancaVencidos,
   'pesquisa-pos-venda': executarPesquisaPosVenda,
 };
+
+/**
+ * Detecta religada (job parado 1+ dia que voltou) ANTES do heartbeat do dia.
+ * Retorna false se a religada falhou — nesse caso o job não roda no tick,
+ * para não disparar backlog acumulado com o corte desatualizado.
+ */
+async function prepararJobDoDia(slug: JobSlug, dia: string): Promise<boolean> {
+  try {
+    if (await jobEstaReligando(slug, dia)) {
+      console.log(`[proativos] job ${slug} religado — disparos valem só daqui pra frente`);
+      if (slug === 'envia-rastreamento') await aplicarCorteReligadaRastreio();
+    }
+    await registrarJobAtivoNoDia(slug, dia);
+    return true;
+  } catch (err) {
+    console.error(`[proativos] erro ao preparar religada do job ${slug}:`, err);
+    return false;
+  }
+}
 
 async function tickProativos(): Promise<void> {
   if (workerRodando) return;
@@ -374,15 +416,16 @@ async function tickProativos(): Promise<void> {
     if (!cfg.disparos_habilitados) return;
 
     const slotInfo = agoraProativos();
-    const slot = `${slotInfo.data}:${slotInfo.hora}`;
 
     for (const abordagem of cfg.abordagens) {
       const slug = abordagem.slug as JobSlug;
       if (!EXECUTORES[slug]) continue;
+      if (!abordagem.ativo) continue;
+      if (!(await prepararJobDoDia(slug, slotInfo.data))) continue;
       if (!jobDeveRodar(abordagem, slotInfo)) continue;
-      console.log(`[proativos] executando job ${slug} slot ${slot}`);
+      console.log(`[proativos] executando job ${slug} em ${slotInfo.data} ${slotInfo.hora}`);
       try {
-        await EXECUTORES[slug](abordagem, slot);
+        await EXECUTORES[slug](abordagem, slotInfo.data);
       } catch (err) {
         console.error(`[proativos] erro no job ${slug}:`, err);
       }
@@ -400,8 +443,26 @@ export async function dispararJobTeste(slug: JobSlug, telefone?: string): Promis
   if (!tel) return { ok: false, erro: 'Configure PROATIVOS_TELEFONE_TESTE ou informe telefone' };
   const executor = EXECUTORES[slug];
   if (!executor) return { ok: false, erro: 'Executor inválido' };
-  const slot = `teste:${Date.now()}`;
-  await executor(abordagem, slot, { forcar: true, telefoneTeste: normalizarTelefoneBrasil(tel) });
+  await executor(abordagem, agoraProativos().data, { forcar: true, telefoneTeste: normalizarTelefoneBrasil(tel) });
+  return { ok: true };
+}
+
+/**
+ * Roda o job agora (produção), sem esperar o horário do cron.
+ * Ainda aplica guarda de religada + dedupe do dia + rate limit alto.
+ */
+export async function dispararJobAgora(slug: JobSlug): Promise<{ ok: boolean; erro?: string }> {
+  const cfg = await obterConfigProativos();
+  const abordagem = obterAbordagemPorSlug(cfg, slug);
+  if (!abordagem) return { ok: false, erro: 'Job não encontrado' };
+  const executor = EXECUTORES[slug];
+  if (!executor) return { ok: false, erro: 'Executor inválido' };
+  const dia = agoraProativos().data;
+  if (!(await prepararJobDoDia(slug, dia))) {
+    return { ok: false, erro: 'Falha ao preparar religada do job' };
+  }
+  console.log(`[proativos] execução forçada do job ${slug} em ${dia}`);
+  await executor(abordagem, dia);
   return { ok: true };
 }
 

@@ -114,6 +114,7 @@ async function montarConteudo(msg: MsgUaz, tipo: ItemDebounce['tipo']): Promise<
 export async function rotasWebhookUazapi(app: FastifyInstance): Promise<void> {
   app.post('/webhook/uazapi', async (req, reply) => {
     const payload = req.body as PayloadUaz;
+    console.log('[webhook-uazapi] payload:', JSON.stringify(payload, null, 2));
     const evento = eventoDe(payload);
 
     if (evento && evento !== 'messages' && !evento.includes('message')) {

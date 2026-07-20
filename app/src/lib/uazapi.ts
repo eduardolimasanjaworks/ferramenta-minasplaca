@@ -160,6 +160,21 @@ export async function uazEnviarTexto(numero: string, texto: string): Promise<voi
   });
 }
 
+/** Confere se o número existe no WhatsApp (evita 500 genérico no envio). */
+export async function uazNumeroNoWhatsapp(numero: string): Promise<boolean> {
+  try {
+    const data = await uazFetch<Array<{ query?: string; isInWhatsapp?: boolean }>>('/chat/check', {
+      method: 'POST',
+      body: { numbers: [numero] },
+    });
+    const row = Array.isArray(data) ? data[0] : null;
+    return row?.isInWhatsapp === true;
+  } catch {
+    // Se a checagem falhar, não bloqueia o envio — deixa o send decidir.
+    return true;
+  }
+}
+
 export async function uazEnviarMidia(opts: {
   number: string;
   type: 'image' | 'audio' | 'video' | 'document' | 'ptt';
@@ -184,7 +199,7 @@ export async function uazDownloadMensagem(id: string, opts?: {
   return_link?: boolean;
   transcribe?: boolean;
 }): Promise<{ base64?: string; url?: string; transcription?: string }> {
-  return uazFetch('/message/download', {
+  const data = await uazFetch<any>('/message/download', {
     method: 'POST',
     body: {
       id,
@@ -197,6 +212,11 @@ export async function uazDownloadMensagem(id: string, opts?: {
         : {}),
     },
   });
+  return {
+    base64: data.base64Data ?? data.base64,
+    url: data.fileURL ?? data.url ?? data.link,
+    transcription: data.transcription,
+  };
 }
 
 export async function uazPing(): Promise<boolean> {

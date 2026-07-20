@@ -22,3 +22,8 @@ yarn-error.log*
 .vscode/
 .idea/
 .DS_Store
+
+.temporario.env
+data/
+*.html
+!app/public/*.html

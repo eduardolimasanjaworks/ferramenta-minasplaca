@@ -1,0 +1,446 @@
+<html lang="pt-BR"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termos de Uso · TechFala</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: #3c4043;
+            max-width: 100%;
+            margin: 0;
+            padding: 20px;
+        }
+        h1, h2, h3, h4, h5 {
+            color: #3c4043;
+            font-weight: 600;
+        }
+        h1 {
+            font-size: 2.2em;
+            text-align: left;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            margin-bottom: 0;
+        }
+        h3 {
+            font-size: 1.8em;
+            margin-top: 40px;
+            border-left: 4px solid #111224;
+            padding-left: 10px;
+        }
+        h4 {
+            font-size: 1.5em;
+            margin-top: 30px;
+        }
+        h5 {
+            font-size: 1.2em;
+            color: #3c4043;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+        p, li {
+            font-size: 1em;
+            color: #3c4043;
+        }
+        strong {
+            font-weight: 600;
+            color: #3c4043;
+        }
+        .section-break {
+            border: 0;
+            height: 1px;
+            background: #ddd;
+            margin: 40px 0;
+        }
+        .important-note {
+            background-color: #e7f3fe;
+            border-left: 5px solid #111224;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .config-section {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .feature-box {
+            background-color: #fff8e1;
+            border-left: 5px solid #ff9800;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        a {
+            color: #111224;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .intro-text {
+            font-size: 1.1em;
+            color: #3c4043;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .step-number {
+            background-color: #111224;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .execution-tool {
+            background-color: #e8f5e8;
+            border-left: 5px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .execution-tool h5 {
+            color: #3c4043;
+            margin-top: 0;
+        }
+        .date-info {
+            font-style: italic;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        ul {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📋 Termos de Uso · TechFala</h1>
+
+    <div class="date-info">
+        <p><strong>Última atualização:</strong> 12/06/2026</p>
+    </div>
+
+    <div class="intro-text">
+        <p>Ao utilizar nossos serviços e ferramentas, você declara que leu, compreendeu e concorda integralmente com estes Termos de Uso.</p>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">1</span>Descrição dos Serviços e Escopo Tecnológico</h3>
+    <div class="config-section">
+        <p>A <strong>TechFala</strong> fornece um ecossistema integrado de soluções baseadas em Inteligência Artificial voltado para lojistas, empresas e profissionais, compreendendo:</p>
+        <div class="feature-box">
+            <ul>
+                <li><strong>Automação de Comunicações:</strong> Integração e automação de fluxos de mensagens (notadamente para a plataforma WhatsApp), permitindo o treinamento de agentes virtuais para interagir com clientes finais;</li>
+                <li><strong>Ferramentas de Marketing Digital:</strong> Módulos de IA generativa voltados para a criação de textos publicitários (copywriting), criativos visuais, carrosséis para redes sociais, Landing Pages, páginas de vendas, apresentações institucionais e demais recursos correlatos de suporte ao marketing.</li>
+            </ul>
+        </div>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">2</span>Registros, Contas e Segurança</h3>
+    <div class="config-section">
+        <p>Para utilizar nossos serviços, você deverá criar uma conta de acesso. Você é o único responsável por fornecer informações precisas e atualizadas, bem como por manter a estrita confidencialidade de sua senha. Todas as atividades realizadas na sua conta serão de sua inteira responsabilidade.</p>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">3</span>Do Uso de Inteligência Artificial e Responsabilidade Exclusiva do Usuário</h3>
+    <div class="config-section">
+        <div class="execution-tool">
+            <h5>3.1 Caráter Auxiliar da Tecnologia</h5>
+            <p>O usuário declara ciência de que os materiais, automações, textos, páginas e artes são produzidos de forma automatizada por algoritmos de Inteligência Artificial, atuando a ferramenta como mera assistente de construção baseada nos comandos (prompts) fornecidos pelo próprio usuário.</p>
+        </div>
+
+        <div class="execution-tool">
+            <h5>3.2 Obrigação de Revisão</h5>
+            <p>Todo e qualquer conteúdo gerado pela IA <strong>deve ser obrigatoriamente revisado, checado e validado pelo usuário</strong> antes de qualquer divulgação, publicação ou envio a terceiros.</p>
+        </div>
+
+        <div class="important-note">
+            <p><strong>Isenção de Responsabilidade por Respostas da IA ("Alucinações"):</strong> A TechFala não se responsabiliza por respostas indevidas, imprecisões, erros técnicos ou informações geradas erroneamente pela IA (fenômeno técnico de alucinação), incluindo, mas não se limitando a: concessão de descontos não autorizados pelo lojista, promessas comerciais divergentes do treinamento ou vazamento de dados por má configuração.</p>
+        </div>
+
+        <div class="important-note">
+            <p><strong>Responsabilidade Legal, Ética e Social:</strong> Toda e qualquer responsabilidade legal, cível, criminal, ética ou social decorrente das informações postadas, veiculadas ou automatizadas através do sistema é de <strong>titularidade exclusiva do usuário</strong>. A TechFala reserva-se estritamente ao papel de desenvolvedora e fornecedora da infraestrutura de IA, não chancelando o teor do material produzido por seus clientes.</p>
+        </div>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">4</span>Política de Créditos (Coins) e Consumo do Sistema</h3>
+    <div class="config-section">
+        <div class="execution-tool">
+            <h5>4.1 Regra de Consumo Conversacional e Computacional</h5>
+            <p>A utilização das ferramentas de marketing, geração de textos, páginas de venda e automações consome créditos internos da plataforma, denominados Coins.</p>
+        </div>
+
+        <div class="execution-tool">
+            <h5>4.2 Consumo por Processamento</h5>
+            <p>Os Coins são consumidos de forma legítima a cada processamento ou interação solicitada pelo usuário. Isso inclui, de forma irrevogável, o consumo de créditos para:</p>
+            <div class="feature-box">
+                <ul>
+                    <li>A construção inicial de materiais;</li>
+                    <li>Revisões, alterações e edições de conteúdos já gerados;</li>
+                    <li>Novas tentativas decorrentes de interpretações equivocadas da IA ou insatisfação do usuário quanto à qualidade estética ou textual do material entregue.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="important-note">
+            <p><strong>Inexistência de Estorno de Créditos:</strong> Uma vez processada a requisição pelo motor de Inteligência Artificial, os Coins correspondentes são considerados estritamente consumidos, não havendo direito a reembolso, estorno ou devolução de créditos por divergência de expectativa do usuário.</p>
+        </div>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">5</span>Restrições de Uso</h3>
+    <div class="config-section">
+        <p>É expressamente proibido ao usuário:</p>
+        <div class="feature-box">
+            <ul>
+                <li>Utilizar os serviços para fins ilícitos, fraudulentos ou que violem regulamentos locais e internacionais;</li>
+                <li>Enviar mensagens em massa não solicitadas (spam), comunicações abusivas ou que violem as políticas de uso das APIs integradas (como as diretrizes da plataforma WhatsApp/Meta);</li>
+                <li>Ultrapassar o limite técnico de 30 interações por minuto, salvo contratação de plano corporativo customizado;</li>
+                <li>Utilizar a ferramenta para a geração de conteúdos injuriosos, discriminatórios, difamatórios ou que infrinjam direitos autorais de terceiros.</li>
+            </ul>
+        </div>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">6</span>Suporte Técnico e SLA (Nível de Serviço)</h3>
+    <div class="config-section">
+        <p>O suporte técnico para a plataforma é fornecido exclusivamente por meio de nossa central de atendimento e sistema de abertura de chamados (Tickets). Comprometemo-nos a empenhar nossos melhores esforços para responder e solucionar intercorrências técnicas relatadas pelos usuários, observando os seguintes prazos médios estimados:</p>
+        <div class="feature-box">
+            <ul>
+                <li><strong>Problemas Casuais e de Baixa Complexidade:</strong> Previsão de resolução técnica em até <strong>24 (vinte e quatro) horas</strong>;</li>
+                <li><strong>Problemas de Média Complexidade:</strong> Previsão de resolução técnica em até <strong>48 (quarenta e oito) horas</strong>;</li>
+                <li><strong>Problemas de Alta Complexidade / Eventos Críticos:</strong> O prazo para resolução dependerá da extensão, natureza e complexidade do problema, com o envio de atualizações periódicas ao usuário sobre o status da tratativa.</li>
+            </ul>
+        </div>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">7</span>Propriedade Intelectual</h3>
+    <div class="config-section">
+        <p>Todos os direitos de propriedade intelectual relacionados ao software, códigos-fonte, algoritmos, design e marcas da TechFala pertencem exclusivamente a nós. A aceitação destes termos confere ao usuário apenas uma licença de uso limitada, revogável e não transferível para a utilização das funcionalidades disponíveis em seu plano.</p>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">8</span>Pagamentos, Renovação e Cancelamento</h3>
+    <div class="config-section">
+        <div class="execution-tool">
+            <h5>8.1 Ciclo de Assinatura</h5>
+            <p>O serviço opera sob o modelo de assinatura mensal recorrente com ciclos de 30 dias, 90 dias, 180 dias e 360 dias, conforme opção do usuário ou disponível nos planos.</p>
+        </div>
+
+        <div class="execution-tool">
+            <h5>8.2 Cancelamento</h5>
+            <p>Caso o cliente não deseje a renovação automática para o próximo ciclo, deverá formalizar o cancelamento diretamente no painel de faturamento da plataforma antes do vencimento do período vigente.</p>
+        </div>
+
+        <div class="execution-tool">
+            <h5>8.3 Política de Não-Reembolso</h5>
+            <div class="important-note">
+                <p><strong>Importante:</strong> Após a confirmação da assinatura e compensação do pagamento, não haverá direito a estornos ou reembolsos proporcionais, independentemente da taxa de utilização real da ferramenta pelo usuário dentro daquele mês.</p>
+            </div>
+        </div>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">9</span>Limitação Geral de Responsabilidade</h3>
+    <div class="config-section">
+        <p>Os serviços são fornecidos "como estão". A TechFala não garante que as funções do sistema funcionarão de forma totalmente ininterrupta ou livre de defeitos, eximindo-se de responsabilidade por lucros cessantes, danos indiretos ou prejuízos comerciais decorrentes de instabilidades temporárias de provedores de nuvem ou bloqueios de segurança operados pelas plataformas proprietárias das APIs (Meta/WhatsApp).</p>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">10</span>Proteção de Dados (LGPD)</h3>
+    <div class="config-section">
+        <p>Cumprimos rigorosamente as diretrizes da Lei Geral de Proteção de Dados (Lei nº 13.709/2018). Adotamos severas medidas técnicas e organizacionais para salvaguardar e proteger as informações armazenadas contra acessos não autorizados, vazamentos ou modificações ilícitas.</p>
+        <div class="important-note">
+            <p><strong>Seus Direitos:</strong> O usuário possui total direito de acessar, corrigir ou requerer a exclusão de seus dados cadastrais a qualquer momento através dos canais de suporte.</p>
+        </div>
+    </div>
+
+
+</body></html>
+
+<body>
+
+    <h1>📋 Termos de Uso · TechFala</h1>
+
+    <div class="date-info">
+        <p><strong>Última atualização:</strong> 12/06/2026</p>
+    </div>
+
+    <div class="intro-text">
+        <p>Ao utilizar nossos serviços e ferramentas, você declara que leu, compreendeu e concorda integralmente com estes Termos de Uso.</p>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">1</span>Descrição dos Serviços e Escopo Tecnológico</h3>
+    <div class="config-section">
+        <p>A <strong>TechFala</strong> fornece um ecossistema integrado de soluções baseadas em Inteligência Artificial voltado para lojistas, empresas e profissionais, compreendendo:</p>
+        <div class="feature-box">
+            <ul>
+                <li><strong>Automação de Comunicações:</strong> Integração e automação de fluxos de mensagens (notadamente para a plataforma WhatsApp), permitindo o treinamento de agentes virtuais para interagir com clientes finais;</li>
+                <li><strong>Ferramentas de Marketing Digital:</strong> Módulos de IA generativa voltados para a criação de textos publicitários (copywriting), criativos visuais, carrosséis para redes sociais, Landing Pages, páginas de vendas, apresentações institucionais e demais recursos correlatos de suporte ao marketing.</li>
+            </ul>
+        </div>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">2</span>Registros, Contas e Segurança</h3>
+    <div class="config-section">
+        <p>Para utilizar nossos serviços, você deverá criar uma conta de acesso. Você é o único responsável por fornecer informações precisas e atualizadas, bem como por manter a estrita confidencialidade de sua senha. Todas as atividades realizadas na sua conta serão de sua inteira responsabilidade.</p>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">3</span>Do Uso de Inteligência Artificial e Responsabilidade Exclusiva do Usuário</h3>
+    <div class="config-section">
+        <div class="execution-tool">
+            <h5>3.1 Caráter Auxiliar da Tecnologia</h5>
+            <p>O usuário declara ciência de que os materiais, automações, textos, páginas e artes são produzidos de forma automatizada por algoritmos de Inteligência Artificial, atuando a ferramenta como mera assistente de construção baseada nos comandos (prompts) fornecidos pelo próprio usuário.</p>
+        </div>
+
+        <div class="execution-tool">
+            <h5>3.2 Obrigação de Revisão</h5>
+            <p>Todo e qualquer conteúdo gerado pela IA <strong>deve ser obrigatoriamente revisado, checado e validado pelo usuário</strong> antes de qualquer divulgação, publicação ou envio a terceiros.</p>
+        </div>
+
+        <div class="important-note">
+            <p><strong>Isenção de Responsabilidade por Respostas da IA ("Alucinações"):</strong> A TechFala não se responsabiliza por respostas indevidas, imprecisões, erros técnicos ou informações geradas erroneamente pela IA (fenômeno técnico de alucinação), incluindo, mas não se limitando a: concessão de descontos não autorizados pelo lojista, promessas comerciais divergentes do treinamento ou vazamento de dados por má configuração.</p>
+        </div>
+
+        <div class="important-note">
+            <p><strong>Responsabilidade Legal, Ética e Social:</strong> Toda e qualquer responsabilidade legal, cível, criminal, ética ou social decorrente das informações postadas, veiculadas ou automatizadas através do sistema é de <strong>titularidade exclusiva do usuário</strong>. A TechFala reserva-se estritamente ao papel de desenvolvedora e fornecedora da infraestrutura de IA, não chancelando o teor do material produzido por seus clientes.</p>
+        </div>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">4</span>Política de Créditos (Coins) e Consumo do Sistema</h3>
+    <div class="config-section">
+        <div class="execution-tool">
+            <h5>4.1 Regra de Consumo Conversacional e Computacional</h5>
+            <p>A utilização das ferramentas de marketing, geração de textos, páginas de venda e automações consome créditos internos da plataforma, denominados Coins.</p>
+        </div>
+
+        <div class="execution-tool">
+            <h5>4.2 Consumo por Processamento</h5>
+            <p>Os Coins são consumidos de forma legítima a cada processamento ou interação solicitada pelo usuário. Isso inclui, de forma irrevogável, o consumo de créditos para:</p>
+            <div class="feature-box">
+                <ul>
+                    <li>A construção inicial de materiais;</li>
+                    <li>Revisões, alterações e edições de conteúdos já gerados;</li>
+                    <li>Novas tentativas decorrentes de interpretações equivocadas da IA ou insatisfação do usuário quanto à qualidade estética ou textual do material entregue.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="important-note">
+            <p><strong>Inexistência de Estorno de Créditos:</strong> Uma vez processada a requisição pelo motor de Inteligência Artificial, os Coins correspondentes são considerados estritamente consumidos, não havendo direito a reembolso, estorno ou devolução de créditos por divergência de expectativa do usuário.</p>
+        </div>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">5</span>Restrições de Uso</h3>
+    <div class="config-section">
+        <p>É expressamente proibido ao usuário:</p>
+        <div class="feature-box">
+            <ul>
+                <li>Utilizar os serviços para fins ilícitos, fraudulentos ou que violem regulamentos locais e internacionais;</li>
+                <li>Enviar mensagens em massa não solicitadas (spam), comunicações abusivas ou que violem as políticas de uso das APIs integradas (como as diretrizes da plataforma WhatsApp/Meta);</li>
+                <li>Ultrapassar o limite técnico de 30 interações por minuto, salvo contratação de plano corporativo customizado;</li>
+                <li>Utilizar a ferramenta para a geração de conteúdos injuriosos, discriminatórios, difamatórios ou que infrinjam direitos autorais de terceiros.</li>
+            </ul>
+        </div>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">6</span>Suporte Técnico e SLA (Nível de Serviço)</h3>
+    <div class="config-section">
+        <p>O suporte técnico para a plataforma é fornecido exclusivamente por meio de nossa central de atendimento e sistema de abertura de chamados (Tickets). Comprometemo-nos a empenhar nossos melhores esforços para responder e solucionar intercorrências técnicas relatadas pelos usuários, observando os seguintes prazos médios estimados:</p>
+        <div class="feature-box">
+            <ul>
+                <li><strong>Problemas Casuais e de Baixa Complexidade:</strong> Previsão de resolução técnica em até <strong>24 (vinte e quatro) horas</strong>;</li>
+                <li><strong>Problemas de Média Complexidade:</strong> Previsão de resolução técnica em até <strong>48 (quarenta e oito) horas</strong>;</li>
+                <li><strong>Problemas de Alta Complexidade / Eventos Críticos:</strong> O prazo para resolução dependerá da extensão, natureza e complexidade do problema, com o envio de atualizações periódicas ao usuário sobre o status da tratativa.</li>
+            </ul>
+        </div>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">7</span>Propriedade Intelectual</h3>
+    <div class="config-section">
+        <p>Todos os direitos de propriedade intelectual relacionados ao software, códigos-fonte, algoritmos, design e marcas da TechFala pertencem exclusivamente a nós. A aceitação destes termos confere ao usuário apenas uma licença de uso limitada, revogável e não transferível para a utilização das funcionalidades disponíveis em seu plano.</p>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">8</span>Pagamentos, Renovação e Cancelamento</h3>
+    <div class="config-section">
+        <div class="execution-tool">
+            <h5>8.1 Ciclo de Assinatura</h5>
+            <p>O serviço opera sob o modelo de assinatura mensal recorrente com ciclos de 30 dias, 90 dias, 180 dias e 360 dias, conforme opção do usuário ou disponível nos planos.</p>
+        </div>
+
+        <div class="execution-tool">
+            <h5>8.2 Cancelamento</h5>
+            <p>Caso o cliente não deseje a renovação automática para o próximo ciclo, deverá formalizar o cancelamento diretamente no painel de faturamento da plataforma antes do vencimento do período vigente.</p>
+        </div>
+
+        <div class="execution-tool">
+            <h5>8.3 Política de Não-Reembolso</h5>
+            <div class="important-note">
+                <p><strong>Importante:</strong> Após a confirmação da assinatura e compensação do pagamento, não haverá direito a estornos ou reembolsos proporcionais, independentemente da taxa de utilização real da ferramenta pelo usuário dentro daquele mês.</p>
+            </div>
+        </div>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">9</span>Limitação Geral de Responsabilidade</h3>
+    <div class="config-section">
+        <p>Os serviços são fornecidos "como estão". A TechFala não garante que as funções do sistema funcionarão de forma totalmente ininterrupta ou livre de defeitos, eximindo-se de responsabilidade por lucros cessantes, danos indiretos ou prejuízos comerciais decorrentes de instabilidades temporárias de provedores de nuvem ou bloqueios de segurança operados pelas plataformas proprietárias das APIs (Meta/WhatsApp).</p>
+    </div>
+
+    <hr class="section-break">
+
+    <h3><span class="step-number">10</span>Proteção de Dados (LGPD)</h3>
+    <div class="config-section">
+        <p>Cumprimos rigorosamente as diretrizes da Lei Geral de Proteção de Dados (Lei nº 13.709/2018). Adotamos severas medidas técnicas e organizacionais para salvaguardar e proteger as informações armazenadas contra acessos não autorizados, vazamentos ou modificações ilícitas.</p>
+        <div class="important-note">
+            <p><strong>Seus Direitos:</strong> O usuário possui total direito de acessar, corrigir ou requerer a exclusão de seus dados cadastrais a qualquer momento através dos canais de suporte.</p>
+        </div>
+    </div>
+
+
+</body>

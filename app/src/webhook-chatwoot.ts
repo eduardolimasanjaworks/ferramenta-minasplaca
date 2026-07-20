@@ -36,7 +36,7 @@ import {
 import { obterConfigFollowup, salvarConfigFollowup } from './followup-config.js';
 import { obterConfigProativos, salvarConfigProativos, alternarDisparosProativos } from './proativos-config.js';
 import { listarLogsDisparos } from './proativos-store.js';
-import { dispararJobTeste, type JobSlug } from './proativos-minasplaca.js';
+import { dispararJobTeste, dispararJobAgora, type JobSlug } from './proativos-minasplaca.js';
 import { publicarEventoPainel } from './painel-eventos.js';
 import { obterConfigDelay, salvarConfigDelay } from './delay-config.js';
 import { obterPromptBruto, salvarPrompt } from './prompt-minasplaca.js';
@@ -788,6 +788,21 @@ export async function rotasWebhookChatwoot(app: FastifyInstance): Promise<void> 
       return reply.status(400).send({ ok: false, erro: resultado.erro });
     }
     return { ok: true };
+  });
+
+  /** Força o job agora (produção), com delay alto e guarda anti-acúmulo. */
+  app.post('/api/ia/proativos/rodar', async (req, reply) => {
+    const body = (req.body ?? {}) as { slug?: string };
+    const slug = String(body.slug || '') as JobSlug;
+    const slugsValidos = ['boleto-a-vencer', 'envia-rastreamento', 'cobranca-vencidos', 'pesquisa-pos-venda'];
+    if (!slugsValidos.includes(slug)) {
+      return reply.status(400).send({ ok: false, erro: 'slug inválido' });
+    }
+    const resultado = await dispararJobAgora(slug);
+    if (!resultado.ok) {
+      return reply.status(400).send({ ok: false, erro: resultado.erro });
+    }
+    return { ok: true, slug };
   });
 
   app.get('/api/ia/precos', async () => {

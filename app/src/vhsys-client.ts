@@ -137,6 +137,16 @@ export async function obterUltimoPedidoCliente(idCliente: string | number): Prom
 
 export function telefoneClienteVhsys(cliente: ClienteVhsys | null): string {
   if (!cliente) return '';
-  const raw = cliente.celular_cliente || cliente.telefone_cliente || cliente.celular || cliente.telefone || '';
+  const c = cliente as Record<string, unknown>;
+  const raw =
+    c.celular_cliente ||
+    c.celular_contato_cliente ||
+    c.telefone_cliente ||
+    c.fone_cliente ||
+    c.fone_contato_cliente ||
+    c.tel_destinatario_cliente ||
+    c.celular ||
+    c.telefone ||
+    '';
   return String(raw).replace(/\D/g, '');
 }
